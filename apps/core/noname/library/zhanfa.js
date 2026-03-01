@@ -6,7 +6,7 @@ import { _status, game, get, lib } from "noname";
  */
 const _zhanfa = {
 	/*zf_: {
-		rarity:"",
+		rarity: "",
 		translate: "",
 		info: "",
 		card: {
@@ -16,6 +16,66 @@ const _zhanfa = {
 
 		}
 	},*/
+	//两个乐诸葛亮专属战法
+	//东风
+	zf_dongfeng: {
+		rarity: "common",
+		translate: "东风",
+		info: "当你造成属性伤害后，本轮你造成的属性伤害+1",
+		card: {
+			ai: { basic: { value: 7.2 } },
+		},
+		skill: {
+			forced: true,
+			trigger: {
+				source: "damageSource",
+			},
+			filter(event, player) {
+				return event.hasNature();
+			},
+			async content(event, trigger, player) {
+				player.addTempSkill(`${event.name}_damage`, "roundStart");
+				player.addMark(`${event.name}_damage`, 1, false);
+			},
+			subSkill: {
+				damage: {
+					inherit: "zf_anyDamage",
+					charlotte: true,
+					filter(event, player) {
+						return event.hasNature();
+					},
+					num(event, trigger, player) {
+						return player.countMark(event.name);
+					},
+					onremove: true,
+					markimage: "image/zhanfa/zf_dongfeng.png",
+					intro: {
+						content: "造成的属性伤害+#",
+					},
+				},
+			},
+		},
+		filterBan: () => true,
+	},
+	//巧器
+	zf_qiaoqi: {
+		rarity: "common",
+		translate: "巧器",
+		info: "你每回合使用的第一张普通锦囊牌额外结算一次",
+		card: {
+			ai: { basic: { value: 7.5 } }
+		},
+		skill: {
+			inherit: "zf_extraEff",
+			filter(event, player) {
+				return (
+					get.type(event.card) == "trick" &&
+					player.getHistory("useCard", evt => get.type(evt.card) == "trick").indexOf(event) == 0
+				)
+			}
+		},
+		filterBan: () => true,
+	},
 	//勤勉
 	zf_qinmian: {
 		rarity: "rare",
@@ -57,7 +117,7 @@ const _zhanfa = {
 			ai: { basic: { value: 6.6 } },
 		},
 		skill: {
-			trigger: { player: "useCard" },
+			inherit: "zf_extraEff",
 			filter(event, player) {
 				if (get.type(event.card) != "trick") {
 					return false;
@@ -65,11 +125,6 @@ const _zhanfa = {
 				const index = player.getHistory("useCard", evt => get.type(evt.card) == "trick").indexOf(event);
 				const num = ["h", "e", "j"].filter(pos => player.countCards(pos) > 0).length;
 				return index < num;
-			},
-			forced: true,
-			async content(event, trigger, player) {
-				game.log(trigger.card, "额外结算1次");
-				trigger.effectCount++;
 			},
 		},
 	},
@@ -1952,12 +2007,9 @@ const _zhanfa = {
 			ai: { basic: { value: 6 } },
 		},
 		skill: {
-			trigger: { player: "useCard" },
+			inherit: "zf_extraEff",
 			filter(event, player) {
 				return event.card.name == "shunshou";
-			},
-			async content(event, trigger, player) {
-				trigger.effectCount++;
 			},
 		},
 	},
@@ -3123,10 +3175,11 @@ export class ZhanfaManager {
 	 * @param {string} pack.id 分包的id
 	 * @param {string} pack.name 分包id的翻译
 	 * @param {string} [pack.info] 分包的简介
+	 * @returns {string | undefined}
 	 */
 	add(zhanfa, pack) {
 		let { id, skill, rarity, translate, info, card, ...args } = zhanfa;
-		if (!id) {
+		if (!id || this.get(id)) {
 			return;
 		}
 		if (typeof skill != "string") {
@@ -3154,24 +3207,25 @@ export class ZhanfaManager {
 		card.type = "zhanfa";
 		rarity ??= "common";
 		card.subtype = `zf_${rarity}`;
+		//不推荐这么写的，只是之前写错了才将错就错，千万不要再按这种写了
 		if (card.value) {
 			card.ai ??= {};
 			card.ai.basic ??= {};
 			card.ai.basic.value = card.value;
 		}
 		lib.card[id] = card;
-		//@ts-ignore
-		let { id: packId, name, info: packInfo } = pack;
-		if (packId) {
+		if (pack && pack.id) {
+			let { id: packId, name, info } = pack;
 			packId = `zf_${packId}`;
 			lib.cardPack[packId] ??= [];
-			lib.translate[`${packId}_card_config`] ??= name;
-			lib.translate[`${packId}_cardsInfo`] ??= packInfo;
+			lib.translate[`${packId}_card_config`] ??= name || packId;
+			lib.translate[`${packId}_cardsInfo`] ??= info;
 			lib.cardPack[packId].push(id);
 		} else {
 			lib.cardPack["zhanfa"].push(id);
 		}
 		this.#zhanfa[id] = { skill: skill, rarity: rarity, ...args };
+		return id;
 	}
 
 	/**
@@ -3191,10 +3245,13 @@ export class ZhanfaManager {
 	/**
 	 * 获取对应战法的Object
 	 * @param {string} id 战法的id
-	 * @returns {object}
+	 * @returns {object | false}
 	 */
 	get(id) {
-		return this.#zhanfa[id] || {}; //|| this.#customZhanfa[id]
+		if (this.#zhanfa[id]) {
+			return this.#zhanfa[id];
+		}
+		return false;
 	}
 
 	/**
@@ -3226,7 +3283,7 @@ export class ZhanfaManager {
 	/**
 	 * 获取对应战法的稀有度
 	 * @param {string} id 战法的id
-	 * @param {boolean} raw 是否返回不带zf_前缀的格式
+	 * @param {boolean} [raw] 是否返回不带zf_前缀的格式
 	 * @returns {string}
 	 */
 	getRarity(id, raw) {

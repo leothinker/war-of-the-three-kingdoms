@@ -119,38 +119,52 @@ const skills = {
 			const { targets } = event;
 			await game.doAsyncInOrder(targets, async target => {
 				const num = target.countMark("mblvezhen_show") + 1;
-				const result = await target
-					.chooseCard(
-						`掠阵：是否展示${num}张手牌，或者取消令${get.translation(player)}视为对你使用一张无距离次数限制的【杀】`,
-						Math.min(target.countCards("h"), num),
-						"h"
-					)
-					.set("sourcex", player)
-					.set("num", num)
-					.set("cardx", get.autoViewAs({ name: "sha", isCard: true }))
-					.set("ai", card => {
-						const { sourcex, player, cardx, num } = get.event();
-						if (
-							!sourcex.canUse(cardx, player, false, false) ||
-							!sourcex.hasSkill("mbhengwei") ||
-							get.effect(player, cardx, sourcex, player) > 0
-						) {
-							return 0;
-						}
-						const att = get.attitude(player, sourcex);
-						if (att > 0 || player.countCards("h", card => get.color(card) != "red") >= num) {
-							return get.color(card) == "red" ? Math.random() : Math.random() + 1;
-						}
-						return Math.random() - 0.5;
-					})
-					.forResult();
+				const hs = target.getCards("h");
+				let result;
+				if (!hs.length) {
+					result = { bool: false };
+				} else if (hs.length <= num) {
+					result = await target
+						.chooseBool({
+							prompt: `掠阵：是否展示所有手牌，或者取消令${get.translation(player)}视为对你使用一张无距离次数限制的【杀】`,
+							choice: Math.random() > 0.5,
+						})
+						.forResult();
+					result.cards = hs;
+				} else {
+					result = await target
+						.chooseCard({
+							prompt: `掠阵：是否展示${num}张手牌，或者取消令${get.translation(player)}视为对你使用一张无距离次数限制的【杀】`,
+							selectCard: num,
+							position: "h",
+							ai(card) {
+								const { sourcex, player, cardx, num } = get.event();
+								if (
+									!sourcex.canUse(cardx, player, false, false) ||
+									!sourcex.hasSkill("mbhengwei") ||
+									get.effect(player, cardx, sourcex, player) > 0
+								) {
+									return 0;
+								}
+								const att = get.attitude(player, sourcex);
+								if (att > 0 || player.countCards("h", card => get.color(card) != "red") >= num) {
+									return get.color(card) == "red" ? Math.random() : Math.random() + 1;
+								}
+								return Math.random() - 0.5;
+							},
+						})
+						.set("sourcex", player)
+						.set("num", num)
+						.set("cardx", get.autoViewAs({ name: "sha", isCard: true }))
+						.forResult();
+				}
 				if (result?.bool) {
 					target.addMark("mblvezhen_show", 1, false);
 					return target.showCards(result.cards);
 				} else {
 					const card = get.autoViewAs({ name: "sha", isCard: true });
 					if (player.canUse(card, target, false, false)) {
-						return player.useCard(card, target, false);
+						return player.useCard({ card: card, targets: [target], addCount: false });
 					}
 				}
 			});
@@ -405,7 +419,7 @@ const skills = {
 			const result = await player
 				.chooseToDuiben(target)
 				.set("title", "谋弈")
-				.set("namelist", ["长驱直入", "无懈可击", "金蝉脱壳", "弃履狂奔"]) //应对策略不明
+				.set("namelist", ["克敌先机", "洞若观火", "金蝉脱壳", "弃履狂奔"]) //应对策略不明
 				.set("translationList", [
 					`以防止${get.translation(player)}令此杀伤害-1`,
 					`以防止${get.translation(player)}令你随机弃置一张手牌`,
@@ -2492,7 +2506,7 @@ const skills = {
 				mark: true,
 				marktext: "白",
 				intro: {
-					markcount: (storage) => storage?.length || 0,
+					markcount: storage => storage?.length || 0,
 					content(_1, player) {
 						const list = player.getStorage("mbkubai_guanjued"),
 							target = _status.currentPhase;

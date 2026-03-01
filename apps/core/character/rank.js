@@ -308,6 +308,7 @@ window.noname_character_rank = {
 		"bigsb_dengai",
 	],
 	am: [
+		"ol_le_zhugeliang",
 		"tw_huangfusong",
 		"dc_sb_jianggan",
 		"dc_sb_chunyuqiong",
@@ -1097,6 +1098,8 @@ window.noname_character_rank = {
 		"pot_zanghong",
 	],
 	b: [
+		"ol_zhangsong",
+		"ol_jsrg_zhanghe",
 		"mb_chitu",
 		"mb_jueying",
 		"mb_dilu",
@@ -1636,6 +1639,7 @@ window.noname_character_rank = {
 		"v_liubei",
 	],
 	bm: [
+		"ol_liuye",
 		"tizhongzhishen",
 		"keaizhishen",
 		"nizhuanzhishen",
@@ -2596,6 +2600,8 @@ window.noname_character_rank = {
 			"v_sunce",
 		],
 		epic: [
+			"ol_le_zhugeliang",
+			"ol_jsrg_zhanghe",
 			"tw_huangfusong",
 			"mb_shen_jiangwei",
 			"ol_sb_dongzhao",
@@ -3119,6 +3125,8 @@ window.noname_character_rank = {
 			"dc_sb_chunyuqiong",
 		],
 		rare: [
+			"ol_liuye",
+			"ol_zhangsong",
 			"star_zhangsong",
 			"tizhongzhishen",
 			"keaizhishen",

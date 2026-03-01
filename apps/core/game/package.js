@@ -1,6 +1,6 @@
 window.noname_package = {
 	character: {
-		zhencang: "2020-2026珍藏版",
+		zhencang: "珍藏版2026",
 		//经典标包＋神话再临
 		standard: "标准",
 		shenhua: "神话再临",
