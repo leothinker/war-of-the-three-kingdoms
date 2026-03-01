@@ -76,8 +76,8 @@
 	"doubleclick_intro": true,
 	"choose_all_button": true,
 	"cheat": false,
-	"volumn_background": 8,
-	"volumn_audio": 8,
+	"volumn_background": 1,
+	"volumn_audio": 4,
 	"connect_avatar": "caocao",
 	"connect_nickname": "无名玩家",
 	"config_menu": true,
@@ -163,9 +163,7 @@
 	"right_click": "pause",
 	"sort": "type_sort",
 	"cards": ["standard", "extra"],
-	"characters": [
-		"zhencang"
-	],
+	"characters": ["zhencang"],
 	"moderned_chracters": [
 		"zhencang",
 		"standard",
