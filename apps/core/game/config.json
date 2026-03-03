@@ -138,7 +138,7 @@
 	"sort": "type_sort",
 	"cards": ["standard", "extra"],
 	"characters": ["standard"],
-	"moderned_chracters": ["standard"],
+	"moderned_characters": ["standard", "shenhua", "extra", "refresh"],
 	"moderned_modes": ["guozhan"],
 	"connect_characters": ["diy"],
 	"connect_cards": ["huodong", "guozhan", "sp", "zhulu", "yingbian", "yongjian", "xianxia"],
