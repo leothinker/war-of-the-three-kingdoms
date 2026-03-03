@@ -6,7 +6,6 @@ window.noname_package = {
 	card: {
 		standard: "标准",
 	},
-	play: {},
 	mode: {
 		identity: "身份",
 	},

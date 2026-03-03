@@ -7,24 +7,13 @@
 	"extension_source": "GitHub Proxy",
 	"forbidai": ["ns_liuzhang"],
 	"forbidai_user": [],
-	"forbidall": [],
-	"forbidstone": [],
-	"forbidchess": [],
-	"forbidboss": [],
-	"forbiddouble": [],
-	"forbidthreecard": [],
-	"zhinang_tricks": ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
-	"connect_zhinang_tricks": ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
 	"all": {
 		"sgscharacters": ["standard"],
 		"sgscards": ["standard"],
 		"sgsmodes": ["identity"],
-		"stockmode": ["identity"],
-		"stockextension": [],
 		"layout": ["default", "newlayout"],
 		"theme": ["woodden", "music", "simple"],
 		"card_font": ["xiaozhuan", "huangcao", "caoshu", "xingshu"],
-		"double_hp": ["hejiansan", "pingjun", "zuidazhi", "zuixiaozhi", "zonghe"],
 		"image_background_filter": ["default", "blur", "gray", "sepia", "invert", "saturate", "contrast", "hue", "brightness"]
 	},
 	"game": "sgs",
@@ -121,10 +110,6 @@
 	"sort": "type_sort",
 	"cards": ["standard"],
 	"characters": ["standard"],
-	"moderned_characters": ["standard"],
-	"moderned_modes": [],
-	"connect_characters": [],
-	"connect_cards": [],
 	"plays": [],
 	"extensions": [],
 	"banned": [],
@@ -138,13 +123,11 @@
 		"global": {
 			"player_number": 8,
 			"auto_identity": "off",
-			"double_character": false,
 			"save_progress": true,
 			"free_choose": true,
 			"swap": true,
 			"change_identity": true,
-			"battle_number": 3,
-			"double_hp": "pingjun"
+			"battle_number": 3
 		},
 		"identity": {
 			"identity": [
