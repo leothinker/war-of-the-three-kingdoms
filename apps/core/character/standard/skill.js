@@ -564,13 +564,13 @@ const skills = {
 	// 神智
 	shenzhi: {
 		audio: 2,
-		trigger: { player: "phaseZhunbeiBegin" },
+		trigger: { player: "phaseBegin" },
 		check(event, player) {
 			if (player.hp > 2) {
 				return false;
 			}
 			var cards = player.getCards("h");
-			if (cards.length < player.hp) {
+			if (cards.length <= player.hp) {
 				return false;
 			}
 			if (cards.length > 3) {
@@ -590,7 +590,7 @@ const skills = {
 		content() {
 			"step 0";
 			var cards = player.getCards("h");
-			event.bool = cards.length >= player.hp;
+			event.bool = cards.length > player.hp;
 			player.discard(cards);
 			"step 1";
 			if (event.bool) {
