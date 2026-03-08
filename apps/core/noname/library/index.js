@@ -304,62 +304,9 @@ export class Library {
 		function () {
 			let url = "";
 			switch (lib.config.cardback_style) {
-				case "official":
-					url = "theme/style/cardback/image/official.png";
-					break;
-				case "feicheng":
-					url = "theme/style/cardback/image/feicheng.png";
-					break;
-				case "liusha":
-					url = "theme/style/cardback/image/liusha.png";
-					break;
 				case "ol":
 					url = "theme/style/cardback/image/ol.png";
 					break;
-				case "new":
-					url = "theme/style/cardback/image/new.png";
-					break;
-				case "wood":
-					url = "theme/woodden/wood.jpg";
-					break;
-				case "music":
-					url = "theme/music/wood3.png";
-					break;
-				case "custom":
-					game.getDB("image", "cardback_style", function (fileToLoad) {
-						if (!fileToLoad) {
-							return;
-						}
-						var fileReader = new FileReader();
-						fileReader.onload = function (fileLoadedEvent) {
-							if (ui.css.cardback_stylesheet) {
-								ui.css.cardback_stylesheet.remove();
-							}
-							ui.css.cardback_stylesheet = lib.init.sheet(
-								".card:empty,.card.infohidden{background-image:url(" + fileLoadedEvent.target.result + ")}"
-							);
-							document.documentElement.style.setProperty("--cardback-url", `url(${fileLoadedEvent.target.result})`);
-							game.getDB("image", "cardback_style2", function (fileToLoad) {
-								if (!fileToLoad) {
-									return;
-								}
-								var fileReader = new FileReader();
-								fileReader.onload = function (fileLoadedEvent) {
-									if (ui.css.cardback_stylesheet2) {
-										ui.css.cardback_stylesheet2.remove();
-									}
-									ui.css.cardback_stylesheet2 = lib.init.sheet(
-										".card.infohidden:not(.infoflip){background-image:url(" + fileLoadedEvent.target.result + ")}"
-									);
-									document.documentElement.style.setProperty("--cardback-url", `url(${fileLoadedEvent.target.result})`);
-								};
-								fileReader.readAsDataURL(fileToLoad, "UTF-8");
-							});
-						};
-						fileReader.readAsDataURL(fileToLoad, "UTF-8");
-					});
-					return;
-				case "default":
 				default:
 					document.documentElement.style.removeProperty("--cardback-url");
 					return;
@@ -2481,15 +2428,7 @@ export class Library {
 					intro: "设置背面朝上的卡牌的样式",
 					init: "default",
 					item: {
-						// wood:'木纹',
-						// music:'音乐',
-						official: "原版",
-						// new:'新版',
-						feicheng: "废城",
-						liusha: "流沙",
 						ol: "手杀",
-						custom: "自定",
-						default: "默认",
 					},
 					visualBar(node, item, create, switcher) {
 						if (node.created) {
@@ -2692,13 +2631,7 @@ export class Library {
 					item: {
 						default: "默认",
 						// official:'勾玉',
-						emotion: "表情",
 						glass: "勾玉",
-						round: "国战",
-						ol: "手杀",
-						xinglass: "双鱼",
-						xinround: "OL",
-						custom: "自定",
 					},
 					visualBar: function (node, item, create, switcher) {
 						if (node.created) {
