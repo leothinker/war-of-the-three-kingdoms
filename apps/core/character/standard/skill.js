@@ -122,7 +122,7 @@ const skills = {
 	},
 	// 激将
 	jijiang: {
-		audio: "jijiang1",
+		audio: 2,
 		audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
 		audioname2: {
 			pe_jun_liubei: "sbjijiang",
@@ -378,7 +378,7 @@ const skills = {
 			}
 			return false;
 		},
-		async content() { },
+		async content() {},
 	},
 	// 赵云
 	// 龙胆
@@ -522,7 +522,12 @@ const skills = {
 		ai: {
 			directHit_ai: true,
 			skillTagFilter(player, tag, arg) {
-				if (get.attitude(player, arg.target) > 0 || arg.card.name != "sha" || !ui.cardPile.firstChild || get.color(ui.cardPile.firstChild, player) != "red") {
+				if (
+					get.attitude(player, arg.target) > 0 ||
+					arg.card.name != "sha" ||
+					!ui.cardPile.firstChild ||
+					get.color(ui.cardPile.firstChild, player) != "red"
+				) {
 					return false;
 				}
 			},
@@ -592,7 +597,7 @@ const skills = {
 			var cards = player.getCards("h");
 			event.bool = cards.length > player.hp;
 			player.discard(cards);
-			"step 1";
+			("step 1");
 			if (event.bool) {
 				player.recover();
 			}
@@ -878,7 +883,12 @@ const skills = {
 				return false;
 			}
 			return game.hasPlayer(current => {
-				return player.inRange(current) && current != event.player && current != player && lib.filter.targetEnabled(event.card, event.player, current);
+				return (
+					player.inRange(current) &&
+					current != event.player &&
+					current != player &&
+					lib.filter.targetEnabled(event.card, event.player, current)
+				);
 			});
 		},
 		async cost(event, trigger, player) {
@@ -1245,18 +1255,22 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseCard(`${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`, get.mode() == "guozhan" ? "hes" : "hs", card => {
-					const player = get.player();
-					const mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
-					if (mod2 != "unchanged") {
-						return mod2;
+				.chooseCard(
+					`${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`,
+					get.mode() == "guozhan" ? "hes" : "hs",
+					card => {
+						const player = get.player();
+						const mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
+						if (mod2 != "unchanged") {
+							return mod2;
+						}
+						const mod = game.checkMod(card, player, "unchanged", "cardRespondable", player);
+						if (mod != "unchanged") {
+							return mod;
+						}
+						return true;
 					}
-					const mod = game.checkMod(card, player, "unchanged", "cardRespondable", player);
-					if (mod != "unchanged") {
-						return mod;
-					}
-					return true;
-				})
+				)
 				.set("ai", card => {
 					const trigger = get.event().getTrigger();
 					const { player, judging } = get.event();
@@ -1338,17 +1352,17 @@ const skills = {
 				source.countCards("h") < 2
 					? { bool: false }
 					: await source
-						.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
-						.set("ai", card => {
-							if (card.name == "tao") {
-								return -10;
-							}
-							if (card.name == "jiu" && get.player().hp == 1) {
-								return -10;
-							}
-							return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
-						})
-						.forResult();
+							.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
+							.set("ai", card => {
+								if (card.name == "tao") {
+									return -10;
+								}
+								if (card.name == "jiu" && get.player().hp == 1) {
+									return -10;
+								}
+								return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
+							})
+							.forResult();
 			if (!result?.bool) {
 				await source.damage();
 			}
@@ -1393,15 +1407,18 @@ const skills = {
 			if (judge < 2) {
 				return;
 			}
-			const { bool: chooseToDiscardResultBool } = await event.target.chooseToDiscard(2).set("ai", card => {
-				if (card.name == "tao") {
-					return -10;
-				}
-				if (card.name == "jiu" && _status.event.player.hp == 1) {
-					return -10;
-				}
-				return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
-			}).forResult();
+			const { bool: chooseToDiscardResultBool } = await event.target
+				.chooseToDiscard(2)
+				.set("ai", card => {
+					if (card.name == "tao") {
+						return -10;
+					}
+					if (card.name == "jiu" && _status.event.player.hp == 1) {
+						return -10;
+					}
+					return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
+				})
+				.forResult();
 			if (chooseToDiscardResultBool === false) {
 				event.target.damage();
 			}
@@ -1550,12 +1567,15 @@ const skills = {
 				const { bool, links } =
 					cards.length == 1
 						? { links: cards.slice(0), bool: true }
-						: await player.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length]).set("ai", () => {
-							if (ui.selected.buttons.length == 0) {
-								return 1;
-							}
-							return 0;
-						}).forResult();
+						: await player
+								.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length])
+								.set("ai", () => {
+									if (ui.selected.buttons.length == 0) {
+										return 1;
+									}
+									return 0;
+								})
+								.forResult();
 				if (!bool) {
 					return;
 				}
@@ -2101,7 +2121,7 @@ const skills = {
 		filter(event, player) {
 			return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num);
 		},
-		content() { },
+		content() {},
 		mod: {
 			globalFrom(from, to, current) {
 				if (from.hp > 2) {
