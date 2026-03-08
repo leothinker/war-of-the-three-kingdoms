@@ -347,7 +347,7 @@ const skills = {
 			},
 		},
 		group: "kongcheng1",
-		audio: "kongcheng1",
+		audio: 2,
 		audioname: ["re_zhugeliang"],
 		ai: {
 			noh: true,
@@ -383,7 +383,7 @@ const skills = {
 	// 赵云
 	// 龙胆
 	longdan: {
-		audio: "longdan_sha",
+		audio: 2,
 		audioname: ["re_zhaoyun"],
 		audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
 		group: ["longdan_sha", "longdan_shan", "longdan_draw"],
