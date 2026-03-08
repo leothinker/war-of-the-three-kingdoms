@@ -113,7 +113,7 @@ const skills = {
 		},
 	},
 	rende1: {
-		trigger: { player: "phaseUseBegin" },
+		trigger: { player: "phaseBeginStart" },
 		silent: true,
 		sourceSkill: "rende",
 		async content(event, trigger, player) {
@@ -600,7 +600,7 @@ const skills = {
 	},
 	// 淑慎
 	shushen: {
-		audio: "shushen",
+		audio: 2,
 		trigger: { player: "recoverEnd" },
 		getIndex(event) {
 			return event.num || 1;
@@ -2037,7 +2037,7 @@ const skills = {
 	// 潘凤
 	// 狂斧
 	kuangfu: {
-		audio: "xinkuangfu",
+		audio: 2,
 		trigger: { source: "damageSource" },
 		forced: true,
 		filter(event, player) {
