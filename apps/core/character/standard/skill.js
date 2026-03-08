@@ -289,7 +289,6 @@ const skills = {
 	guanxing_fail: {},
 	guanxing: {
 		audio: 2,
-		audioname: ["jiangwei", "re_jiangwei", "re_zhugeliang", "ol_jiangwei"],
 		trigger: { player: "phaseZhunbeiBegin" },
 		frequent: true,
 		preHidden: true,
@@ -331,7 +330,7 @@ const skills = {
 		},
 	},
 	kongcheng1: {
-		audio: 2,
+		audio: "kongcheng",
 		trigger: { player: "loseEnd" },
 		forced: true,
 		firstDo: true,
@@ -348,7 +347,7 @@ const skills = {
 			}
 			return false;
 		},
-		async content() { },
+		async content() {},
 	},
 	// 赵云
 	// 龙胆
