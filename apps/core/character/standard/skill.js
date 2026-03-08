@@ -113,17 +113,13 @@ const skills = {
 	// 激将
 	jijiang: {
 		audio: 2,
-		audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
-		audioname2: {
-			pe_jun_liubei: "sbjijiang",
-		},
 		group: ["jijiang1"],
 		zhuSkill: true,
 		filter(event, player) {
 			if (!player.hasZhuSkill("jijiang") || !game.hasPlayer(current => current != player && current.group == "shu")) {
 				return false;
 			}
-			return !event.jijiang && (event.type != "phase" || !player.hasSkill("jijiang3"));
+			return !event.jijiang && (event.type != "phase" || !player.hasSkill("jijiang2"));
 		},
 		enable: ["chooseToUse", "chooseToRespond"],
 		viewAs: { name: "sha" },
@@ -144,11 +140,7 @@ const skills = {
 		},
 	},
 	jijiang1: {
-		audio: 2,
-		audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
-		audioname2: {
-			pe_jun_liubei: "sbjijiang",
-		},
+		audio: "jijiang",
 		trigger: { player: ["useCardBegin", "respondBegin"] },
 		logTarget: "targets",
 		sourceSkill: "jijiang",
@@ -164,7 +156,7 @@ const skills = {
 					event.current = player.next;
 				}
 				if (event.current == player) {
-					player.addTempSkill("jijiang3");
+					player.addTempSkill("jijiang2");
 					trigger.cancel();
 					trigger.getParent().goto(0);
 					return;
@@ -200,7 +192,7 @@ const skills = {
 			}
 		},
 	},
-	jijiang3: {
+	jijiang2: {
 		trigger: { global: ["useCardAfter", "useSkillAfter", "phaseAfter"] },
 		silent: true,
 		charlotte: true,
@@ -209,7 +201,7 @@ const skills = {
 			return event.skill != "jijiang" && event.skill != "qinwang";
 		},
 		async content(event, trigger, player) {
-			player.removeSkill("jijiang3");
+			player.removeSkill("jijiang2");
 		},
 	},
 	// 关羽
