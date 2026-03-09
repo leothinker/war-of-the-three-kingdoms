@@ -27,8 +27,6 @@ window.noname_package = {
 		shousha: "方正隶变_GBK",
 	},
 	theme: {
-		woodden: "木纹",
-		music: "音乐",
 		simple: "简约",
 	},
 };
