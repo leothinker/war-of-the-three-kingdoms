@@ -10152,10 +10152,6 @@ export class Library {
 			stratagem_fury: "怒气",
 			_stratagem_add_buff: "强化",
 			danqi_hufu: "虎符",
-			zf_common: "普通",
-			zf_rare: "稀有",
-			zf_epic: "史诗",
-			zf_legend: "传说",
 			assigned_tag: "已分配",
 
 			phaseZhunbei: "准备阶段",
