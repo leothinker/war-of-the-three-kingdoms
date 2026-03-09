@@ -1689,7 +1689,7 @@ const skills = {
 	// 骁果
 	xiaoguo: {
 		audio: 2,
-		trigger: { global: "phaseJieshuBegin" },
+		trigger: { global: "phaseEnd" },
 		filter(event, player) {
 			return (
 				event.player.isIn() &&
@@ -1830,9 +1830,6 @@ const skills = {
 	},
 	wushuang1: {
 		audio: "wushuang",
-			sb_lvbu: "sbliyu_effect",
-			gz_lvlingqi: "wushuang_lvlingqi",
-		},
 		trigger: { player: "useCardToPlayered" },
 		forced: true,
 		sourceSkill: "wushuang",
@@ -1864,9 +1861,6 @@ const skills = {
 	},
 	wushuang2: {
 		audio: "wushuang",
-			sb_lvbu: "sbliyu_effect",
-			gz_lvlingqi: "wushuang_lvlingqi",
-		},
 		trigger: { player: "useCardToPlayered", target: "useCardToTargeted" },
 		forced: true,
 		sourceSkill: "wushuang",
@@ -2026,7 +2020,7 @@ const skills = {
 		filter(event, player) {
 			return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num);
 		},
-		content() { },
+		content() {},
 		mod: {
 			globalFrom(from, to, current) {
 				if (from.hp > 2) {

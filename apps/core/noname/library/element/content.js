@@ -3670,7 +3670,6 @@ export const Content = {
 	},
 	async addExtraTarget(event, trigger, player) {
 		const { card, targets } = event;
-		event.addedTargets = [];
 
 		const info = get.info(card);
 		for (const target of targets) {
@@ -3698,7 +3697,6 @@ export const Content = {
 				event.addedTargets.push(false);
 				result = { bool: false };
 			}
-
 			if (result.bool) {
 				event.addedTargets.push(result.targets[0]);
 				player.line2([target, result.targets[0]]);
@@ -9093,6 +9091,10 @@ export const Content = {
 				}
 			}
 			if (event.dialog.buttons.length == 0) {
+				event.result = {
+					bool: false,
+				}
+				event.dialog.close();
 				event.finish();
 				return;
 			}
@@ -9318,6 +9320,9 @@ export const Content = {
 			}
 
 			if (event.dialog.buttons.length == 0) {
+				event.result = {
+					bool: false,
+				}
 				event.dialog.close();
 				event.finish();
 				return;
