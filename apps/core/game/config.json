@@ -30,7 +30,7 @@
 	"auto_popped_config": true,
 	"auto_popped_history": false,
 	"auto_skill": true,
-	"auto_confirm": true,
+	"auto_confirm": false,
 	"enable_drag": true,
 	"enable_pressure": false,
 	"pressure_taptic": true,

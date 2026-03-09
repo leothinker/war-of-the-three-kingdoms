@@ -37,7 +37,7 @@ import "vue/dist/vue.esm-browser.js";
 		await boot();
 	} catch (e) {
 		console.error(e);
-		alert(`《无名杀》加载内容失败
+		console.error(`《无名杀》加载内容失败
 浏览器UA信息: 
 ${userAgentLowerCase}
 错误信息: 
