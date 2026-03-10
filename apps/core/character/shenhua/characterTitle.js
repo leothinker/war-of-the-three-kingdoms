@@ -4,7 +4,7 @@ export default {
 	xunyu: "王佐之才",
 	dianwei: "古之恶来",
 	taishici: "笃烈之士",
-	yanwen: "虎狼兄弟",
+	yanliangwenchou: "虎狼兄弟",
 	yuanshao: "乱箭肃敌",
 	jiangwei: "龙的衣钵",
 	liushan: "无为的真命主",

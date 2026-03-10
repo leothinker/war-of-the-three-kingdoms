@@ -3794,41 +3794,6 @@ export class Library {
 						}
 					},
 				},
-				link_style2: {
-					name: "横置样式",
-					intro: "设置角色被横置时的样式",
-					init: "chain",
-					unfrequent: true,
-					item: {
-						chain: "铁索",
-						rotate: "横置",
-						mark: "标记",
-					},
-					onclick(style) {
-						var list = [];
-						for (var i = 0; i < game.players.length; i++) {
-							if (game.players[i].isLinked()) {
-								list.push(game.players[i]);
-							}
-						}
-						game.saveConfig("link_style2", style);
-						for (var i = 0; i < list.length; i++) {
-							if (get.is.linked2(list[i])) {
-								list[i].classList.add("linked2");
-								list[i].classList.remove("linked");
-							} else {
-								list[i].classList.add("linked");
-								list[i].classList.remove("linked2");
-							}
-						}
-						if (style == "chain") {
-							ui.arena.classList.remove("nolink");
-						} else {
-							ui.arena.classList.add("nolink");
-						}
-						ui.updatem();
-					},
-				},
 				cardshape: {
 					name: "手牌显示",
 					intro: "将手牌设置为正方形或长方形",
@@ -3855,13 +3820,8 @@ export class Library {
 							ui.window.classList.remove("oblongcard");
 						}
 						if (linked) {
-							if (get.is.linked2(game.me)) {
-								game.me.classList.remove("linked");
-								game.me.classList.add("linked2");
-							} else {
-								game.me.classList.add("linked");
-								game.me.classList.remove("linked2");
-							}
+							game.me.classList.remove("linked");
+							game.me.classList.add("linked2");
 						}
 					},
 				},
@@ -13193,6 +13153,13 @@ export class Library {
 	natureBg = new Map([["stab", "image/card/cisha.png"]]);
 	natureSeparator = "|";
 	namePrefix = new Map([
+		[
+			"神",
+			{
+				color: "#faecd1",
+				nature: "orangemm",
+			},
+		],
 		[
 			"界",
 			{

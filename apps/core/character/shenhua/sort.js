@@ -1,10 +1,8 @@
 const characterSort = {
-	shenhua_feng: ["sp_zhangjiao", "re_yuji", "old_zhoutai", "old_caoren", "re_xiahouyuan", "xiaoqiao", "re_huangzhong", "re_weiyan"],
-	shenhua_huo: ["dianwei", "xunyu", "pangtong", "sp_zhugeliang", "taishici", "yanwen", "re_yuanshao", "re_pangde"],
-	shenhua_lin: ["caopi", "re_xuhuang", "menghuo", "zhurong", "re_lusu", "sunjian", "dongzhuo", "jiaxu"],
-	shenhua_shan: ["dengai", "zhanghe", "liushan", "jiangwei", "zhangzhang", "sunce", "caiwenji", "zuoci"],
-	shenhua_yin: ["wangji", "kuailiangkuaiyue", "yanyan", "wangping", "sunliang", "luji", "xuyou", "yl_luzhi"],
-	shenhua_lei: ["haozhao", "guanqiujian", "chendao", "zhugezhan", "lukang", "zhoufei", "zhangxiu", "yl_yuanshu"],
+	shenhua_feng: ["huangzhong", "weiyan", "xiahouyuan", "caoren", "xiaoqiao", "zhoutai", "zhangjiao", "yuji", "le_guanyu", "le_lvmeng"],
+	shenhua_huo: ["dianwei", "xunyu", "pangtong", "wolongzhuge", "taishici", "pangde", "yanliangwenchou", "yuanshao", "le_zhouyu", "le_zhugeliang"],
+	shenhua_lin: ["xuhuang", "caopi", "sunjian", "dongzhuo", "zhurong", "menghuo", "jiaxu", "lusu", "le_caocao", "le_lvbu"],
+	shenhua_shan: ["zhanghe", "dengai", "jiangwei", "liushan", "sunce", "zhangzhaozhanghong", "zuoci", "caiwenji", "le_zhaoyun", "le_simayi"],
 };
 
 const characterSortTranslate = {
@@ -12,8 +10,6 @@ const characterSortTranslate = {
 	shenhua_huo: "神话再临·火",
 	shenhua_lin: "神话再临·林",
 	shenhua_shan: "神话再临·山",
-	shenhua_yin: "神话再临·阴",
-	shenhua_lei: "神话再临·雷",
 };
 
 export { characterSort, characterSortTranslate };

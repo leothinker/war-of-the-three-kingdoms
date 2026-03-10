@@ -42,12 +42,6 @@ const characters = {
 		hp: 3,
 		skills: ["jizhi", "qicai"],
 	},
-	ganfuren: {
-		sex: "female",
-		group: "shu",
-		hp: 3,
-		skills: ["shenzhi", "shushen"],
-	},
 	sunquan: {
 		sex: "male",
 		group: "wu",
@@ -140,12 +134,6 @@ const characters = {
 		hp: 3,
 		skills: ["qingguo", "luoshen"],
 	},
-	yuejin: {
-		sex: "male",
-		group: "wei",
-		hp: 4,
-		skills: ["xiaoguo"],
-	},
 	huatuo: {
 		sex: "male",
 		group: "qun",
@@ -164,12 +152,6 @@ const characters = {
 		hp: 3,
 		skills: ["lijian", "biyue"],
 	},
-	panfeng: {
-		sex: "male",
-		group: "qun",
-		hp: 4,
-		skills: ["kuangfu"],
-	},
 	huaxiong: {
 		sex: "male",
 		group: "qun",
@@ -181,6 +163,24 @@ const characters = {
 		group: "qun",
 		hp: 4,
 		skills: ["yicong"],
+	},
+	panfeng: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["kuangfu"],
+	},
+	ganfuren: {
+		sex: "female",
+		group: "shu",
+		hp: 3,
+		skills: ["shenzhi", "shushen"],
+	},
+	yuejin: {
+		sex: "male",
+		group: "wei",
+		hp: 4,
+		skills: ["xiaoguo"],
 	},
 };
 

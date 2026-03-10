@@ -10389,18 +10389,10 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	addLink() {
-		if (get.is.linked2(this)) {
-			this.classList.add("linked2");
-		} else {
-			this.classList.add("linked");
-		}
+		this.classList.add("linked2");
 	}
 	removeLink() {
-		if (get.is.linked2(this)) {
-			this.classList.remove("linked2");
-		} else {
-			this.classList.remove("linked");
-		}
+		this.classList.remove("linked2");
 	}
 	/**
 	 * 能否对target使用card
@@ -12705,10 +12697,7 @@ export class Player extends HTMLDivElement {
 	 * @returns { boolean }
 	 */
 	isLinked() {
-		if (get.is.linked2(this)) {
 			return this.classList.contains("linked2");
-		}
-		return this.classList.contains("linked");
 	}
 	/**
 	 * 返回玩家是否是翻面状态

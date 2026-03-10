@@ -1,5 +1,5 @@
 const characterSort = {
-	standard_2025: ["liubei", "guanyu", "zhangfei", "zhugeliang", "zhaoyun", "machao", "huangyueying", "ganfuren", "sunquan", "ganning", "lvmeng", "huanggai", "zhouyu", "daqiao", "luxun", "sunshangxiang", "caocao", "simayi", "xiahoudun", "zhangliao", "xuchu", "guojia", "zhenji", "yuejin", "huatuo", "lvbu", "diaochan", "panfeng", "huaxiong", "gongsunzan"],
+	standard_2025: ["liubei", "guanyu", "zhangfei", "zhugeliang", "zhaoyun", "machao", "huangyueying", "sunquan", "ganning", "lvmeng", "huanggai", "zhouyu", "daqiao", "luxun", "sunshangxiang", "caocao", "simayi", "xiahoudun", "zhangliao", "xuchu", "guojia", "zhenji", "huatuo", "lvbu", "diaochan", "huaxiong", "gongsunzan", "panfeng", "ganfuren", "yuejin"],
 };
 
 const characterSortTranslate = {

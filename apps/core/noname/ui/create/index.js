@@ -2433,9 +2433,6 @@ export class Create {
 		if (lib.config.turned_style == false) {
 			ui.arena.classList.add("hide_turned");
 		}
-		if (lib.config.link_style2 != "chain") {
-			ui.arena.classList.add("nolink");
-		}
 		if (lib.config.show_name == false) {
 			ui.arena.classList.add("hide_name");
 		}

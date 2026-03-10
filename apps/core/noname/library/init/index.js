@@ -448,16 +448,9 @@ export class LibInit {
 					ui.arena.classList.remove("phone");
 				}
 				for (var i = 0; i < game.players.length; i++) {
-					if (get.is.linked2(game.players[i])) {
-						if (game.players[i].classList.contains("linked")) {
-							game.players[i].classList.remove("linked");
-							game.players[i].classList.add("linked2");
-						}
-					} else {
-						if (game.players[i].classList.contains("linked2")) {
-							game.players[i].classList.remove("linked2");
-							game.players[i].classList.add("linked");
-						}
+					if (game.players[i].classList.contains("linked")) {
+						game.players[i].classList.remove("linked");
+						game.players[i].classList.add("linked2");
 					}
 				}
 				if (game.layout == "long" || game.layout == "long2") {
