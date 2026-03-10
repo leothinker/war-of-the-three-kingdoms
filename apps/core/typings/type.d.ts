@@ -837,8 +837,8 @@ type _AllCardName = "caoyao" | "dinvxuanshuang" | "du" | "fengyinzhidan" | "hufu
     "xuanyuanjian" | "yajiaoqiang" | "yinyueqiang" | "yitianjian" | "zhangba" | "zheji" | "zhuge" | "zhungangshuo" | "zhuque" |
     "bagua" | "baihupifeng" | "baiyin" | "guangshatianyi" | "heiguangkai" | "huxinjing" | "lanyinjia" | "mianju" | "mutoumianju" |
     "nvzhuang" | "qinglianxindeng" | "renwang" | "serafuku" | "suolianjia" | "tengjia" | "yexingyi" | "yinfengjia" | "yinfengyi" |
-    "dilu" | "hualiu" | "jueying" | "xiayuncailing" | "zhanxiang" | "zhuahuang" | "chitu" | "daihuofenglun" | "dawan" | "jingfanma" |
-    "numa" | "yonglv" | "zixin" | "donghuangzhong" | "fuxiqin" | "gjyuheng" | "guilingzhitao" | "haotianta" | "jinhe" | "jiuwei" |
+    "dilu" | "hualiu" | "jueying" | "xiayuncailing" | "zhanxiang" | "zhuahuang" | "chitu" | "daihuofenglun" | "dayuan" | "jingfanma" |
+    "numa" | "yonglv" | "zixing" | "donghuangzhong" | "fuxiqin" | "gjyuheng" | "guilingzhitao" | "haotianta" | "jinhe" | "jiuwei" |
     "kongdongyin" | "kunlunjingc" | "langeguaiyi" | "lianyaohu" | "monkey" | "muniu" | "nvwashi" | "qiankundai" | "qinglonglingzhu" |
     "sadengjinhuan" | "shennongding" | "shentoumianju" | "shuchui" | "sifeizhenmian" | "taigongyinfu" | "tianjitu" | "tongque" | "xinge" |
     "xingjunyan" | "xixueguizhihuan" | "xuelunyang" | "yufulu" | "yuruyi" | "baishouzhihu" | "bingpotong" | "cangchizhibi" | "chunbing" |
