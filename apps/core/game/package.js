@@ -7,9 +7,9 @@ window.noname_package = {
 	card: {
 		standard: "标准版",
 		extra: "军争篇",
+		refresh: "界限突破",
 	},
-	play: {
-	},
+	play: {},
 	mode: {
 		identity: "身份",
 	},
@@ -21,8 +21,7 @@ window.noname_package = {
 	background: {
 		ol_bg: "龙纹",
 	},
-	music: {
-	},
+	music: {},
 	font: {
 		xiaozhuan: "方正小篆体",
 		xinwei: "华文新魏_GBK",

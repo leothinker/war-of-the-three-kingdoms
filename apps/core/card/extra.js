@@ -292,52 +292,6 @@ game.import("card", function () {
 					game.addVideo("cardDialog", null, videoId);
 					game.broadcastAll("closeDialog", videoId);
 				},
-				/*content() {
-					"step 0";
-					if (target.countCards("h") == 0) {
-						event.finish();
-						return;
-					} else if (target.countCards("h") == 1) {
-						event._result = { cards: target.getCards("h") };
-					} else {
-						target.chooseCard(true).ai = function (card) {
-							if (_status.event.getRand() < 0.5) {
-								return Math.random();
-							}
-							return get.value(card);
-						};
-					}
-					"step 1";
-					target.showCards(result.cards).setContent(function () {});
-					event.dialog = ui.create.dialog(get.translation(target) + "展示的手牌", result.cards);
-					event.videoId = lib.status.videoId++;
-
-					game.broadcast("createDialog", event.videoId, get.translation(target) + "展示的手牌", result.cards);
-					game.addVideo("cardDialog", null, [get.translation(target) + "展示的手牌", get.cardsInfo(result.cards), event.videoId]);
-					event.card2 = result.cards[0];
-					game.log(target, "展示了", event.card2);
-					game.addCardKnower(result.cards, "everyone");
-					event._result = {};
-					player
-						.chooseToDiscard({ suit: get.suit(event.card2) }, function (card) {
-							var evt = _status.event.getParent();
-							if (get.damageEffect(evt.target, evt.player, evt.player, "fire") > 0) {
-								return 6.2 + Math.min(4, evt.player.hp) - get.value(card, evt.player);
-							}
-							return -1;
-						})
-						.set("prompt", false);
-					game.delay(2);
-					"step 2";
-					if (result.bool) {
-						target.damage("fire");
-					} else {
-						target.addTempSkill("huogong2");
-					}
-					event.dialog.close();
-					game.addVideo("cardDialog", null, event.videoId);
-					game.broadcast("closeDialog", event.videoId);
-				},*/
 				ai: {
 					basic: {
 						order: 9.2,
@@ -573,11 +527,17 @@ game.import("card", function () {
 					},
 				},
 			},
-			hualiu: {
+			guding: {
 				fullskin: true,
 				type: "equip",
-				subtype: "equip3",
-				distance: { globalTo: 1 },
+				subtype: "equip1",
+				distance: { attackFrom: -1 },
+				ai: {
+					basic: {
+						equipValue: 2,
+					},
+				},
+				skills: ["guding_skill"],
 			},
 			zhuque: {
 				fullskin: true,
@@ -590,18 +550,6 @@ game.import("card", function () {
 					},
 				},
 				skills: ["zhuque_skill"],
-			},
-			guding: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip1",
-				distance: { attackFrom: -1 },
-				ai: {
-					basic: {
-						equipValue: 2,
-					},
-				},
-				skills: ["guding_skill"],
 			},
 			tengjia: {
 				fullskin: true,
@@ -758,322 +706,14 @@ game.import("card", function () {
 					},
 				},
 			},
+			hualiu: {
+				fullskin: true,
+				type: "equip",
+				subtype: "equip3",
+				distance: { globalTo: 1 },
+			},
 		},
 		skill: {
-			bingliang_changban: {
-				cardSkill: true,
-				unique: true,
-				trigger: { player: "phaseDrawBegin" },
-				silent: true,
-				content() {
-					trigger.num--;
-				},
-				group: "bingliang_changban2",
-			},
-			bingliang_changban2: {
-				cardSkill: true,
-				trigger: { player: "phaseDrawAfter" },
-				silent: true,
-				content() {
-					if (player.enemy) {
-						player.enemy.draw();
-					}
-				},
-			},
-			muniu_skill: {
-				equipSkill: true,
-				enable: "phaseUse",
-				onChooseToUse(event) {
-					if (game.online) {
-						return;
-					}
-					const cards = event.player.getVCards("e").filter(card => card.name == "muniu" && !card?.storage?.used);
-					event.set("muniu_skill", cards);
-				},
-				sync(muniu) {
-					if (game.online) {
-						return;
-					}
-					if (!muniu.storages) {
-						muniu.storages = [];
-					}
-					for (var i = 0; i < muniu.storages.length; i++) {
-						if (get.position(muniu.storages[i]) != "s") {
-							muniu.storages.splice(i--, 1);
-						}
-					}
-					game.broadcast(
-						(muniu, cards) => {
-							muniu.storages = cards;
-						},
-						muniu,
-						muniu.storages
-					);
-				},
-				filter(event, player) {
-					return player.countCards("h") && event?.muniu_skill?.length;
-				},
-				chooseButton: {
-					dialog(event, player) {
-						const cards = event.muniu_skill;
-						let list = [];
-						for (let data of cards) {
-							list.push([data.number || 0, get.translation(data.suit), data.name]);
-						}
-						const dialog = ui.create.dialog("木牛流马", [list, "vcard"], "hidden");
-						dialog.direct = true;
-						for (let i = 0; i < dialog.buttons.length; i++) {
-							const button = dialog.buttons[i];
-							const num = cards[i]?.storages?.length || 0;
-							button.node.gaintag.innerHTML = get.cnNumber(num) + "牌";
-							button._number = num;
-							button.link = cards[i];
-							button._customintro = function (uiintro, evt) {
-								uiintro.add("木牛流马");
-								let str = "此牌下没有扣置牌";
-								if (button.link?.storages?.length) {
-									str = "此牌下扣置了";
-								}
-								uiintro.add('<div class="text" style="display:inline">' + str + "</div>");
-								if (button.link?.storages?.length) {
-									uiintro.addSmall(button.link?.storages);
-								}
-								return button;
-							};
-						}
-						return dialog;
-					},
-					check(button) {
-						return -button._number + 1;
-					},
-					backup(links, player) {
-						return {
-							muniu: links[0].vcardID,
-							filterCard: true,
-							ai1(card) {
-								if (card.name == "du") {
-									return 20;
-								}
-								var player = _status.event.player;
-								var nh = player.countCards("h");
-								if (!player.needsToDiscard()) {
-									if (nh < 3) {
-										return 0;
-									}
-									if (nh == 3) {
-										return 5 - get.value(card);
-									}
-									return 7 - get.value(card);
-								}
-								return 10 - get.useful(card);
-							},
-							discard: false,
-							lose: false,
-							delay: false,
-							prepare(cards, player) {
-								player.$give(1, player, false);
-							},
-							async content(event, trigger, player) {
-								await player.loseToSpecial(event.cards, "muniu");
-								for (var i = 0; i < event.cards.length; i++) {
-									if (event.cards[i]._selfDestroyed || !event.cards[i].hasGaintag("muniu") || get.position(event.cards[i]) != "s") {
-										event.cards[i].remove();
-										event.cards.splice(i--, 1);
-									}
-								}
-								const muniu = player.getVCards("e").find(card => card.vcardID == lib.skill.muniu_skill_backup.muniu);
-								if (!muniu || !event.cards.length) {
-									game.broadcastAll(cards => {
-										for (var i = 0; i < cards.length; i++) {
-											cards[i].discard();
-										}
-									}, event.cards);
-									event.finish();
-									return;
-								}
-								muniu.storages ??= [];
-								muniu.storage ??= {};
-								if (typeof muniu.storage.used != "number") {
-									muniu.storage.used = 0;
-								}
-								muniu.storage.used++;
-								muniu.storages.push(event.cards[0]);
-								game.broadcast(
-									(muniu, cards) => {
-										muniu.storages = cards;
-									},
-									muniu,
-									muniu.storages
-								);
-								await game.delayx();
-								player.updateMarks();
-								const players = game.filterPlayer(current => {
-									return current.canEquip(muniu) && current != player && !current.isTurnedOver() && get.attitude(player, current) >= 3 && get.attitude(current, player) >= 3;
-								});
-								players.sort(lib.sort.seat);
-								const choice = players[0];
-								const next = player
-									.chooseTarget("是否移动木牛流马？", (card, player, target) => {
-										return !target.isMin() && player != target && target.canEquip(_status.event.muniu);
-									})
-									.set("muniu", muniu);
-								next.set("ai", target => {
-									return target == _status.event.choice ? 1 : -1;
-								});
-								next.set("choice", choice);
-								const result = await next.forResult();
-								if (result?.bool && result?.targets?.length) {
-									const card = player.getCards("e", i => i[i.cardSymbol] == muniu)[0];
-									if (card) {
-										await result.targets[0].equip(card);
-										player.$give(card, result.targets[0]);
-										player.line(result.targets, "green");
-										await game.delay();
-									}
-								} else {
-									player.updateMarks();
-								}
-							},
-							ai: { result: { player: 1 } },
-						};
-					},
-					prompt(links, player) {
-						return "###木牛###将一张手牌扣置于你装备区里的" + get.translation(links[0]) + "下，然后可以将此装备移动到一名其他角色的装备区里。";
-					},
-				},
-				ai: {
-					order: 1,
-					expose: 0.1,
-					result: { player: 1 },
-				},
-				mod: {
-					cardEnabled2(card, player) {
-						if (!ui.selected.cards.length) {
-							return;
-						}
-						const cards = player.getVCards("e").filter(i => i.name == "muniu");
-						for (let muniu of cards) {
-							if (!muniu || !muniu.storages || !muniu.storages.length) {
-								return;
-							}
-							for (var i of ui.selected.cards) {
-								if (muniu.cards?.includes(i) && muniu.storages.includes(card)) {
-									return false;
-								}
-								if (muniu.storages.includes(i) && card == muniu) {
-									return false;
-								}
-							}
-						}
-					},
-				},
-				mark: true,
-				markimage2: "image/card/muniu_small.png",
-				intro: {
-					content(storage, player) {
-						const munius = player.getVCards("e").filter(i => i.name == "muniu");
-						let cards = [];
-						for (let muniu of munius) {
-							if (muniu?.storages?.length) {
-								cards.addArray(muniu.storages);
-							}
-						}
-						if (!cards.length) {
-							return "共有零张牌";
-						}
-						if (player.isUnderControl(true)) {
-							return get.translation(cards);
-						} else {
-							return "共有" + get.cnNumber(cards.length) + "张牌";
-						}
-					},
-					mark(dialog, storage, player) {
-						const munius = player.getVCards("e").filter(i => i.name == "muniu");
-						let cards = [];
-						for (let muniu of munius) {
-							if (muniu?.storages?.length) {
-								cards.addArray(muniu.storages);
-							}
-						}
-						if (!cards.length) {
-							return "共有零张牌";
-						}
-						if (player.isUnderControl(true)) {
-							dialog.addAuto(cards);
-						} else {
-							return "共有" + get.cnNumber(cards.length) + "张牌";
-						}
-					},
-					markcount(storage, player) {
-						const munius = player.getVCards("e").filter(i => i.name == "muniu");
-						let cards = [];
-						for (let muniu of munius) {
-							if (muniu?.storages?.length) {
-								cards.addArray(muniu.storages);
-							}
-						}
-						return cards.length;
-					},
-				},
-				subSkill: { backup: {} },
-			},
-			muniu_skill7: {
-				charlotte: true,
-				trigger: { player: ["phaseUseBefore", "loseEnd"] },
-				firstDo: true,
-				forced: true,
-				silent: true,
-				delay: false,
-				filter(event, player) {
-					if (event.name == "phaseUse") {
-						return true;
-					}
-					if (!event.ss || !event.ss.length || event.parent.name == "lose_muniu") {
-						return false;
-					}
-					const munius = player.getVCards("e").filter(i => i.name == "muniu");
-					let cards = [];
-					for (let muniu of munius) {
-						if (muniu?.storages?.length) {
-							cards.addArray(muniu.storages);
-						}
-					}
-					if (!cards.length) {
-						return false;
-					}
-					return (
-						event.ss.filter(function (card) {
-							return cards.includes(card);
-						}).length > 0
-					);
-				},
-				content() {
-					const munius = player.getVCards("e").filter(i => i.name == "muniu");
-					let cards = [];
-					for (let muniu of munius) {
-						if (muniu?.storages?.length) {
-							cards.addArray(muniu.storages);
-						}
-					}
-					if (trigger.name == "phaseUse") {
-						for (let muniu of munius) {
-							if (muniu?.storage?.used) {
-								muniu.storage.used = 0;
-							}
-						}
-					} else {
-						player.logSkill(event.name);
-						for (let muniu of munius) {
-							if (muniu && muniu.storages) {
-								muniu.storages.removeArray(trigger.ss);
-								lib.skill.muniu_skill.sync(muniu);
-							}
-						}
-						player.updateMarks();
-					}
-				},
-			},
-			huogong2: { charlotte: true },
 			jiu: {
 				trigger: { player: "useCard1" },
 				filter(event) {
@@ -1144,6 +784,27 @@ game.import("card", function () {
 					game.addVideo("jiuNode", player, false);
 				},
 			},
+			huogong2: { charlotte: true },
+			bingliang_changban: {
+				cardSkill: true,
+				unique: true,
+				trigger: { player: "phaseDrawBegin" },
+				silent: true,
+				content() {
+					trigger.num--;
+				},
+				group: "bingliang_changban2",
+			},
+			bingliang_changban2: {
+				cardSkill: true,
+				trigger: { player: "phaseDrawAfter" },
+				silent: true,
+				content() {
+					if (player.enemy) {
+						player.enemy.draw();
+					}
+				},
+			},
 			guding_skill: {
 				equipSkill: true,
 				audio: true,
@@ -1179,6 +840,51 @@ game.import("card", function () {
 							}
 						},
 					},
+				},
+			},
+			zhuque_skill: {
+				equipSkill: true,
+				trigger: { player: "useCard1" },
+				//priority:7,
+				filter(event, player) {
+					if (event.card.name == "sha" && !game.hasNature(event.card)) {
+						return true;
+					}
+				},
+				audio: true,
+				check(event, player) {
+					let eff = 0,
+						nature = event.card.nature;
+					for (let i = 0; i < event.targets.length; i++) {
+						eff -= get.effect(event.targets[i], event.card, player, player);
+						event.card.nature = "fire";
+						eff += get.effect(event.targets[i], event.card, player, player);
+						event.card.nature = nature;
+					}
+					return eff > 0;
+				},
+				prompt2(event, player) {
+					return "将" + get.translation(event.card) + "改为火属性";
+				},
+				content() {
+					game.setNature(trigger.card, "fire");
+					if (get.itemtype(trigger.card) == "card") {
+						var next = game.createEvent("zhuque_clear");
+						next.card = trigger.card;
+						event.next.remove(next);
+						trigger.after.push(next);
+						next.setContent(function () {
+							game.setNature(trigger.card, []);
+						});
+					}
+				},
+			},
+			zhuque_skill2: {
+				trigger: { player: "useCardAfter" },
+				forced: true,
+				popup: false,
+				content() {
+					delete player.storage.zhuque_skill.nature;
 				},
 			},
 			tengjia1: {
@@ -1412,52 +1118,6 @@ game.import("card", function () {
 					},
 				},
 			},
-			zhuque_skill: {
-				equipSkill: true,
-				trigger: { player: "useCard1" },
-				//priority:7,
-				filter(event, player) {
-					if (event.card.name == "sha" && !game.hasNature(event.card)) {
-						return true;
-					}
-				},
-				audio: true,
-				check(event, player) {
-					let eff = 0,
-						nature = event.card.nature;
-					for (let i = 0; i < event.targets.length; i++) {
-						eff -= get.effect(event.targets[i], event.card, player, player);
-						event.card.nature = "fire";
-						eff += get.effect(event.targets[i], event.card, player, player);
-						event.card.nature = nature;
-					}
-					return eff > 0;
-				},
-				prompt2(event, player) {
-					return "将" + get.translation(event.card) + "改为火属性";
-				},
-				content() {
-					game.setNature(trigger.card, "fire");
-					if (get.itemtype(trigger.card) == "card") {
-						var next = game.createEvent("zhuque_clear");
-						next.card = trigger.card;
-						event.next.remove(next);
-						trigger.after.push(next);
-						next.setContent(function () {
-							game.setNature(trigger.card, []);
-						});
-					}
-				},
-			},
-			zhuque_skill2: {
-				trigger: { player: "useCardAfter" },
-				forced: true,
-				popup: false,
-				content() {
-					delete player.storage.zhuque_skill.nature;
-				},
-			},
-			huogon2: {},
 		},
 		translate: {
 			huosha: "火杀",
@@ -1470,9 +1130,12 @@ game.import("card", function () {
 			huogong: "火攻",
 			huogong_bg: "攻",
 			huogong_info: "出牌阶段，对一名有手牌的角色使用。该角色展示一张手牌，然后若你弃置与之花色相同的一张手牌，则你对其造成1点火焰伤害。",
+			huogong_append: '<span class="text" style="font-family: yuanli">“行火必有因，烟火必素具。”——《孙子·火攻》</span>',
 			tiesuo: "铁索连环",
 			tiesuo_info: "出牌阶段，对一至两名角色使用。目标角色横置或重置。（被横置的角色处于“连环状态”）\n重铸：出牌阶段，你可以将此牌放入弃牌堆，然后摸一张牌。",
 			tiesuo_bg: "索",
+			tiesuo_append: '<span class="text" style="font-family: yuanli">“或三十为一排，或五十为一排，首尾用铁环连锁，上铺阔板，休言人可渡，马亦可走矣。乘此而行，任他风浪潮水上下，复何惧哉？”——《三国演义》</span>',
+
 			bingliang: "兵粮寸断",
 			bingliang_bg: "粮",
 			bingliang_info: "出牌阶段，对距离为1的一名其他角色使用，将【兵粮寸断】放入该角色的判断区。若判定结果不为♣，则其跳过摸牌阶段。",
@@ -1480,28 +1143,28 @@ game.import("card", function () {
 			guding: "古锭刀",
 			guding_info: "锁定技，当你使用【杀】对目标角色造成伤害时，若其没有手牌，则此伤害+1。",
 			guding_skill: "古锭刀",
+			guding_append: '<span class="text" style="font-family: yuanli">“孙坚披烂银铠，裹赤帻，横古锭刀，骑花鬃马…”——《三国演义》</span>',
 			zhuque: "朱雀羽扇",
 			zhuque_bg: "扇",
 			zhuque_skill: "朱雀羽扇",
 			zhuque_info: "当你使用普通【杀】时，你可以将此【杀】改为火【杀】。",
+			zhuque_append: '<span class="text" style="font-family: yuanli">“羽扇纶巾，谈笑间，樯橹灰飞烟灭。”——《念奴娇·赤壁怀古》</span>',
+
 			tengjia: "藤甲",
 			tengjia_info: "锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效；当你受到火焰伤害时，此伤害+1。",
 			tengjia1: "藤甲",
 			tengjia2: "藤甲",
 			tengjia3: "藤甲",
+			tengjia_append: '<span class="text" style="font-family: yuanli">“…穿在身上，渡江不沉，经水不湿，刀箭皆不能入…”——《三国演义》</span>',
 			baiyin: "白银狮子",
 			baiyin_info: "锁定技，当你受到伤害时，若伤害值大于1，则你将此伤害值改为1；当你失去装备区里的【白银狮子】后，你回复1点体力。",
 			baiyin_skill: "白银狮子",
+			baiyin_append: '<span class="text" style="font-family: yuanli">“马超纵骑持枪而出；狮盔兽带，银甲白袍：一来结束非凡，二者人才出众。”——《三国演义》</span>',
+
 			hualiu: "骅骝",
 			hualiu_bg: "+马",
 			hualiu_info: "当其他角色计算与你距离时，始终+1。",
-			muniu: "木牛流马",
-			muniu_bg: "牛",
-			muniu_skill: "木牛",
-			muniu_skill7: "木牛流马",
-			muniu_skill_bg: "辎",
-			muniu_info: "出牌阶段限一次，你可以将一张手牌扣置于装备区里的【木牛流马】下，然后可以将【木牛流马】放入一名其他角色的装备区；你可以如手牌般使用或打出【木牛流马】下的牌。",
-			muniu_skill_info: "出牌阶段限一次，你可以将一张手牌扣置于装备区里的【木牛流马】下，然后可以将【木牛流马】放入一名其他角色的装备区；你可以如手牌般使用或打出【木牛流马】下的牌。",
+			hualiu_append: '<span class="text" style="font-family: yuanli">“枥上骅骝嘶鼓角，门前老将识风云。”——《上将行》</span>',
 		},
 		list: [
 			["heart", 4, "sha", "fire"],
@@ -1537,13 +1200,9 @@ game.import("card", function () {
 			["club", 3, "jiu"],
 			["club", 9, "jiu"],
 
-			["diamond", 13, "hualiu"],
-			["club", 1, "baiyin"],
-			["spade", 2, "tengjia"],
-			["club", 2, "tengjia"],
-			["spade", 1, "guding"],
-			["diamond", 1, "zhuque"],
-
+			["heart", 1, "wuxie"],
+			["heart", 13, "wuxie"],
+			["spade", 13, "wuxie"],
 			["heart", 2, "huogong"],
 			["heart", 3, "huogong"],
 			["diamond", 12, "huogong"],
@@ -1553,13 +1212,15 @@ game.import("card", function () {
 			["club", 11, "tiesuo"],
 			["club", 12, "tiesuo"],
 			["club", 13, "tiesuo"],
-			["heart", 1, "wuxie"],
-			["heart", 13, "wuxie"],
-			["spade", 13, "wuxie"],
 			["spade", 10, "bingliang"],
 			["club", 4, "bingliang"],
 
-			["diamond", 5, "muniu"],
+			["spade", 1, "guding"],
+			["diamond", 1, "zhuque"],
+			["spade", 2, "tengjia"],
+			["club", 2, "tengjia"],
+			["club", 1, "baiyin"],
+			["diamond", 13, "hualiu"],
 		],
 	};
 });
