@@ -1,7 +1,7 @@
 import { lib, game, ui, get, ai, _status } from "noname";
 game.import("card", function () {
 	return {
-		name: "standard",
+		name: "simplified",
 		connect: true,
 		card: {
 			damage: {
@@ -3186,18 +3186,6 @@ game.import("card", function () {
 				},
 				skills: ["zhuge_skill"],
 			},
-			qinggang: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip1",
-				distance: { attackFrom: -1 },
-				ai: {
-					basic: {
-						equipValue: 2,
-					},
-				},
-				skills: ["qinggang_skill"],
-			},
 			cixiong: {
 				fullskin: true,
 				type: "equip",
@@ -3209,18 +3197,6 @@ game.import("card", function () {
 					},
 				},
 				skills: ["cixiong_skill"],
-			},
-			hanbing: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip1",
-				distance: { attackFrom: -1 },
-				skills: ["hanbing_skill"],
-				ai: {
-					basic: {
-						equipValue: 2,
-					},
-				},
 			},
 			qinglong: {
 				fullskin: true,
@@ -3269,30 +3245,6 @@ game.import("card", function () {
 				},
 				skills: ["guanshi_skill"],
 			},
-			fangtian: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip1",
-				distance: { attackFrom: -3 },
-				ai: {
-					basic: {
-						equipValue: 2.5,
-					},
-				},
-				skills: ["fangtian_skill"],
-			},
-			qilin: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip1",
-				distance: { attackFrom: -4 },
-				ai: {
-					basic: {
-						equipValue: 3,
-					},
-				},
-				skills: ["qilin_skill"],
-			},
 			bagua: {
 				fullskin: true,
 				type: "equip",
@@ -3303,39 +3255,6 @@ game.import("card", function () {
 					},
 				},
 				skills: ["bagua_skill"],
-			},
-			renwang: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip2",
-				skills: ["renwang_skill"],
-				ai: {
-					basic: {
-						equipValue: 7.5,
-					},
-				},
-			},
-			jueying: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip3",
-				distance: { globalTo: 1 },
-				battleOfWancheng() {
-					// 宛城之战
-					if (get.mode() !== "doudizhu") {
-						return false;
-					}
-					const date = new Date();
-					if (date.getMonth() !== 6) {
-						return false;
-					}
-					let day = date.getDate();
-					if (day === 5) {
-						return date.getHours() >= 8;
-					}
-					return day > 5 && day < 22;
-				},
-				global: "jueying_wancheng",
 			},
 			dilu: {
 				fullskin: true,
@@ -3356,12 +3275,6 @@ game.import("card", function () {
 				distance: { globalFrom: -1 },
 			},
 			dayuan: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip4",
-				distance: { globalFrom: -1 },
-			},
-			zixing: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip4",
@@ -3836,68 +3749,6 @@ game.import("card", function () {
 					},
 				},
 			},
-			qinggang_skill: {
-				equipSkill: true,
-				audio: true,
-				trigger: {
-					player: "useCardToPlayered",
-				},
-				filter(event) {
-					return event.card.name === "sha";
-				},
-				forced: true,
-				logTarget: "target",
-				content() {
-					trigger.target.addTempSkill("qinggang2");
-					trigger.target.storage.qinggang2.add(trigger.card);
-					trigger.target.markSkill("qinggang2");
-				},
-				ai: {
-					unequip_ai: true,
-					skillTagFilter(player, tag, arg) {
-						if (arg && arg.name === "sha") {
-							return true;
-						}
-						return false;
-					},
-				},
-			},
-			qinggang2: {
-				firstDo: true,
-				ai: { unequip2: true },
-				init(player, skill) {
-					if (!player.storage[skill]) {
-						player.storage[skill] = [];
-					}
-				},
-				onremove: true,
-				trigger: {
-					player: ["damage", "damageCancelled", "damageZero"],
-					source: ["damage", "damageCancelled", "damageZero"],
-					target: ["shaMiss", "useCardToExcluded", "useCardToEnd", "eventNeutralized"],
-					global: ["useCardEnd"],
-				},
-				charlotte: true,
-				filter(event, player) {
-					const evt = event.getParent("useCard", true, true);
-					if (evt && evt.effectedCount < evt.effectCount) {
-						return false;
-					}
-					return player.storage.qinggang2 && event.card && player.storage.qinggang2.includes(event.card) && (event.name !== "damage" || event.notLink());
-				},
-				silent: true,
-				forced: true,
-				popup: false,
-				priority: 12,
-				content() {
-					player.storage.qinggang2.remove(trigger.card);
-					if (!player.storage.qinggang2.length) {
-						player.removeSkill("qinggang2");
-					}
-				},
-				marktext: "※",
-				intro: { content: "当前防具技能已失效" },
-			},
 			cixiong_skill: {
 				equipSkill: true,
 				trigger: { player: "useCardToPlayered" },
@@ -3975,85 +3826,6 @@ game.import("card", function () {
 					"step 1";
 					if (result.bool === false) {
 						player.draw();
-					}
-				},
-			},
-			hanbing_skill: {
-				equipSkill: true,
-				trigger: { source: "damageBegin2" },
-				//direct:true,
-				audio: true,
-				filter(event) {
-					return event.card && event.card.name === "sha" && event.notLink() && event.player.getCards("he").length > 0;
-				},
-				//priority:1,
-				check(event, player) {
-					var target = event.player;
-					var eff = get.damageEffect(target, player, player, event.nature);
-					if (get.attitude(player, target) > 0) {
-						if (
-							eff >= 0 ||
-							(event.nature &&
-								target.isLinked() &&
-								game.hasPlayer(cur => {
-									return cur !== target && cur.isLinked() && get.damageEffect(cur, player, player, event.nature) > 0;
-								}))
-						) {
-							return false;
-						}
-						return true;
-					}
-					if (eff <= 0) {
-						return true;
-					}
-					if (target.hp === 1 || player.hasSkill("tianxianjiu")) {
-						return false;
-					}
-					if (
-						!target.hasSkillTag("filterDamage", null, {
-							player: player,
-							card: event.card,
-							jiu: player.hasSkill("jiu"),
-						})
-					) {
-						if (
-							event.num > 1 ||
-							player.hasSkillTag("damageBonus", true, {
-								player: player,
-								card: event.card,
-							})
-						) {
-							return false;
-						}
-					}
-					if (target.countCards("he") < 2) {
-						return false;
-					}
-					var num = 0;
-					var cards = target.getCards("he");
-					for (var i = 0; i < cards.length; i++) {
-						if (get.value(cards[i]) > 6) {
-							num++;
-						}
-					}
-					if (num >= 2) {
-						return true;
-					}
-					return false;
-				},
-				logTarget: "player",
-				content() {
-					"step 0";
-					trigger.cancel();
-					"step 1";
-					if (trigger.player.countDiscardableCards(player, "he")) {
-						player.line(trigger.player);
-						player.discardPlayerCard("he", trigger.player, true);
-					}
-					"step 2";
-					if (trigger.player.countDiscardableCards(player, "he")) {
-						player.line(trigger.player);
-						player.discardPlayerCard("he", trigger.player, true);
 					}
 				},
 			},
@@ -4210,89 +3982,6 @@ game.import("card", function () {
 					},
 				},
 			},
-			fangtian_skill: {
-				equipSkill: true,
-				audio: true,
-				trigger: { player: "useCard1" },
-				forced: true,
-				firstDo: true,
-				filter(event, player) {
-					if (event.card.name !== "sha" || get.mode() === "guozhan") {
-						return false;
-					}
-					var card = event.card;
-					var range;
-					var select = get.copy(get.info(card).selectTarget);
-					if (select === undefined) {
-						if (get.info(card).filterTarget === undefined) {
-							return false;
-						}
-						range = [1, 1];
-					} else if (typeof select === "number") {
-						range = [select, select];
-					} else if (get.itemtype(select) === "select") {
-						range = select;
-					} else if (typeof select === "function") {
-						range = select(card, player);
-						if (typeof range == "number") {
-							range = [range, range];
-						}
-					}
-					game.checkMod(card, player, range, "selectTarget", player);
-					return range[1] !== -1 && event.targets.length > range[1];
-				},
-				content() {},
-				mod: {
-					selectTarget(card, player, range) {
-						if (card.name !== "sha") {
-							return;
-						}
-						if (get.mode() === "guozhan") {
-							return;
-						}
-						if (range[1] === -1) {
-							return;
-						}
-						var cards = player.getCards("h");
-						if (!cards.length) {
-							return;
-						}
-						for (var i = 0; i < cards.length; i++) {
-							if (cards[i].classList.contains("selected") === false) {
-								return;
-							}
-						}
-						range[1] += 2;
-					},
-				},
-			},
-			qilin_skill: {
-				equipSkill: true,
-				trigger: { source: "damageBegin2" },
-				filter(event, player) {
-					return event.card && event.card.name === "sha" && event.notLink() && event.player.getCards("e", { subtype: ["equip3", "equip4", "equip6"] }).length > 0;
-				},
-				direct: true,
-				audio: true,
-				content() {
-					"step 0";
-					var att = get.attitude(player, trigger.player) <= 0;
-					var next = player.chooseButton();
-					next.set("att", att);
-					next.set("createDialog", ["是否发动【麒麟弓】，弃置" + get.translation(trigger.player) + "的一张坐骑牌？", trigger.player.getCards("e", { subtype: ["equip3", "equip4", "equip6"] })]);
-					next.set("ai", function (button) {
-						if (_status.event.att) {
-							return get.buttonValue(button);
-						}
-						return 0;
-					});
-					"step 1";
-					if (result.bool) {
-						player.logSkill("qilin_skill", trigger.player);
-						trigger.player.discard(result.links[0]);
-					}
-				},
-			},
 			bagua_skill: {
 				equipSkill: true,
 				trigger: { player: ["chooseToRespondBegin", "chooseToUseBegin"] },
@@ -4414,57 +4103,6 @@ game.import("card", function () {
 					},
 				},
 			},
-			renwang_skill: {
-				equipSkill: true,
-				trigger: { target: "shaBegin" },
-				forced: true,
-				priority: 6,
-				audio: true,
-				filter(event, player) {
-					if (player.hasSkillTag("unequip2")) {
-						return false;
-					}
-					if (
-						event.player.hasSkillTag("unequip", false, {
-							name: event.card ? event.card.name : null,
-							target: player,
-							card: event.card,
-						})
-					) {
-						return false;
-					}
-					return event.card.name === "sha" && get.color(event.card) === "black";
-				},
-				content() {
-					trigger.cancel();
-				},
-				ai: {
-					effect: {
-						target(card, player, target) {
-							if (typeof card !== "object" || target.hasSkillTag("unequip2")) {
-								return;
-							}
-							if (
-								player.hasSkillTag("unequip", false, {
-									name: card ? card.name : null,
-									target: target,
-									card: card,
-								}) ||
-								player.hasSkillTag("unequip_ai", false, {
-									name: card ? card.name : null,
-									target: target,
-									card: card,
-								})
-							) {
-								return;
-							}
-							if (card.name === "sha" && get.color(card) === "black") {
-								return "zeroplayertarget";
-							}
-						},
-					},
-				},
-			},
 		},
 		translate: {
 			sha: "杀",
@@ -4516,21 +4154,11 @@ game.import("card", function () {
 			zhuge_skill: "诸葛连弩",
 			zhuge_skill_info: "锁定技，你使用【杀】无次数限制。",
 			zhuge_info: "锁定技，你使用【杀】无次数限制。",
-			qinggang: "青釭剑",
-			qinggang_skill: "青釭剑",
-			qinggang_skill_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
-			qinggang_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
-			qinggang2: "破防",
 			cixiong: "雌雄双股剑",
 			cixiong_bg: "双",
 			cixiong_skill: "雌雄双股剑",
 			cixiong_skill_info: "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
 			cixiong_info: "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
-			hanbing: "寒冰剑",
-			hanbing_bg: "冰",
-			hanbing_skill: "寒冰剑",
-			hanbing_info: "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
-			hanbing_skill_info: "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
 			qinglong: "青龙偃月刀",
 			qinglong_bg: "偃",
 			qinglong_skill: "青龙偃月刀",
@@ -4545,30 +4173,13 @@ game.import("card", function () {
 			guanshi_skill: "贯石斧",
 			guanshi_skill_info: "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
 			guanshi_info: "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
-			fangtian: "方天画戟",
-			fangtian_skill: "方天画戟",
-			fangtian_skill_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
-			fangtian_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
-			qilin: "麒麟弓",
-			qilin_bg: "弓",
-			qilin_skill: "麒麟弓",
-			qilin_skill_info: "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
-			qilin_info: "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
 
 			bagua: "八卦阵",
 			bagua_bg: "卦",
 			bagua_skill: "八卦阵",
 			bagua_info: "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
 			bagua_skill_info: "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
-			renwang: "仁王盾",
-			renwang_bg: "盾",
-			renwang_skill: "仁王盾",
-			renwang_info: "锁定技，黑色【杀】对你无效。",
-			renwang_skill_info: "锁定技，黑色【杀】对你无效。",
 
-			jueying: "绝影",
-			jueying_bg: "+马",
-			jueying_info: "当其他角色计算与你距离时，始终+1。",
 			dilu: "的卢",
 			dilu_bg: "+马",
 			dilu_info: "当其他角色计算与你距离时，始终+1。",
@@ -4581,122 +4192,67 @@ game.import("card", function () {
 			dayuan: "大宛",
 			dayuan_bg: "-马",
 			dayuan_info: "当你计算与其他角色距离时，始终-1。",
-			zixing: "紫骍",
-			zixing_bg: "-马",
-			zixing_info: "当你计算与其他角色距离时，始终-1。",
 		},
 		list: [
 			["spade", 1, "juedou"],
 			["spade", 1, "shandian"],
 			["spade", 2, "cixiong"],
-			["spade", 2, "bagua"],
-			["spade", 3, "shunshou"],
 			["spade", 3, "guohe"],
-			["spade", 4, "shunshou"],
 			["spade", 4, "guohe"],
-			["spade", 5, "jueying"],
 			["spade", 5, "qinglong"],
-			["spade", 6, "qinggang"],
 			["spade", 6, "lebu"],
-			["spade", 7, "sha"],
 			["spade", 7, "nanman"],
 			["spade", 8, "sha"],
-			["spade", 8, "sha"],
 			["spade", 9, "sha"],
-			["spade", 9, "sha"],
-			["spade", 10, "sha"],
 			["spade", 10, "sha"],
 			["spade", 11, "shunshou"],
-			["spade", 11, "wuxie"],
-			["spade", 12, "guohe"],
 			["spade", 12, "zhangba"],
-			["spade", 13, "nanman"],
 			["spade", 13, "dayuan"],
 
 			["heart", 1, "wanjian"],
 			["heart", 1, "taoyuan"],
 			["heart", 2, "shan"],
-			["heart", 2, "shan"],
 			["heart", 3, "wugu"],
-			["heart", 3, "tao"],
-			["heart", 4, "wugu"],
 			["heart", 4, "tao"],
 			["heart", 5, "chitu"],
-			["heart", 5, "qilin"],
 			["heart", 6, "lebu"],
-			["heart", 6, "tao"],
-			["heart", 7, "wuzhong"],
 			["heart", 7, "tao"],
 			["heart", 8, "wuzhong"],
-			["heart", 8, "tao"],
-			["heart", 9, "wuzhong"],
 			["heart", 9, "tao"],
 			["heart", 10, "sha"],
-			["heart", 10, "sha"],
 			["heart", 11, "wuzhong"],
-			["heart", 11, "sha"],
-			["heart", 12, "tao"],
 			["heart", 12, "guohe"],
-			["heart", 13, "shan"],
 			["heart", 13, "zhuahuang"],
 
-			["club", 1, "juedou"],
 			["club", 1, "zhuge"],
-			["club", 2, "sha"],
 			["club", 2, "bagua"],
 			["club", 3, "sha"],
-			["club", 3, "guohe"],
 			["club", 4, "sha"],
-			["club", 4, "guohe"],
-			["club", 5, "sha"],
 			["club", 5, "dilu"],
 			["club", 6, "sha"],
-			["club", 6, "lebu"],
-			["club", 7, "sha"],
 			["club", 7, "nanman"],
 			["club", 8, "sha"],
-			["club", 8, "sha"],
-			["club", 9, "sha"],
 			["club", 9, "sha"],
 			["club", 10, "sha"],
-			["club", 10, "sha"],
-			["club", 11, "sha"],
 			["club", 11, "sha"],
 			["club", 12, "wuxie"],
 			["club", 12, "jiedao"],
-			["club", 13, "wuxie"],
 			["club", 13, "jiedao"],
 
 			["diamond", 1, "juedou"],
-			["diamond", 1, "zhuge"],
 			["diamond", 2, "shan"],
-			["diamond", 2, "shan"],
-			["diamond", 3, "shunshou"],
 			["diamond", 3, "shan"],
 			["diamond", 4, "shunshou"],
-			["diamond", 4, "shan"],
 			["diamond", 5, "guanshi"],
-			["diamond", 5, "shan"],
 			["diamond", 6, "sha"],
-			["diamond", 6, "shan"],
-			["diamond", 7, "sha"],
 			["diamond", 7, "shan"],
-			["diamond", 8, "sha"],
 			["diamond", 8, "shan"],
-			["diamond", 9, "sha"],
 			["diamond", 9, "shan"],
 			["diamond", 10, "sha"],
-			["diamond", 10, "shan"],
 			["diamond", 11, "shan"],
-			["diamond", 11, "shan"],
-			["diamond", 12, "fangtian"],
 			["diamond", 12, "tao"],
-			["diamond", 13, "zixing"],
 			["diamond", 13, "sha"],
 
-			["spade", 2, "hanbing"],
-			["heart", 12, "shandian"],
-			["club", 2, "renwang"],
 			["diamond", 12, "wuxie"],
 		],
 	};
