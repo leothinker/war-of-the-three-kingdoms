@@ -3235,7 +3235,7 @@ game.import("card", function () {
 						equipValue: 3.5,
 					},
 				},
-				skills: ["qinglong_skill"],
+				skills: ["qinglong_skill", "qinglong_guozhan"],
 			},
 			zhangba: {
 				fullskin: true,
@@ -3279,7 +3279,7 @@ game.import("card", function () {
 						equipValue: 2.5,
 					},
 				},
-				skills: ["fangtian_skill"],
+				skills: ["fangtian_skill", "fangtian_guozhan"],
 			},
 			qilin: {
 				fullskin: true,
@@ -4091,6 +4091,61 @@ game.import("card", function () {
 						.set("addCount", false).logSkill = "qinglong_skill";
 				},
 			},
+			qinglong_guozhan: {
+				equipSkill: true,
+				trigger: { player: "useCard" },
+				forced: true,
+				audio: "qinglong_skill",
+				filter(event, player) {
+					return get.mode() === "guozhan" && event.card.name === "sha";
+				},
+				content() {
+					if (!_status.qinglong_guozhan) {
+						_status.qinglong_guozhan = [];
+					}
+					_status.qinglong_guozhan.add(trigger);
+					game.countPlayer2(function (current) {
+						current.addTempSkill("qinglong_guozhan_mingzhi");
+					});
+					game.broadcast(
+						function (list) {
+							_status.qinglong_guozhan = list;
+						},
+						_status.qinglong_guozhan.map(function (i) {
+							return { targets: i.targets };
+						})
+					);
+					var next = game.createEvent("qinglong_guozhan");
+					event.next.remove(next);
+					trigger.after.add(next);
+					next.setContent(function () {
+						_status.qinglong_guozhan.remove(event.parent);
+						game.broadcast(
+							function (list) {
+								_status.qinglong_guozhan = list;
+							},
+							_status.qinglong_guozhan.map(function (i) {
+								return { targets: i.targets };
+							})
+						);
+					});
+				},
+			},
+			qinglong_guozhan_mingzhi: {
+				ai: {
+					nomingzhi: true,
+					skillTagFilter(player) {
+						if (_status.qinglong_guozhan) {
+							for (var i = 0; i < _status.qinglong_guozhan.length; i++) {
+								if (_status.qinglong_guozhan[i].targets.includes(player)) {
+									return true;
+								}
+							}
+						}
+						return false;
+					},
+				},
+			},
 			zhangba_skill: {
 				audio: true,
 				equipSkill: true,
@@ -4263,6 +4318,105 @@ game.import("card", function () {
 							}
 						}
 						range[1] += 2;
+					},
+				},
+			},
+			fangtian_guozhan: {
+				equipSkill: true,
+				trigger: { player: "useCard2" },
+				filter(event, player) {
+					if (get.mode() !== "guozhan") {
+						return false;
+					}
+					if (event.card.name !== "sha") {
+						return false;
+					}
+					return game.hasPlayer(target => {
+						if (event.targets.includes(target)) {
+							return false;
+						}
+						if (!lib.filter.filterTarget(event.card, player, target)) {
+							return false;
+						}
+						if (target.identity === "ye" || target.identity === "unknown") {
+							return true;
+						}
+						for (var i = 0; i < event.targets.length; i++) {
+							if (target.identity === event.targets[i].identity) {
+								return false;
+							}
+						}
+						return true;
+					});
+				},
+				log: false,
+				async cost(event, trigger, player) {
+					const next = player.chooseTarget(get.prompt2("fangtian"));
+
+					next.set("selectTarget", [1, Infinity]);
+					next.set("filterTarget", filterTarget);
+					next.set("promptbar", "none");
+					next.set("complexTarget", true);
+					next.set("cardx", trigger.card);
+					next.set("targets", trigger.targets);
+					next.set("ai", check);
+
+					event.result = await next.forResult();
+
+					function filterTarget(card, player, target) {
+						const cardx = get.event().cardx;
+
+						if (!lib.filter.filterTarget(cardx, player, target)) {
+							return false;
+						}
+
+						const targets = get.event().targets.concat(ui.selected.targets);
+
+						if (targets.includes(target)) {
+							return false;
+						}
+						if (target.identity === "ye" || target.identity === "unknown") {
+							return true;
+						}
+
+						for (let i = 0; i < targets.length; i++) {
+							if (target.identity === targets[i].identity) {
+								return false;
+							}
+						}
+
+						return true;
+					}
+
+					function check(target) {
+						const player = get.player();
+						const card = get.event().cardx;
+						return get.effect(target, card, player, player);
+					}
+				},
+				async content(event, trigger, player) {
+					player.logSkill("fangtian_skill", event.targets);
+
+					trigger.targets.addArray(event.targets);
+					player.addTempSkill(event.name + "_trigger");
+					player.markAuto(event.name + "_trigger", [trigger.card]);
+				},
+				subSkill: {
+					trigger: {
+						trigger: { player: ["shaMiss", "useCardAfter", "useCardCancelled"] },
+						filter(event, player) {
+							return player.getStorage("fangtian_guozhan_trigger").includes(event.card);
+						},
+						silent: true,
+						onremove: true,
+						charlotte: true,
+						async content(event, trigger, player) {
+							if (event.triggername === "shaMiss" && player.getStorage(event.name).includes(trigger.card)) {
+								trigger.getParent().excluded.addArray(trigger.getParent().targets);
+							} else {
+								player.unmarkAuto(event.name, [trigger.card]);
+							}
+						},
 					},
 				},
 			},
@@ -4534,8 +4688,10 @@ game.import("card", function () {
 			qinglong: "青龙偃月刀",
 			qinglong_bg: "偃",
 			qinglong_skill: "青龙偃月刀",
+			qinglong_guozhan: "青龙偃月刀",
 			qinglong_skill_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
 			qinglong_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
+			qinglong_info_guozhan: "锁定技，当你使用【杀】时，所有目标角色不能明置武将牌直到此【杀】结算完毕。",
 			zhangba: "丈八蛇矛",
 			zhangba_bg: "蛇",
 			zhangba_skill: "丈八蛇矛",
@@ -4549,6 +4705,7 @@ game.import("card", function () {
 			fangtian_skill: "方天画戟",
 			fangtian_skill_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
 			fangtian_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
+			fangtian_info_guozhan: "你使用【杀】可以选择任意名势力各不相同或未确定势力的角色为目标，若任意一名目标角色使用【闪】抵消了此【杀】，则此【杀】对剩余的目标角色无效。",
 			qilin: "麒麟弓",
 			qilin_bg: "弓",
 			qilin_skill: "麒麟弓",
