@@ -113,6 +113,7 @@ const skills = {
 	// 激将
 	jijiang: {
 		audio: 2,
+		audioname: ["liushan"],
 		group: ["jijiang1"],
 		zhuSkill: true,
 		filter(event, player) {
@@ -141,6 +142,7 @@ const skills = {
 	},
 	jijiang1: {
 		audio: "jijiang",
+		audioname: ["liushan"],
 		trigger: { player: ["useCardBegin", "respondBegin"] },
 		logTarget: "targets",
 		sourceSkill: "jijiang",
@@ -289,6 +291,7 @@ const skills = {
 	guanxing_fail: {},
 	guanxing: {
 		audio: 2,
+		audioname: ["jiangwei"],
 		trigger: { player: "phaseZhunbeiBegin" },
 		frequent: true,
 		preHidden: true,
@@ -662,6 +665,7 @@ const skills = {
 	// 英姿
 	yingzi: {
 		audio: 2,
+		audioname: ["sunce"],
 		trigger: { player: "phaseDrawBegin2" },
 		frequent: true,
 		filter(event, player) {
@@ -1707,6 +1711,7 @@ const skills = {
 	// 无双
 	wushuang: {
 		audio: 2,
+		audioname: ["le_lvbu"],
 		forced: true,
 		locked: true,
 		group: ["wushuang1", "wushuang2"],

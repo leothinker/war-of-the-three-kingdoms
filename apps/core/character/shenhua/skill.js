@@ -59,13 +59,13 @@ const skills = {
 	// 夏侯渊
 	// 神速
 	shensu: {
-		audio: "shensu1",
+		audio: 2,
 		audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
 		group: ["shensu1", "shensu2"],
 		preHidden: ["shensu1", "shensu2"],
 	},
 	shensu1: {
-		audio: 2,
+		audio: "shensu",
 		audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
 		trigger: { player: "phaseJudgeBefore" },
 		sourceSkill: "shensu",
@@ -94,7 +94,7 @@ const skills = {
 		},
 	},
 	shensu2: {
-		audio: "shensu1",
+		audio: "shensu",
 		audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
 		trigger: { player: "phaseUseBefore" },
 		sourceSkill: "shensu",
@@ -549,7 +549,7 @@ const skills = {
 	},
 	// 黄天
 	huangtian: {
-		audio: "huangtian2",
+		audio: 2,
 		audioname: ["zhangjiao", "re_zhangjiao"],
 		audioname2: {
 			pe_jun_zhangjiao: ["xinhuangtian2_re_zhangjiao1.mp3", "xinhuangtian2_re_zhangjiao2.mp3"],
@@ -558,7 +558,7 @@ const skills = {
 		zhuSkill: true,
 	},
 	huangtian2: {
-		audio: 2,
+		audio: "huangtian",
 		enable: "phaseUse",
 		discard: false,
 		lose: false,
@@ -1800,7 +1800,7 @@ const skills = {
 	// 徐晃
 	// 断粮
 	duanliang: {
-		audio: "duanliang1",
+		audio: 2,
 		audioname: ["re_xuhuang"],
 		group: ["duanliang1", "duanliang2"],
 		ai: {
@@ -1808,7 +1808,7 @@ const skills = {
 		},
 	},
 	duanliang1: {
-		audio: 2,
+		audio: "duanliang",
 		audioname: ["re_xuhuang"],
 		enable: "chooseToUse",
 		sourceSkill: "duanliang",
@@ -1960,11 +1960,11 @@ const skills = {
 	songwei: {
 		group: "songwei2",
 		audioname: ["re_caopi"],
-		audio: "songwei2",
+		audio: 2,
 		zhuSkill: true,
 	},
 	songwei2: {
-		audio: 2,
+		audio: "songwei",
 		audioname: ["re_caopi"],
 		audioname2: {
 			pe_jun_caopi: "sbsongwei",
@@ -1995,7 +1995,7 @@ const skills = {
 	// 孙坚
 	yinghun: {
 		audio: "yinghun",
-		audioname: ["re_sunjian", "sunce", "re_sunben", "re_sunce", "ol_sunjian", "sb_sunce"],
+		audioname: ["sunce"],
 		audioname2: {
 			re_sunyi: "yinghun_re_sunyi",
 		},
@@ -2198,11 +2198,11 @@ const skills = {
 	baonue: {
 		group: "baonue2",
 		audioname: ["re_dongzhuo"],
-		audio: "baonue2",
+		audio: 2,
 		zhuSkill: true,
 	},
 	baonue2: {
-		audio: 2,
+		audio: "baonue",
 		audioname: ["re_dongzhuo"],
 		//forceaudio:true,
 		trigger: { global: "damageSource" },
@@ -2241,7 +2241,7 @@ const skills = {
 	juxiang: {
 		//unique:true,
 		locked: true,
-		audio: "juxiang1",
+		audio: 2,
 		audioname: ["re_zhurong", "ol_zhurong"],
 		group: ["juxiang1", "juxiang2"],
 		preHidden: ["juxiang1", "juxiang2"],
@@ -2256,7 +2256,7 @@ const skills = {
 		},
 	},
 	juxiang1: {
-		audio: 2,
+		audio: "juxiang",
 		audioname: ["re_zhurong", "ol_zhurong"],
 		trigger: { target: "useCardToBefore" },
 		forced: true,
@@ -2270,7 +2270,7 @@ const skills = {
 		},
 	},
 	juxiang2: {
-		audio: "juxiang1",
+		audio: "juxiang",
 		audioname: ["re_zhurong", "ol_zhurong"],
 		trigger: { global: "useCardAfter" },
 		forced: true,
@@ -2307,7 +2307,7 @@ const skills = {
 	// 孟获
 	// 祸首
 	huoshou: {
-		audio: "huoshou1",
+		audio: 2,
 		audioname: ["re_menghuo"],
 		locked: true,
 		group: ["huoshou1", "huoshou2"],
@@ -2324,7 +2324,7 @@ const skills = {
 		},
 	},
 	huoshou1: {
-		audio: 2,
+		audio: "huoshou",
 		audioname: ["re_menghuo"],
 		trigger: { target: "useCardToBefore" },
 		forced: true,
@@ -2338,7 +2338,7 @@ const skills = {
 		},
 	},
 	huoshou2: {
-		audio: "huoshou1",
+		audio: "huoshou",
 		audioname: ["re_menghuo"],
 		trigger: { global: "useCard" },
 		forced: true,
@@ -4410,7 +4410,7 @@ const skills = {
 				}
 			},
 		},
-		audio: "wushen",
+		audio: 2,
 		trigger: {
 			player: "useCard",
 		},
