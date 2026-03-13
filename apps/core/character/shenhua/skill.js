@@ -5575,7 +5575,7 @@ const skills = {
 				return 0;
 			},
 		},
-		audio: true,
+		audio: 2,
 		trigger: { player: "phaseDrawBegin2" },
 		//priority:-5,
 		filter(event, player) {
@@ -5588,7 +5588,7 @@ const skills = {
 	},
 	// 龙魂
 	longhun: {
-		audio: 4,
+		audio: 2,
 		mod: {
 			aiOrder(player, card, num) {
 				if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() < 2) {
