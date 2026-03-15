@@ -29,15 +29,10 @@ import "vue/dist/vue.esm-browser.js";
 		});
 		await preload({ lib, game, get, _status, ui, ai });
 
-		// GPL确认
-		if (!localStorage.getItem("gplv3_noname_alerted")) {
-			localStorage.setItem("gplv3_noname_alerted", String(true));
-		}
-
 		await boot();
 	} catch (e) {
 		console.error(e);
-		console.error(`《无名杀》加载内容失败
+		alert(`《三国杀》加载内容失败
 浏览器UA信息: 
 ${userAgentLowerCase}
 错误信息: 

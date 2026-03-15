@@ -8,7 +8,7 @@ import { CacheContext } from "@/library/cache/cacheContext.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { loadCard, loadCardPile, loadCharacter, loadExtension, loadMode, loadPlay } from "./loading.js";
 
-// 无名杀，启动！
+// 三国杀，启动！
 export async function boot() {
 	// 不想看，反正别动
 	if (typeof __dirname === "string" && __dirname.length) {

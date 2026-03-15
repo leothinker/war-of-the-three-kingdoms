@@ -645,36 +645,89 @@ const skills = {
 	},
 	// 黄月英
 	// 集智
-	jizhi: {
+	jx_jizhi: {
 		audio: 2,
+		audioname2: {
+			lukang: "jx_jizhi_lukang",
+			zj_lukang: "jx_jizhi_lukang",
+			new_simayi: "jx_jizhi_new_simayi",
+		},
+		locked: false,
 		trigger: { player: "useCard" },
 		frequent: true,
-		preHidden: true,
 		filter(event) {
-			return get.type(event.card) == "trick";
+			return get.type(event.card, "trick") == "trick" && event.card.isCard;
+		},
+		init(player) {
+			player.storage.jx_jizhi = 0;
 		},
 		async content(event, trigger, player) {
-			player.draw("nodelay");
+			const result = await player.draw("nodelay").forResult();
+			event.card = result.cards[0];
+			if (get.type(event.card) !== "basic") {
+				return;
+			}
+
+			const result2 = await player
+				.chooseBool(`是否弃置${get.translation(event.card)}并令本回合手牌上限+1？`)
+				.set("ai", (evt, player) => _status.currentPhase === player && player.needsToDiscard(-3) && _status.event.value < 6)
+				.set("value", get.value(event.card, player))
+				.forResult();
+
+			if (result2.bool) {
+				await player.discard(event.card);
+				player.storage.jx_jizhi++;
+				if (_status.currentPhase === player) {
+					player.markSkill("jx_jizhi");
+				}
+			}
 		},
 		ai: {
 			threaten: 1.4,
 			noautowuxie: true,
 		},
+		mod: {
+			maxHandcard(player, num) {
+				return num + player.storage.jx_jizhi;
+			},
+		},
+		intro: {
+			content: "本回合手牌上限+#",
+		},
+		group: "jx_jizhi_clear",
+		subSkill: {
+			clear: {
+				trigger: { global: "phaseAfter" },
+				silent: true,
+				async content(event, trigger, player) {
+					player.storage.jx_jizhi = 0;
+					player.unmarkSkill("jx_jizhi");
+				},
+			},
+		},
 	},
 	// 奇才
-	qicai: {
+	jx_qicai: {
+		audio: 2,
 		mod: {
 			targetInRange(card, player, target, now) {
-				if (["trick", "delay"].includes(get.type(card))) {
+				var type = get.type(card);
+				if (type == "trick" || type == "delay") {
 					return true;
+				}
+			},
+			canBeDiscarded(card, player, target) {
+				if (get.position(card) == "e" && get.subtypes(card).some(subtype => ["equip2", "equip5"].includes(subtype)) && player != target) {
+					return false;
 				}
 			},
 		},
 	},
 	// 孙权
 	// 制衡
-	zhiheng: {
+	jx_zhiheng: {
 		audio: 2,
+		audioname2: { shen_caopi: "jx_zhiheng_shen_caopi", new_simayi: "jx_zhiheng_new_simayi" },
 		mod: {
 			aiOrder(player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") {
@@ -690,12 +743,24 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		position: "he",
-		filterCard: true,
+		filterCard: lib.filter.cardDiscardable,
+		discard: false,
+		lose: false,
+		delay: false,
 		selectCard: [1, Infinity],
 		allowChooseAll: true,
-		prompt: "弃置任意张牌并摸等量的牌",
 		check(card) {
 			let player = _status.event.player;
+			if (
+				get.position(card) == "h" &&
+				!player.countCards("h", "du") &&
+				(player.hp > 2 ||
+					!player.countCards("h", i => {
+						return get.value(i) >= 8;
+					}))
+			) {
+				return 1;
+			}
 			if (get.position(card) == "e") {
 				let subs = get.subtypes(card);
 				if (subs.includes("equip2") || subs.includes("equip3")) {
@@ -705,36 +770,104 @@ const skills = {
 			return 6 - get.value(card);
 		},
 		async content(event, trigger, player) {
-			player.draw(event.cards.length);
+			const { cards } = event;
+			event.num = 1;
+			const hs = player.getCards("h");
+			if (!hs.length) {
+				event.num = 0;
+			}
+			for (let i = 0; i < hs.length; i++) {
+				if (!cards.includes(hs[i])) {
+					event.num = 0;
+					break;
+				}
+			}
+			await player.discard(cards);
+			await player.draw(event.num + cards.length);
+		},
+		//group:'jx_zhiheng_draw',
+		subSkill: {
+			draw: {
+				trigger: { player: "loseEnd" },
+				silent: true,
+				filter(event, player) {
+					if (event.getParent(2).skill != "jx_zhiheng" && event.getParent(2).skill != "jilue_zhiheng") {
+						return false;
+					}
+					if (player.countCards("h")) {
+						return false;
+					}
+					for (var i = 0; i < event.cards.length; i++) {
+						if (event.cards[i].original == "h") {
+							return true;
+						}
+					}
+					return false;
+				},
+				async content(event, trigger, player) {
+					player.addTempSkill("jx_zhiheng_delay", trigger.getParent(2).skill + "After");
+				},
+			},
+			delay: {},
 		},
 		ai: {
-			order: 1,
+			order(item, player) {
+				if (player.hasCard(i => get.value(i) > Math.max(6, 9 - player.hp), "he")) {
+					return 1;
+				}
+				return 10;
+			},
 			result: {
 				player: 1,
 			},
-			threaten: 1.5,
+			nokeep: true,
+			skillTagFilter(player, tag, arg) {
+				if (tag === "nokeep") {
+					return (
+						(!arg || (arg && arg.card && get.name(arg.card) === "tao")) &&
+						player.isPhaseUsing() &&
+						!player.getStat().skill.jx_zhiheng &&
+						player.hasCard(card => get.name(card) !== "tao", "h")
+					);
+				}
+			},
+			threaten: 1.55,
 		},
 	},
 	// 救援
-	jiuyuan: {
+	jx_jiuyuan: {
 		audio: 2,
-		trigger: { target: "taoBegin" },
 		zhuSkill: true,
-		forced: true,
+		trigger: { global: "recoverBefore" },
+		direct: true,
 		filter(event, player) {
-			if (event.player == player) {
-				return false;
-			}
-			if (!player.hasZhuSkill("jiuyuan")) {
-				return false;
-			}
-			if (event.player.group != "wu") {
-				return false;
-			}
-			return true;
+			return (
+				player != event.player &&
+				event.player.group == "wu" &&
+				player.hp <= event.player.hp &&
+				event.getParent().name != "jx_jiuyuan" &&
+				player.hasZhuSkill("jx_jiuyuan", event.player) &&
+				event.player === _status.currentPhase
+			);
 		},
 		async content(event, trigger, player) {
-			trigger.baseDamage++;
+			// step 0
+			const result = await trigger.player
+				.chooseBool("是否对" + get.translation(player) + "发动【救援】？", "改为令其回复1点体力，然后你摸一张牌")
+				.set("ai", function () {
+					const evt = _status.event;
+					return get.attitude(evt.player, evt.getParent().player) > 0;
+				})
+				.forResult();
+
+			// step 1
+			if (result.bool) {
+				player.logSkill("jx_jiuyuan");
+				trigger.player.line(player, "green");
+				trigger.cancel();
+				await player.recover(trigger.player);
+				await trigger.player.draw();
+			}
 		},
 	},
 	// 甘宁

@@ -40,13 +40,13 @@ const characters = {
 		sex: "female",
 		group: "shu",
 		hp: 3,
-		skills: ["jizhi", "qicai"],
+		skills: ["jx_jizhi", "jx_qicai"],
 	},
 	jx_sunquan: {
 		sex: "male",
 		group: "wu",
 		hp: 4,
-		skills: ["zhiheng", "jiuyuan"],
+		skills: ["jx_zhiheng", "jx_jiuyuan"],
 		isZhugong: true,
 	},
 	jx_ganning: {
