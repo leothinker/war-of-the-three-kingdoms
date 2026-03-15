@@ -3,25 +3,25 @@ const translates = {
 	rende: "仁德",
 	rende_info: "出牌阶段，你可以将任意张手牌交给其他角色，每回合你以此法给出第二张牌时，回复1点体力。",
 	jijiang: "激将",
-	jijiang_info: "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色选择是否替你使用或打出（视为由你使用或打出）。",
+	jijiang_info: "主公技，你可以令其他蜀势力角色选择是否替你使用或打出【杀】。",
 
 	guanyu: "关羽",
 	wusheng: "武圣",
 	wusheng_info: "你可以将一张红色牌当【杀】使用或打出。",
 
 	zhangfei: "张飞",
-	jx_paoxiao: "咆哮",
+	paoxiao: "咆哮",
 	paoxiao_info: "锁定技，你使用【杀】无次数限制。",
 
 	zhugeliang: "诸葛亮",
 	guanxing: "观星",
 	guanxing_info: "准备阶段，你可以观看牌堆顶的X张牌（X为全场角色数且最多为5），然后以任意顺序分配于牌堆顶或牌堆底。",
 	kongcheng: "空城",
-	kongcheng_info: "锁定技，若你没有手牌，你不能成为【杀】或【决斗】的目标。",
+	kongcheng_info: "锁定技，若你没有手牌，则你不能成为【杀】或【决斗】的目标。",
 
 	zhaoyun: "赵云",
 	longdan: "龙胆",
-	longdan_info: "你可以将一张【杀】当【闪】、【闪】当【杀】使用或打出。",
+	longdan_info: "你可以将【杀】当【闪】、【闪】当【杀】使用或打出。",
 
 	machao: "马超",
 	mashu: "马术",
