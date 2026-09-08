@@ -361,6 +361,16 @@ const translates = {
   juexiang_he: "和弦",
   juexiang_he_info:
     "当你回复体力后，你可以令一名其他角色回复1点体力，弃置一张装备牌。",
+
+  yangxiu: "杨修",
+  danlao: "啖酪",
+  danlao_info:
+    "当你成为锦囊牌的目标后，若你不是此牌的唯一目标，你可以摸一张牌，然后此牌对你无效。",
+  jilei: "鸡肋",
+  jilei2: "鸡肋",
+  jilei2_bg: "肋",
+  jilei_info:
+    "当你受到伤害后，你可以声明一种牌的类别，本回合伤害来源不能使用、打出或弃置你声明的此类手牌。",
 }
 
 export default translates

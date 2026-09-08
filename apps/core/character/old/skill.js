@@ -3754,7 +3754,7 @@ const skills = {
   // 辛宪英
   // 忠鉴
   oldzhongjian: {
-    audio: "zhongjian",
+    audio: 2,
     enable: "phaseUse",
     usable(skill, player) {
       return (
@@ -3845,7 +3845,7 @@ const skills = {
   },
   // 才识
   oldcaishi: {
-    audio: "caishi",
+    audio: 2,
     trigger: { player: "phaseDrawBegin" },
     async cost(event, trigger, player) {
       const choices = []
@@ -4305,6 +4305,167 @@ const skills = {
           forced: true,
         })
       }
+    },
+  },
+  // 杨修
+  // 啖酪
+  danlao: {
+    audio: 2,
+    filter(event, player) {
+      return (
+        get.type(event.card) === "trick" &&
+        event.targets &&
+        event.targets.length > 1
+      )
+    },
+    check(event, player) {
+      return (
+        event.getParent().excluded.includes(player) ||
+        get.tag(event.card, "multineg") ||
+        get.effect(player, event.card, event.player, player) <= 0
+      )
+    },
+    trigger: { target: "useCardToTargeted" },
+    content() {
+      trigger.getParent().excluded.add(player)
+      player.draw()
+    },
+    ai: {
+      effect: {
+        target(card) {
+          if (get.type(card) !== "trick") {
+            return
+          }
+          if (card.name === "tiesuo") {
+            return [0, 0]
+          }
+          if (card.name === "yihuajiemu") {
+            return [0, 1]
+          }
+          if (get.tag(card, "multineg")) {
+            return [0, 2]
+          }
+        },
+      },
+    },
+  },
+  // 鸡肋
+  jilei: {
+    trigger: { player: "damageEnd" },
+    audio: 2,
+    filter(event) {
+      return event.source?.isIn()
+    },
+    async cost(event, trigger, player) {
+      const types = ["basic", "trick", "equip"].map((i) => `caoying_${i}`)
+      const { bool, links } = await player
+        .chooseButton([
+          get.prompt2(event.skill, trigger.source),
+          [types, "vcard"],
+        ])
+        .set("ai", (button) => {
+          const type = button.link[2].slice(8),
+            { player, source } = get.event()
+          if (get.attitude(player, source) > 0) {
+            return 0
+          }
+          if (source.getStorage("jilei2").includes(type)) {
+            return 0
+          }
+          if (
+            type === "trick" &&
+            source.countCards("h", (card) => {
+              return (
+                get.type(card, null, source) === "trick" &&
+                source.hasValueTarget(card)
+              )
+            })
+          ) {
+            return 3
+          }
+          return ["equip", "trick", "basic"].indexOf(type)
+        })
+        .set("source", trigger.source)
+        .forResult()
+      event.result = {
+        bool: bool,
+        targets: [trigger.source],
+        cost_data: links,
+      }
+    },
+    async content(event, trigger, player) {
+      const type = event.cost_data[0][2].slice(8)
+      player.popup(`${get.translation(type)}牌`)
+      trigger.source.addTempSkill("jilei2")
+      trigger.source.markAuto("jilei2", type)
+    },
+    ai: {
+      maixie_defend: true,
+      threaten: 0.7,
+    },
+  },
+  jilei2: {
+    charlotte: true,
+    intro: {
+      content(storage) {
+        return `不能使用、打出或弃置${get.translation(storage)}牌`
+      },
+    },
+    init(player, skill) {
+      if (!player.storage[skill]) {
+        player.storage[skill] = []
+      }
+    },
+    mark: true,
+    onremove: true,
+    mod: {
+      cardDiscardable(card, player) {
+        if (player.storage.jilei2.includes(get.type(card, "trick"))) {
+          return false
+        }
+      },
+      cardEnabled(card, player) {
+        if (player.storage.jilei2.includes(get.type(card, "trick"))) {
+          var hs = player.getCards("h"),
+            cards = [card]
+          if (Array.isArray(card.cards)) {
+            cards.addArray(card.cards)
+          }
+          for (var i of cards) {
+            if (hs.includes(i)) {
+              return false
+            }
+          }
+        }
+      },
+      cardRespondable(card, player) {
+        if (player.storage.jilei2.includes(get.type(card, "trick"))) {
+          var hs = player.getCards("h"),
+            cards = [card]
+          if (Array.isArray(card.cards)) {
+            cards.addArray(card.cards)
+          }
+          for (var i of cards) {
+            if (hs.includes(i)) {
+              return false
+            }
+          }
+        }
+      },
+      cardSavable(card, player) {
+        if (player.storage.jilei2.includes(get.type(card, "trick"))) {
+          var hs = player.getCards("h"),
+            cards = [card]
+          if (Array.isArray(card.cards)) {
+            cards.addArray(card.cards)
+          }
+          for (var i of cards) {
+            if (hs.includes(i)) {
+              return false
+            }
+          }
+        }
+      },
     },
   },
 }

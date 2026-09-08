@@ -65,8 +65,20 @@ export default {
   "#oldyoudi2": "予以小利，必有大获。",
   "#old_zhuhuan:die": "这巍巍巨城，吾竟无力撼动。",
 
+  "#oldzhongjian1": "行路八千里，方可辨忠奸。",
+  "#oldzhongjian2": "观其行，明其志，而后知心。",
+  "#oldcaishi1": "为谋大计，失小利亦无妨。",
+  "#oldcaishi2": "才思敏捷，方可识人喻事。",
+  "#old_xinxianying:die": "慧眼，也难看清这乱世的尘埃。",
+
   "#juexiang_ji1": "一弹一拨，铿锵有力！",
   "#juexiang_lie1": "一壶烈云烧，一曲人皆醉。",
   "#juexiang_rou1": "君子以琴会友，以瑟辅人。",
   "#juexiang_he1": "悠悠琴音，人人自醉。",
+
+  "#danlao1": "我喜欢！",
+  "#danlao2": "来来，一人一口！",
+  "#jilei1": "曹公之意，我已了然！",
+  "#jilei2": "食之无肉，弃之有味。",
+  "#yangxiu:die": "我固自以死之晚也……",
 }

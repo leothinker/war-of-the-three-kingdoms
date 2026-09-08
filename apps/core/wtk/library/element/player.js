@@ -6899,6 +6899,7 @@ export class Player extends HTMLDivElement {
    */
   chooseCardOL(params) {
     const next = game.createEvent("chooseCardOL")
+    next.player = this
     next._args = []
 
     const args = [...arguments]
@@ -9675,6 +9676,7 @@ export class Player extends HTMLDivElement {
     }
     next.filterStop = function () {
       if (this.num <= 0 || this.player.isHealthy()) {
+        this.num = 0
         delete this.filterStop
         this.finish()
         this._triggered = null

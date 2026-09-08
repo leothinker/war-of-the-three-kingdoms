@@ -57,4 +57,6 @@ export default {
 
   old_xinxianying: "名门智女",
   old_jikang: "峻峰孤松",
+
+  yangxiu: "恃才放旷",
 }
