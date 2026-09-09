@@ -1,5 +1,4 @@
 import { _status, game, get, lib, ui } from "wtk"
-import { security } from "@/util/sandbox.js"
 
 /**
  * @typedef {import("../index.js").Library["message"]["client"]} ClientMsgs
@@ -31,7 +30,7 @@ export class Client {
     this.closed = false
 
     if (!temp) {
-      this.sandbox = security.createSandbox(this.id)
+      this.sandbox = null
       if (this.sandbox) {
         Reflect.defineProperty(this, "sandbox", {
           value: this.sandbox,

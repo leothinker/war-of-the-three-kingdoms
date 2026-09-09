@@ -17,7 +17,7 @@ import {
   characterDefaultPicturePath,
   userAgentLowerCase,
 } from "@/util/index.js"
-import { ErrorManager, security } from "@/util/sandbox.js"
+import { ErrorManager } from "@/util/sandbox.js"
 import { Announce } from "./announce/index.js"
 import * as Element from "./element/index.js"
 import { experimental } from "./experimental/index.js"
@@ -8168,7 +8168,6 @@ export class Library {
           onclick() {
             if (this.firstChild.innerHTML !== "已重置") {
               this.firstChild.innerHTML = "已重置"
-              security.resetGrantedServers()
               setTimeout(() => {
                 if (confirm("是否重置游戏让改变的列表生效?")) {
                   game.reload()
@@ -11427,17 +11426,8 @@ export class Library {
           ) {
             throw new Error("err")
           }
-          if (game.sandbox) {
-            security.enterSandbox(game.sandbox)
-          }
-          try {
-            for (var i = 1; i < message.length; i++) {
-              message[i] = get.parsedResult(message[i])
-            }
-          } finally {
-            if (game.sandbox) {
-              security.exitSandbox()
-            }
+          for (var i = 1; i < message.length; i++) {
+            message[i] = get.parsedResult(message[i])
           }
         } catch (e) {
           console.log(e)
@@ -11477,7 +11467,6 @@ export class Library {
         }
         game.online = false
         game.ws = null
-        game.sandbox = null
       },
     },
     /**
@@ -14744,9 +14733,7 @@ export class Library {
       exec: function (func) {
         const key = game.onlineKey
         if (typeof func === "function") {
-          const isMarshalled =
-            security.isSandboxRequired() &&
-            security.importSandbox().Domain.current.isFrom(func)
+          const isMarshalled = false
           // 被封送的函数额外间隔了四层调用栈
           const level = isMarshalled ? 4 : 0
           const args = Array.from(arguments).slice(1)

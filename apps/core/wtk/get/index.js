@@ -2683,12 +2683,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (paramstr.length === 0) {
       return true
     }
-    const canCreateFunction =
-      security.isSandboxRequired() &&
-      security.importSandbox().Marshal.canCreateFunction
-    if (canCreateFunction) {
-      return canCreateFunction(paramstr, "")
-    }
     try {
       new Function(paramstr, "")
       return true
@@ -2708,12 +2702,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns {boolean}
    */
   isFunctionBody(code, type = /* (function(){return null})() */ null) {
-    const canCreateFunction =
-      security.isSandboxRequired() &&
-      security.importSandbox().Marshal.canCreateFunction
-    if (canCreateFunction) {
-      return canCreateFunction("", code, type)
-    }
     if (type === "any") {
       return (
         ["async", "generator", "agenerator", null]
@@ -2893,9 +2881,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
       // 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
       /** @type {(func: Function) => string} */
-      const decompileFunction = security.isSandboxRequired()
-        ? security.importSandbox().Marshal.decompileFunction
-        : Function.prototype.call.bind(Function.prototype.toString)
+      const decompileFunction = Function.prototype.call.bind(
+        Function.prototype.toString,
+      )
       const str = decompileFunction(func)
       // js内置的函数
       if (/\{\s*\[native code\]\s*\}/.test(str)) {
@@ -2919,18 +2907,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (/\{\s*\[native code\]\s*\}/.test(str)) {
         return () => {}
       }
-      if (security.isSandboxRequired()) {
-        const loadStr = `return (${str});`
-        const box = security.currentSandbox()
-        if (!box) {
-          throw new ReferenceError("没有找到当前沙盒")
-        }
-        func = box.exec(loadStr)
-        ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 5))
-      } else {
-        func = security.exec(`return (${str});`)
-        ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 3))
-      }
+      func = security.exec(`return (${str});`)
+      ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 3))
     } catch (e) {
       console.error(`${e} in \n${str}`)
       return () => {}

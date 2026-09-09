@@ -1,6 +1,5 @@
 import { _status, game, get, lib, rootURL, ui } from "wtk"
 import { ContentCompiler } from "@/library/element/gameEvent.js"
-import { security } from "@/util/sandbox.js"
 import { LibInitPromises } from "./promises.js"
 
 export class LibInit {
@@ -141,17 +140,8 @@ export class LibInit {
         ) {
           throw new Error("err")
         }
-        if (client.sandbox) {
-          security.enterSandbox(client.sandbox)
-        }
-        try {
-          for (var i = 1; i < message.length; i++) {
-            message[i] = get.parsedResult(message[i])
-          }
-        } finally {
-          if (client.sandbox) {
-            security.exitSandbox()
-          }
+        for (var i = 1; i < message.length; i++) {
+          message[i] = get.parsedResult(message[i])
         }
       } catch (e) {
         console.log(e)

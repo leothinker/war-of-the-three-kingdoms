@@ -7,17 +7,12 @@
 
 // 最后为安全考虑，请遵守规范，尽量不要使用 `eval` 函数而是使用 `security.exec2` 来替代
 
-import { isSandboxEnabled, SANDBOX_EXPORT } from "./initRealms.js"
-
 // 很重要的事情！
 // 请不要在在其他文件中import sandbox.js！
 // 如果需要沙盒相关的类请用security.importSandbox()导入！！！
 // 什么时候支持顶级await(Chrome 89)就可以改回去了，现在好麻烦哦
 
 /** @typedef {any} Window */
-
-// 新的开关放到了 "./initRealms.js" 里面，请不要改动此处！
-const SANDBOX_ENABLED = isSandboxEnabled()
 
 // 暴露方法Symbol，用于类之间通信
 const SandboxExposer = Symbol("Sandbox.Exposer") // 实例暴露
@@ -4615,88 +4610,4 @@ function sealObject(obj, freeze = Object.freeze) {
   }
 }
 
-if (SANDBOX_ENABLED) {
-  // 确保顶级运行域的原型链不暴露
-  if (window.top === window) {
-    ;({
-      // @ts-expect-error Sandbox
-      AccessAction,
-      // @ts-expect-error Sandbox
-      Rule,
-      // @ts-expect-error Sandbox
-      Monitor,
-      // @ts-expect-error Sandbox
-      Marshal,
-      // @ts-expect-error Sandbox
-      Domain,
-      // @ts-expect-error Sandbox
-      Sandbox,
-    } = SANDBOX_EXPORT)
-  } else {
-    // 这里是沙盒核心类初始化时所在的独立运行域
-    // 这里的全局对象不会直接暴露
-
-    // 防止被不信任代码更改
-    sealClass(AccessAction)
-    sealClass(Rule)
-    sealClass(Globals)
-    sealClass(DomainMonitors)
-    sealClass(Monitor)
-    sealClass(Marshal)
-    sealClass(Domain)
-    sealClass(Sandbox)
-
-    sealClass(Object)
-    sealClass(Array)
-    sealClass(Function)
-    sealClass(Promise)
-    sealClass(RegExp)
-    sealClass(String)
-    sealClass(Number)
-    sealClass(Boolean)
-    sealClass(Symbol)
-    sealClass(Reflect)
-    sealClass(Proxy)
-    sealClass(Date)
-    sealClass(Math)
-    sealClass(Error)
-    sealClass(TypeError)
-    sealClass(ReferenceError)
-    sealClass(RangeError)
-    sealClass(EvalError)
-    sealClass(SyntaxError)
-
-    sealClass(function* () {}.constructor)
-    sealClass((async () => {}).constructor)
-    sealClass(async function* () {}.constructor)
-
-    // 改为此处初始化，防止多次初始化
-    Domain[SandboxExposer2](SandboxSignal_InitDomain)
-
-    // 获取顶级域的错误管理器
-    ;({ CodeSnippet, ErrorReporter, ErrorManager } =
-      // @ts-expect-error Sandbox
-      window.replacedErrors)
-
-    // 向顶级运行域暴露导出
-    // @ts-expect-error Sandbox
-    window.SANDBOX_EXPORT = {
-      AccessAction,
-      Rule,
-      Monitor,
-      Marshal,
-      Domain,
-      Sandbox,
-    }
-  }
-}
-
-export {
-  AccessAction,
-  Domain,
-  Marshal,
-  Monitor,
-  Rule,
-  SANDBOX_ENABLED,
-  Sandbox,
-}
+export { AccessAction, Domain, Marshal, Monitor, Rule, Sandbox }

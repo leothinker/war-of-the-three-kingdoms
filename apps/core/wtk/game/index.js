@@ -2228,16 +2228,6 @@ export class Game {
     }
   }
   /**
-   * ```plain
-   * 进入沙盒运行模式
-   * ```
-   *
-   * @param { string } ip
-   */
-  requireSandboxOn(ip = "") {
-    security.requireSandboxOn(ip)
-  }
-  /**
    * @param { string } ip
    * @param { (result: boolean) => any } callback
    */
@@ -2307,7 +2297,6 @@ export class Game {
       return
     }
 
-    game.sandbox = security.createSandbox(ip)
     game.ws.onopen = lib.element.ws.onopen
     game.ws.onmessage = lib.element.ws.onmessage
     game.ws.onerror = lib.element.ws.onerror

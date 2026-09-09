@@ -4,7 +4,7 @@ import { CacheContext } from "@/library/cache/cacheContext.js"
 import * as config from "@/util/config.js"
 import { setOnError } from "@/util/error.ts"
 import { userAgentLowerCase } from "@/util/index.js"
-import { initializeSandboxRealms, security } from "@/util/sandbox.js"
+import { security } from "@/util/sandbox.js"
 import {
   importCardPack,
   importCharacterPack,
@@ -63,11 +63,6 @@ export async function boot() {
   if (config.get("compatible") ?? true) {
     await import("./compatible.js")
   }
-
-  const sandboxEnabled = !config.get("debug") && !get.is.safari()
-
-  // 初始化沙盒的Realms
-  await initializeSandboxRealms(sandboxEnabled)
 
   // 初始化security
   await security.initSecurity({ lib, game, ui, get, ai, _status })

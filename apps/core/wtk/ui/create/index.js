@@ -198,73 +198,39 @@ export class Create {
         event: lib.element.event,
         dialog: lib.element.dialog,
       })
-      if (security.isSandboxRequired()) {
-        const { Monitor, AccessAction } = security.importSandbox()
-        new Monitor()
-          .action(AccessAction.DEFINE)
-          .action(AccessAction.WRITE)
-          .action(AccessAction.DELETE)
-          .require("target", proxyWindow)
-          .require(
-            "property",
-            "_status",
-            "lib",
-            "game",
-            "ui",
-            "get",
-            "ai",
-            "player",
-            "card",
-            "event",
-            "dialog",
-          )
-          .then((access, nameds, control) => {
-            if (access.action === AccessAction.DEFINE) {
-              control.preventDefault()
-              control.stopPropagation()
-              control.setReturnValue(false)
-              return
-            }
+      const keys = [
+        "_status",
+        "lib",
+        "game",
+        "ui",
+        "get",
+        "ai",
+        "player",
+        "card",
+        "event",
+        "dialog",
+      ]
 
-            //
-            control.overrideParameter("target", window)
-          })
-          .start()
-      } else {
-        const keys = [
-          "_status",
-          "lib",
-          "game",
-          "ui",
-          "get",
-          "ai",
-          "player",
-          "card",
-          "event",
-          "dialog",
-        ]
-
-        for (const key of keys) {
-          const descriptor = Reflect.getOwnPropertyDescriptor(proxyWindow, key)
-          if (!descriptor) {
-            continue
-          }
-          descriptor.writable = false
-          descriptor.enumerable = true
-          descriptor.configurable = false
-          Reflect.defineProperty(proxyWindow, key, descriptor)
+      for (const key of keys) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(proxyWindow, key)
+        if (!descriptor) {
+          continue
         }
-
-        proxyWindow = new Proxy(proxyWindow, {
-          set(target, propertyKey, value, receiver) {
-            if (typeof propertyKey === "string" && keys.includes(propertyKey)) {
-              return Reflect.set(target, propertyKey, value, receiver)
-            }
-
-            return Reflect.set(window, propertyKey, value)
-          },
-        })
+        descriptor.writable = false
+        descriptor.enumerable = true
+        descriptor.configurable = false
+        Reflect.defineProperty(proxyWindow, key, descriptor)
       }
+
+      proxyWindow = new Proxy(proxyWindow, {
+        set(target, propertyKey, value, receiver) {
+          if (typeof propertyKey === "string" && keys.includes(propertyKey)) {
+            return Reflect.set(target, propertyKey, value, receiver)
+          }
+
+          return Reflect.set(window, propertyKey, value)
+        },
+      })
 
       extensions.push(
         javascript({ typescript: true }),

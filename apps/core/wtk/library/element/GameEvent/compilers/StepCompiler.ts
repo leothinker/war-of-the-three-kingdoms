@@ -5,7 +5,7 @@ import {
   AsyncGeneratorFunction,
   GeneratorFunction,
 } from "@/util/index.js"
-import { CodeSnippet, ErrorManager, security } from "@/util/sandbox.js"
+import { CodeSnippet, ErrorManager } from "@/util/sandbox.js"
 import ContentCompiler from "./ContentCompiler.ts"
 import ContentCompilerBase from "./ContentCompilerBase.ts"
 import type { EventContent } from "./IContentCompiler.ts"
@@ -72,7 +72,7 @@ class StepParser {
       throw new TypeError("为确保安全禁止用parsex/parseStep解析非函数")
     }
     // ModAsyncFunction
-    this.functionConstructor = security.getIsolatedsFrom(func)[2] as any
+    this.functionConstructor = AsyncFunction as any
     this.str = this.formatFunction(func)
   }
 
@@ -143,9 +143,7 @@ class StepParser {
   formatFunction(func: GeneralFunction) {
     // 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
     const decompileFunction: (func: GeneralFunction) => string =
-      security.isSandboxRequired()
-        ? security.importSandbox().Marshal.decompileFunction
-        : Function.prototype.call.bind(Function.prototype.toString)
+      Function.prototype.call.bind(Function.prototype.toString)
 
     //移除所有注释
     const code = decompileFunction(func)

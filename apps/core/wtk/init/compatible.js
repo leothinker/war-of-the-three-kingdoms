@@ -846,14 +846,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
         if (!get.isFunctionBody(str2)) {
           throw new Error("无效的content函数代码")
         }
-        let recompiledScope
-        if (security.isSandboxRequired()) {
-          recompiledScope = scope
-            ? security.eval(`return (${scope.toString()})`)
-            : (code) => security.eval(`return (${code.toString()})`)
-        } else {
-          recompiledScope = scope || eval
-        }
+        const recompiledScope = scope || eval
         compileStep(str2, recompiledScope)
       }
     }
@@ -988,9 +981,6 @@ lib.element.Player.prototype.when = function (...triggerNames) {
     apply(_scope) {
       if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
-      }
-      if (security.isSandboxRequired()) {
-        console.warn("`player.when().apply()` 在沙盒模式下不推荐使用")
       }
       scope = _scope
       if (skill.contentFuns.length > 0) {

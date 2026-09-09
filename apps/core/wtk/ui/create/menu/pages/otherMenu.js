@@ -2,7 +2,6 @@ import dedent from "dedent"
 import { createApp } from "vue"
 import { _status, ai, game, get, lib, ui } from "wtk"
 import { formatBuildLabel } from "@/util/meta"
-import { security } from "@/util/sandbox.js"
 import {
   clickContainer,
   menuContainer,
@@ -529,94 +528,35 @@ export const otherMenu = (/** @type { boolean | undefined } */ connectMenu) => {
         ai: ai,
         cheat: lib.cheat,
       })
-      if (security.isSandboxRequired()) {
-        const { Monitor, AccessAction } = security.importSandbox()
-        new Monitor()
-          .action(AccessAction.DEFINE)
-          .action(AccessAction.WRITE)
-          .action(AccessAction.DELETE)
-          .require("target", proxyWindow)
-          .require(
-            "property",
-            "_status",
-            "lib",
-            "game",
-            "ui",
-            "get",
-            "ai",
-            "cheat",
-          )
-          .then((access, nameds, control) => {
-            if (access.action === AccessAction.DEFINE) {
-              control.preventDefault()
-              control.stopPropagation()
-              control.setReturnValue(false)
-              return
-            }
+      const keys = ["_status", "lib", "game", "ui", "get", "ai", "cheat"]
 
-            //
-            control.overrideParameter("target", window)
-          })
-          .start()
-      } else {
-        const keys = ["_status", "lib", "game", "ui", "get", "ai", "cheat"]
-
-        for (const key of keys) {
-          const descriptor = Reflect.getOwnPropertyDescriptor(proxyWindow, key)
-          if (!descriptor) {
-            continue
-          }
-          descriptor.writable = false
-          descriptor.enumerable = true
-          descriptor.configurable = false
-          Reflect.defineProperty(proxyWindow, key, descriptor)
+      for (const key of keys) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(proxyWindow, key)
+        if (!descriptor) {
+          continue
         }
-
-        proxyWindow = new Proxy(proxyWindow, {
-          set(target, propertyKey, value, receiver) {
-            if (typeof propertyKey === "string" && keys.includes(propertyKey)) {
-              return Reflect.set(target, propertyKey, value, receiver)
-            }
-
-            return Reflect.set(window, propertyKey, value)
-          },
-        })
+        descriptor.writable = false
+        descriptor.enumerable = true
+        descriptor.configurable = false
+        Reflect.defineProperty(proxyWindow, key, descriptor)
       }
+
+      proxyWindow = new Proxy(proxyWindow, {
+        set(target, propertyKey, value, receiver) {
+          if (typeof propertyKey === "string" && keys.includes(propertyKey)) {
+            return Reflect.set(target, propertyKey, value, receiver)
+          }
+
+          return Reflect.set(window, propertyKey, value)
+        },
+      })
       //使用new Function隔绝作用域，避免在控制台可以直接访问到runCommand等变量
       /**
        * @type { (value:string)=>any }
        */
-      let fun
-      if (security.isSandboxRequired()) {
-        const reg =
-          /^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/
-        fun = (value) => {
-          const exp = reg.test(value) ? `(${value})` : value
-          const expName = `_${Math.random().toString().slice(2)}`
-          return security.exec(`return eval(${expName})`, {
-            window: proxyWindow,
-            [expName]: exp,
-          })
-        }
-        // security.exec(`
-        // 	const _status=window._status;
-        // 	const lib=window.lib;
-        // 	const game=window.game;
-        // 	const ui=window.ui;
-        // 	const get=window.get;
-        // 	const ai=window.wtkAI;
-        // 	// const cheat=window.lib.cheat; // 不再允许使用 cheat，因为它是不允许访问的变量
-        // 	//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
-        // 	const reg=${/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/};
-        // 	return function(value){
-        // 		"use strict";
-        // 		return eval(reg.test(value)?('('+value+')'):value);
-        // 	};
-        // `, { window: proxyWindow });
-      } else {
-        fun = new Function(
-          "window",
-          dedent`
+      const fun = new Function(
+        "window",
+        dedent`
 					const _status=window._status;
 					const lib=window.lib;
 					const game=window.game;
@@ -631,8 +571,7 @@ export const otherMenu = (/** @type { boolean | undefined } */ connectMenu) => {
 						return eval(reg.test(value)?('('+value+')'):value);
 					}
 				`,
-        )(proxyWindow)
-      }
+      )(proxyWindow)
       const runCommand = () => {
         if (text2.value && !["up", "down"].includes(text2.value)) {
           logindex = -1
