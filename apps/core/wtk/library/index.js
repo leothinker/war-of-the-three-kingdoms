@@ -9,6 +9,7 @@
  * @typedef { InstanceType<typeof lib.element.Control> } Control
  */
 
+import dedent from "dedent"
 import { _status, ai, game, get, ui } from "wtk"
 import { defaultSplashs } from "@/init/onload/index.js"
 import {
@@ -25,10 +26,16 @@ import { defaultHooks } from "./hooks/index.js"
 import { LibInit } from "./init/index.js"
 import { PoptipManager } from "./poptip.js"
 import skills from "./skill.js"
+import { updateURLs } from "./update-urls.js"
+
+const html = dedent
 
 export class Library {
   configprefix = "wtk_0.9_"
   versionOL = 27
+  updateURLS = updateURLs
+  updateURL = updateURLs.github
+  mirrorURL = updateURLs.coding
   hallURL = "wss://wtk.leothinker.dpdns.org/ws"
   assetURL = assetURL
   userAgent = userAgentLowerCase
@@ -48,6 +55,9 @@ export class Library {
     {},
     {
       get(target, prop, receiver) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, newValue) {
@@ -60,6 +70,10 @@ export class Library {
             Promise.resolve().then(() => {
               ui.updateCharacterPackMenu.forEach((fun) => fun(prop))
             })
+          }
+
+          if (prop.startsWith("mode_extension_")) {
+            prop = prop.slice("mode_extension_".length)
           }
         }
         const newPack = new Proxy(
@@ -74,6 +88,9 @@ export class Library {
         return Reflect.set(target, prop, newPack)
       },
       defineProperty(target, prop, descriptor) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.defineProperty(target, prop, descriptor)
       },
     },
@@ -83,12 +100,21 @@ export class Library {
     {},
     {
       get(target, prop, receiver) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, value, receiver) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.set(target, prop, value, receiver)
       },
       defineProperty(target, prop, descriptor) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.defineProperty(target, prop, descriptor)
       },
     },
@@ -103,6 +129,9 @@ export class Library {
     {},
     {
       get(target, prop, receiver) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, newValue) {
@@ -113,9 +142,15 @@ export class Library {
             })
           }
         }
+        if (prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.set(target, prop, newValue)
       },
       defineProperty(target, prop, descriptor) {
+        if (typeof prop === "string" && prop.startsWith("mode_extension_")) {
+          prop = prop.slice("mode_extension_".length)
+        }
         return Reflect.defineProperty(target, prop, descriptor)
       },
     },
@@ -301,6 +336,46 @@ export class Library {
         case "music":
           url = "theme/music/wood3.png"
           break
+        case "custom":
+          game.getDB("image", "cardback_style", (fileToLoad) => {
+            if (!fileToLoad) {
+              return
+            }
+            var fileReader = new FileReader()
+            fileReader.onload = (fileLoadedEvent) => {
+              if (ui.css.cardback_stylesheet) {
+                ui.css.cardback_stylesheet.remove()
+              }
+              ui.css.cardback_stylesheet = lib.init.sheet(
+                `.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`,
+              )
+              document.documentElement.style.setProperty(
+                "--cardback-url",
+                `url(${fileLoadedEvent.target.result})`,
+              )
+              game.getDB("image", "cardback_style2", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.cardback_stylesheet2) {
+                    ui.css.cardback_stylesheet2.remove()
+                  }
+                  ui.css.cardback_stylesheet2 = lib.init.sheet(
+                    `.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`,
+                  )
+                  document.documentElement.style.setProperty(
+                    "--cardback-url",
+                    `url(${fileLoadedEvent.target.result})`,
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
+            fileReader.readAsDataURL(fileToLoad, "UTF-8")
+          })
+          return
         default:
           document.documentElement.style.removeProperty("--cardback-url")
           return
@@ -314,6 +389,8 @@ export class Library {
   onfree = []
   inpile = []
   inpile_nature = []
+  extensions = []
+  extensionPack = {}
 
   /**
    * @type { IOnloadSplash[] }
@@ -415,9 +492,10 @@ export class Library {
     return this.#relatedTrigger
   }
   /**
-   * @type { { character?: Record<string, importCharacterConfig>, card?: Record<string, importCardConfig>, mode?: Record<string, importModeConfig>, player?: Record<string, importPlayerConfig>, play?: Record<string, importPlayConfig> } }
+   * @type { { character?: Record<string, importCharacterConfig>, card?: Record<string, importCardConfig>, mode?: Record<string, importModeConfig>, player?: Record<string, importPlayerConfig>, extension?: Record<string, importExtensionConfig>, play?: Record<string, importPlayConfig> } }
    */
   imported = {}
+  layoutfixed = ["chess", "tafang", "stone"]
   pinyins = {
     _metadata: {
       shengmu: [
@@ -1141,6 +1219,13 @@ export class Library {
             }
           },
         },
+        mount_combine: {
+          name: "合并坐骑栏",
+          init: false,
+          unfrequent: true,
+          intro: "<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。",
+          restart: true,
+        },
         auto_confirm: {
           name: "自动确认",
           init: false,
@@ -1155,7 +1240,7 @@ export class Library {
         },
         unauto_choose: {
           name: "拆顺手牌选择",
-          init: true,
+          init: false,
           unfrequent: true,
           intro: "拆牌或者顺牌时，就算只能选择对方的手牌依然手动选择",
         },
@@ -1415,7 +1500,6 @@ export class Library {
               alert("已清除所有收藏武将")
             } else {
               this.innerHTML = "<span>确认清除</span>"
-
               setTimeout(() => {
                 this.innerHTML = "<span>清除已收藏武将</span>"
               }, 1000)
@@ -1441,7 +1525,6 @@ export class Library {
               alert(`${lib.mode[get.mode()]?.name ?? "本"}模式禁用武将已清除！`)
             } else {
               this.innerHTML = "<span>确认清除</span>"
-
               setTimeout(() => {
                 this.innerHTML = "<span>清除已禁用武将</span>"
               }, 1000)
@@ -1471,7 +1554,6 @@ export class Library {
               )
             } else {
               this.innerHTML = "<span>确认清除</span>"
-
               setTimeout(() => {
                 this.innerHTML = "<span>清除最近使用武将</span>"
               }, 1000)
@@ -1585,6 +1667,132 @@ export class Library {
             }
           },
           unfrequent: true,
+        },
+        extension_auto_import: {
+          name: "自动导入扩展",
+          intro: dedent`
+						开启后三国杀会自动导入扩展目录下的扩展（以此法导入的扩展默认关闭）
+						<br />
+						※ 如果你的运行环境不支持文件操作，则该选项无效
+						<br />
+						※ 鉴于不同平台下文件操作的性能区别，开启后可能会降低加载速度
+					`,
+          init: false,
+          async onclick(bool) {
+            await game.promises.saveConfig("extension_auto_import", bool)
+          },
+          unfrequent: true,
+        },
+        fuck_sojson: {
+          name: "检测加密扩展",
+          init: false,
+          unfrequent: true,
+        },
+        update_link: {
+          name: "更新地址",
+          init: "coding",
+          unfrequent: true,
+          item: {
+            coding: "URC",
+            github: "GitHub",
+          },
+          onclick(item) {
+            game.saveConfig("update_link", item)
+            lib.updateURL = lib.updateURLS[item] || lib.updateURLS.coding
+          },
+        },
+        extension_source: {
+          name: "获取扩展地址",
+          init: "GitHub Proxy",
+          unfrequent: true,
+          item: {},
+          intro: () =>
+            `获取在线扩展时的地址。当前地址：${document.createElement("br").outerHTML}${lib.config.extension_sources[lib.config.extension_source]}`,
+        },
+        extension_create: {
+          name: "添加获取扩展地址",
+          clear: true,
+          unfrequent: true,
+          onclick() {
+            game.prompt("请输入地址名称", (str) => {
+              if (str) {
+                var map = lib.config.extension_sources
+                game.prompt(`请输入${str}的地址`, (str2) => {
+                  if (str2) {
+                    delete map[str]
+                    map[str] = str2
+                    game.saveConfig("extension_sources", map)
+                    game.saveConfig("extension_source", str)
+                    var nodexx = ui.extension_source
+                    nodexx.updateInner()
+                    var nodeyy = nodexx._link.menu
+                    var nodezz = nodexx._link.config
+                    for (var i = 0; i < nodeyy.childElementCount; i++) {
+                      if (nodeyy.childNodes[i]._link === str) {
+                        nodeyy.childNodes[i].remove()
+                        break
+                      }
+                    }
+                    var textMenu = ui.create.div("", str, nodeyy, function () {
+                      var node = this.parentNode._link
+                      var config = node._link.config
+                      node._link.current = this.link
+                      var tmpName = node.lastChild.innerHTML
+                      node.lastChild.innerHTML = config.item[this._link]
+                      if (config.onclick) {
+                        if (
+                          config.onclick.call(node, this._link, this) === false
+                        ) {
+                          node.lastChild.innerHTML = tmpName
+                        }
+                      }
+                      if (config.update) {
+                        config.update()
+                      }
+                    })
+                    textMenu._link = str
+                    nodezz.item[name] = str
+                    alert(`已添加扩展地址：${str}`)
+                  }
+                })
+              }
+            })
+          },
+        },
+        extension_delete: {
+          name: "删除当前扩展地址",
+          clear: true,
+          unfrequent: true,
+          onclick() {
+            var bool = false,
+              map = lib.config.extension_sources
+            for (var i in map) {
+              if (i !== lib.config.extension_source) {
+                bool = true
+                break
+              }
+            }
+            if (!bool) {
+              alert("不能删除最后一个扩展地址！")
+              return
+            }
+            var name = lib.config.extension_source
+            game.saveConfig("extension_source", i)
+            delete map[name]
+            game.saveConfig("extension_sources", map)
+            var nodexx = ui.extension_source
+            nodexx.updateInner()
+            var nodeyy = nodexx._link.menu
+            var nodezz = nodexx._link.config
+            for (var i = 0; i < nodeyy.childElementCount; i++) {
+              if (nodeyy.childNodes[i]._link === name) {
+                nodeyy.childNodes[i].remove()
+                break
+              }
+            }
+            delete nodezz.item[name]
+            alert(`已删除扩展地址：${name}`)
+          },
         },
         update: (config, map) => {
           if ("ontouchstart" in document) {
@@ -1872,7 +2080,11 @@ export class Library {
             }
           },
           onclick(layout) {
-            lib.init.layout(layout)
+            if (lib.layoutfixed.includes(lib.config.mode)) {
+              game.saveConfig("layout", layout)
+            } else {
+              lib.init.layout(layout)
+            }
           },
         },
         splash_style: {
@@ -2086,6 +2298,100 @@ export class Library {
           name: "游戏背景",
           init: "default",
           item: {},
+          visualBar: (node, item, create) => {
+            if (node.created) {
+              node.lastChild.classList.remove("active")
+              return
+            }
+            node.created = true
+            var fileInput = ui.create.filediv(
+              ".menubutton",
+              "添加背景",
+              node,
+              function (file) {
+                var files = this.files
+                if (files && files.length > 0) {
+                  // 支持多文件导入
+                  var fileList = Array.from(files)
+                  var totalFiles = fileList.length
+                  var processedFiles = 0
+                  fileList.forEach((file, index) => {
+                    if (file) {
+                      var name = file.name
+                      if (name.includes(".")) {
+                        name = name.slice(0, name.indexOf("."))
+                      }
+                      var link = (game.writeFile ? "cdv_" : "custom_") + name
+                      if (item[link]) {
+                        for (var i = 1; i < 1000; i++) {
+                          if (!item[`${link}_${i}`]) {
+                            link = `${link}_${i}`
+                            break
+                          }
+                        }
+                      }
+                      item[link] = name
+                      var callback = () => {
+                        create(link, node.parentNode.defaultNode)
+                        node.parentNode.updateBr()
+                        lib.config.customBackgroundPack.add(link)
+                        game.saveConfig(
+                          "customBackgroundPack",
+                          lib.config.customBackgroundPack,
+                        )
+                        processedFiles++
+                        if (
+                          processedFiles === totalFiles &&
+                          node.lastChild.classList.contains("active")
+                        ) {
+                          editbg.call(node.lastChild)
+                        }
+                      }
+                      if (game.writeFile) {
+                        game.writeFile(
+                          file,
+                          "image/background",
+                          `${link}.jpg`,
+                          callback,
+                        )
+                      } else {
+                        game.putDB("image", link, file, callback)
+                      }
+                    }
+                  })
+                }
+              },
+            )
+            fileInput.inputNode.accept = "image/*"
+            fileInput.inputNode.multiple = true
+            var editbg = function () {
+              this.classList.toggle("active")
+              var page = this.parentNode.parentNode
+              for (var i = 0; i < page.childElementCount; i++) {
+                if (page.childNodes[i].classList.contains("button")) {
+                  var link = page.childNodes[i]._link
+                  if (link && link !== "default") {
+                    var str
+                    if (this.classList.contains("active")) {
+                      if (
+                        link.startsWith("custom_") ||
+                        link.startsWith("cdv_")
+                      ) {
+                        str = "删除"
+                      } else {
+                        str = "隐藏"
+                      }
+                    } else {
+                      str = item[link]
+                    }
+                    page.childNodes[i].firstChild.innerHTML =
+                      get.verticalStr(str)
+                  }
+                }
+              }
+            }
+            ui.create.div(".menubutton", "编辑背景", node, editbg)
+          },
           visualMenu: (node, link, name, config) => {
             node.className = "button character"
             node.style.backgroundImage = ""
@@ -2093,10 +2399,26 @@ export class Library {
             if (node.firstChild) {
               node.firstChild.innerHTML = get.verticalStr(name)
             }
-            if (link === "default") {
+            if (link === "default" || link.startsWith("custom_")) {
               node.style.backgroundImage = "none"
               node.classList.add("dashedmenubutton")
-              node.parentNode.defaultNode = node
+              if (link.startsWith("custom_")) {
+                game.getDB("image", link, (fileToLoad) => {
+                  if (!fileToLoad) {
+                    return
+                  }
+                  var fileReader = new FileReader()
+                  fileReader.onload = (fileLoadedEvent) => {
+                    var data = fileLoadedEvent.target.result
+                    node.style.backgroundImage = `url(${data})`
+                    node.style.backgroundSize = "cover"
+                    node.classList.remove("dashedmenubutton")
+                  }
+                  fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                })
+              } else {
+                node.parentNode.defaultNode = node
+              }
             } else {
               node.setBackgroundImage(`image/background/${link}.jpg`)
               node.style.backgroundSize = "cover"
@@ -2143,6 +2465,11 @@ export class Library {
                     "customBackgroundPack",
                     lib.config.customBackgroundPack,
                   )
+                  if (background.startsWith("cdv_")) {
+                    game.removeFile(`image/background/${background}.jpg`)
+                  } else {
+                    game.deleteDB("image", background)
+                  }
                   delete lib.configMenu.appearence.config.image_background.item[
                     background
                   ]
@@ -2164,6 +2491,30 @@ export class Library {
             game.updateBackground()
           },
         },
+        image_background_random: {
+          name: "随机背景",
+          init: false,
+          onclick(bool) {
+            game.saveConfig("image_background_random", bool)
+            lib.init.background()
+          },
+        },
+        image_background_blur: {
+          name: "背景模糊",
+          init: false,
+          onclick(bool) {
+            game.saveConfig("image_background_blur", bool)
+            if (lib.config.image_background_blur) {
+              ui.background.style.filter = "blur(8px)"
+              ui.background.style.webkitFilter = "blur(8px)"
+              ui.background.style.transform = "scale(1.05)"
+            } else {
+              ui.background.style.filter = ""
+              ui.background.style.webkitFilter = ""
+              ui.background.style.transform = ""
+            }
+          },
+        },
         phonelayout: {
           name: "触屏布局",
           init: false,
@@ -2181,6 +2532,42 @@ export class Library {
             }
           },
         },
+        change_skin: {
+          name: "开启换肤",
+          init: true,
+          intro: "在武将资料卡界面换肤，皮肤添加方法查看docs/skin-guide.md文件",
+          onclick(item) {
+            game.saveConfig("change_skin", item)
+            if (item === false) {
+              game.broadcastAll(() => {
+                lib.config.skin = {}
+                game.saveConfig("skin", lib.config.skin)
+              })
+            }
+          },
+        },
+        change_skin_auto: {
+          name: "自动换肤",
+          init: "off",
+          item: {
+            off: "关闭",
+            30000: "半分钟",
+            60000: "一分钟",
+            120000: "两分钟",
+            300000: "五分钟",
+          },
+          intro: "游戏每进行一段时间自动为一个随机角色更换皮肤",
+          onclick(item) {
+            game.saveConfig("change_skin_auto", item)
+            clearTimeout(_status.skintimeout)
+            if (item !== "off") {
+              _status.skintimeout = setTimeout(
+                ui.click.autoskin,
+                parseInt(item, 10),
+              )
+            }
+          },
+        },
         card_style: {
           name: "卡牌样式",
           init: "ol",
@@ -2191,13 +2578,80 @@ export class Library {
             simple: "原版",
             ol: "手杀",
             // new:'新版',
+            custom: "自定",
             default: "默认",
+          },
+          visualBar: (node, item, create, switcher) => {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            var deletepic
+            ui.create.filediv(".menubutton", "添加图片", node, (file) => {
+              if (file) {
+                game.putDB("image", "card_style", file, () => {
+                  game.getDB("image", "card_style", (fileToLoad) => {
+                    if (!fileToLoad) {
+                      return
+                    }
+                    var fileReader = new FileReader()
+                    fileReader.onload = (fileLoadedEvent) => {
+                      var data = fileLoadedEvent.target.result
+                      button.style.backgroundImage = `url(${data})`
+                      button.className = "button card fullskin"
+                      node.classList.add("showdelete")
+                    }
+                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                  })
+                })
+              }
+            }).inputNode.accept = "image*"
+            deletepic = ui.create.div(
+              ".menubutton.deletebutton",
+              "删除图片",
+              node,
+              () => {
+                if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                  game.deleteDB("image", "card_style")
+                  button.style.backgroundImage = "none"
+                  button.className = "button character dashedmenubutton"
+                  node.classList.remove("showdelete")
+                  if (lib.config.card_style === "custom") {
+                    lib.configMenu.appearence.config.card_style.onclick(
+                      "default",
+                    )
+                    switcher.lastChild.innerHTML = "默认"
+                  }
+                  button.classList.add("transparent")
+                }
+              },
+            )
           },
           visualMenu: (node, link, name, config) => {
             node.className = "button card fullskin"
             node.style.backgroundSize = "100% 100%"
             switch (link) {
               case "default":
+              case "custom": {
+                if (lib.config.theme === "simple") {
+                  node.style.backgroundImage =
+                    "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
+                  node.className = "button character"
+                } else {
+                  node.style.backgroundImage = "none"
+                  node.className = "button character dashedmenubutton"
+                }
+                break
+              }
               case "new":
                 node.setBackgroundImage("theme/style/card/image/new.png")
                 break
@@ -2215,6 +2669,22 @@ export class Library {
                 node.setBackgroundImage("theme/simple/card.png")
                 break
             }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              game.getDB("image", "card_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  var data = fileLoadedEvent.target.result
+                  node.style.backgroundImage = `url(${data})`
+                  node.className = "button card fullskin"
+                  node.parentNode.lastChild.classList.add("showdelete")
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
           },
           onclick(layout) {
             game.saveConfig("card_style", layout)
@@ -2227,6 +2697,23 @@ export class Library {
             if (ui.css.card_stylesheet) {
               ui.css.card_stylesheet.remove()
               delete ui.css.card_stylesheet
+            }
+            if (layout === "custom") {
+              game.getDB("image", "card_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.card_stylesheet) {
+                    ui.css.card_stylesheet.remove()
+                  }
+                  ui.css.card_stylesheet = lib.init.sheet(
+                    `.card:not(*:empty){background-image:url(${fileLoadedEvent.target.result})}`,
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
             }
           },
           unfrequent: true,
@@ -2243,12 +2730,80 @@ export class Library {
             feicheng: "废城",
             liusha: "流沙",
             ol: "手杀",
+            custom: "自定",
             default: "默认",
+          },
+          visualBar(node, item, create, switcher) {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            ui.create.filediv(".menubutton", "添加图片", node, (file) => {
+              if (file) {
+                game.putDB("image", "cardback_style", file, () => {
+                  game.getDB("image", "cardback_style", (fileToLoad) => {
+                    if (!fileToLoad) {
+                      return
+                    }
+                    var fileReader = new FileReader()
+                    fileReader.onload = (fileLoadedEvent) => {
+                      var data = fileLoadedEvent.target.result
+                      button.style.backgroundImage = `url(${data})`
+                      button.className = "button character"
+                      node.classList.add("showdelete")
+                    }
+                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                  })
+                })
+              }
+            }).inputNode.accept = "image/*"
+            ui.create.filediv(
+              ".menubutton.deletebutton.addbutton",
+              "添加翻转图片",
+              node,
+              (file) => {
+                if (file) {
+                  game.putDB("image", "cardback_style2", file, () => {
+                    node.classList.add("hideadd")
+                  })
+                }
+              },
+            ).inputNode.accept = "image/*"
+            ui.create.div(".menubutton.deletebutton", "删除图片", node, () => {
+              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                game.deleteDB("image", "cardback_style")
+                game.deleteDB("image", "cardback_style2")
+                button.style.backgroundImage = "none"
+                button.className = "button character dashedmenubutton"
+                node.classList.remove("showdelete")
+                node.classList.remove("hideadd")
+                if (lib.config.cardback_style === "custom") {
+                  lib.configMenu.appearence.config.cardback_style.onclick(
+                    "default",
+                  )
+                  switcher.lastChild.innerHTML = "默认"
+                }
+                button.classList.add("transparent")
+              }
+            })
           },
           visualMenu(node, link, name, config) {
             node.style.backgroundSize = "100% 100%"
             switch (link) {
               case "default":
+              case "custom":
+                node.style.backgroundImage = "none"
+                node.className = "button character dashedmenubutton"
+                break
               case "new":
                 node.className = "button character"
                 node.setBackgroundImage("theme/style/cardback/image/new.png")
@@ -2282,6 +2837,27 @@ export class Library {
                 node.className = "button card fullskin"
                 node.setBackgroundImage("theme/music/wood3.png")
                 break
+            }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              game.getDB("image", "cardback_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  var data = fileLoadedEvent.target.result
+                  node.style.backgroundImage = `url(${data})`
+                  node.className = "button character"
+                  node.parentNode.lastChild.classList.add("showdelete")
+                  game.getDB("image", "cardback_style2", (file) => {
+                    if (file) {
+                      node.parentNode.lastChild.classList.add("hideadd")
+                    }
+                  })
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
             }
           },
           onclick(layout) {
@@ -2323,6 +2899,46 @@ export class Library {
               case "music":
                 url = "theme/music/wood3.png"
                 break
+              case "custom":
+                game.getDB("image", "cardback_style", (fileToLoad) => {
+                  if (!fileToLoad) {
+                    return
+                  }
+                  var fileReader = new FileReader()
+                  fileReader.onload = (fileLoadedEvent) => {
+                    if (ui.css.cardback_stylesheet) {
+                      ui.css.cardback_stylesheet.remove()
+                    }
+                    ui.css.cardback_stylesheet = lib.init.sheet(
+                      `.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`,
+                    )
+                    document.documentElement.style.setProperty(
+                      "--cardback-url",
+                      `url(${fileLoadedEvent.target.result})`,
+                    )
+                    game.getDB("image", "cardback_style2", (fileToLoad) => {
+                      if (!fileToLoad) {
+                        return
+                      }
+                      var fileReader = new FileReader()
+                      fileReader.onload = (fileLoadedEvent) => {
+                        if (ui.css.cardback_stylesheet2) {
+                          ui.css.cardback_stylesheet2.remove()
+                        }
+                        ui.css.cardback_stylesheet2 = lib.init.sheet(
+                          `.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`,
+                        )
+                        document.documentElement.style.setProperty(
+                          "--cardback-url",
+                          `url(${fileLoadedEvent.target.result})`,
+                        )
+                      }
+                      fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                    })
+                  }
+                  fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                })
+                return
               default:
                 document.documentElement.style.removeProperty("--cardback-url")
                 return
@@ -2346,6 +2962,84 @@ export class Library {
             ol: "手杀",
             xinglass: "双鱼",
             xinround: "OL",
+            custom: "自定",
+          },
+          visualBar: (node, item, create, switcher) => {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            var deletepic
+            ui.create.filediv(
+              ".menubutton.addbutton",
+              "添加图片",
+              node,
+              (file) => {
+                if (file && node.currentDB) {
+                  game.putDB("image", `hp_style${node.currentDB}`, file, () => {
+                    game.getDB(
+                      "image",
+                      `hp_style${node.currentDB}`,
+                      (fileToLoad) => {
+                        if (!fileToLoad) {
+                          return
+                        }
+                        var fileReader = new FileReader()
+                        fileReader.onload = (fileLoadedEvent) => {
+                          var data = fileLoadedEvent.target.result
+                          button.childNodes[
+                            node.currentDB - 1
+                          ].style.backgroundImage = `url(${data})`
+                          button.classList.add("shown")
+                          node.classList.add("showdelete")
+                          node.currentDB++
+                          if (node.currentDB > 4) {
+                            node.classList.add("hideadd")
+                            button.classList.remove("transparent")
+                            delete node.currentDB
+                          }
+                        }
+                        fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                      },
+                    )
+                  })
+                }
+              },
+            ).inputNode.accept = "image/*"
+            deletepic = ui.create.div(
+              ".menubutton.deletebutton",
+              "删除图片",
+              node,
+              () => {
+                if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                  game.deleteDB("image", "hp_style1")
+                  game.deleteDB("image", "hp_style2")
+                  game.deleteDB("image", "hp_style3")
+                  game.deleteDB("image", "hp_style4")
+                  for (var i = 0; i < button.childElementCount; i++) {
+                    button.childNodes[i].style.backgroundImage = "none"
+                  }
+                  node.classList.remove("showdelete")
+                  node.classList.remove("hideadd")
+                  if (lib.config.hp_style === "custom") {
+                    lib.configMenu.appearence.config.hp_style.onclick("default")
+                    switcher.lastChild.innerHTML = "默认"
+                  }
+                  button.classList.add("transparent")
+                  button.classList.remove("shown")
+                  node.currentDB = 1
+                }
+              },
+            )
           },
           visualMenu: (node, link, name, config) => {
             node.className = "button hpbutton dashedmenubutton"
@@ -2360,6 +3054,34 @@ export class Library {
               if (i === 4) {
                 div.style.webkitFilter = "grayscale(1)"
               }
+            }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              var getDB = (num) => {
+                node.parentNode.lastChild.currentDB = num
+                game.getDB("image", `hp_style${num}`, (fileToLoad) => {
+                  if (!fileToLoad) {
+                    return
+                  }
+                  var fileReader = new FileReader()
+                  fileReader.onload = (fileLoadedEvent) => {
+                    var data = fileLoadedEvent.target.result
+                    node.childNodes[num - 1].style.backgroundImage =
+                      `url(${data})`
+                    node.classList.add("shown")
+                    node.parentNode.lastChild.classList.add("showdelete")
+                    if (num < 4) {
+                      getDB(num + 1)
+                    } else {
+                      node.parentNode.lastChild.classList.add("hideadd")
+                      node.classList.remove("transparent")
+                      delete node.parentNode.firstChild.currentDB
+                    }
+                  }
+                  fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                })
+              }
+              getDB(1)
             }
           },
           onclick(layout) {
@@ -2386,6 +3108,74 @@ export class Library {
               ui.css.hp_stylesheet4.remove()
               delete ui.css.hp_stylesheet4
             }
+            if (layout === "custom") {
+              game.getDB("image", "hp_style1", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.hp_stylesheet1) {
+                    ui.css.hp_stylesheet1.remove()
+                  }
+                  ui.css.hp_stylesheet1 = lib.init.sheet(
+                    '.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(' +
+                      fileLoadedEvent.target.result +
+                      ")}",
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+              game.getDB("image", "hp_style2", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.hp_stylesheet2) {
+                    ui.css.hp_stylesheet2.remove()
+                  }
+                  ui.css.hp_stylesheet2 = lib.init.sheet(
+                    '.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(' +
+                      fileLoadedEvent.target.result +
+                      ")}",
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+              game.getDB("image", "hp_style3", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.hp_stylesheet3) {
+                    ui.css.hp_stylesheet3.remove()
+                  }
+                  ui.css.hp_stylesheet3 = lib.init.sheet(
+                    '.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(' +
+                      fileLoadedEvent.target.result +
+                      ")}",
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+              game.getDB("image", "hp_style4", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.hp_stylesheet4) {
+                    ui.css.hp_stylesheet4.remove()
+                  }
+                  ui.css.hp_stylesheet4 = lib.init.sheet(
+                    `.hp:not(.text):not(.actcount)>.lost{background-image:url(${fileLoadedEvent.target.result})}`,
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
           },
           unfrequent: true,
         },
@@ -2397,7 +3187,64 @@ export class Library {
             wood: "木纹",
             music: "音乐",
             simple: "简约",
+            custom: "自定",
             default: "默认",
+          },
+          visualBar: (node, item, create, switcher) => {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            var deletepic
+            ui.create.filediv(".menubutton", "添加图片", node, (file) => {
+              if (file) {
+                game.putDB("image", "player_style", file, () => {
+                  game.getDB("image", "player_style", (fileToLoad) => {
+                    if (!fileToLoad) {
+                      return
+                    }
+                    var fileReader = new FileReader()
+                    fileReader.onload = (fileLoadedEvent) => {
+                      var data = fileLoadedEvent.target.result
+                      button.style.backgroundImage = `url(${data})`
+                      button.className = "button character"
+                      button.style.backgroundSize = "100% 100%"
+                      node.classList.add("showdelete")
+                    }
+                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                  })
+                })
+              }
+            }).inputNode.accept = "image/*"
+            deletepic = ui.create.div(
+              ".menubutton.deletebutton",
+              "删除图片",
+              node,
+              () => {
+                if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                  game.deleteDB("image", "player_style")
+                  button.style.backgroundImage = "none"
+                  button.className = "button character dashedmenubutton"
+                  node.classList.remove("showdelete")
+                  if (lib.config.player_style === "custom") {
+                    lib.configMenu.appearence.config.player_style.onclick(
+                      "default",
+                    )
+                    switcher.lastChild.innerHTML = "默认"
+                  }
+                  button.classList.add("transparent")
+                }
+              },
+            )
           },
           visualMenu: (node, link, name, config) => {
             node.className = "button character"
@@ -2405,6 +3252,11 @@ export class Library {
             node.style.height = "108px"
             switch (link) {
               case "default":
+              case "custom": {
+                node.style.backgroundImage = "none"
+                node.className = "button character dashedmenubutton"
+                break
+              }
               case "wood":
                 node.setBackgroundImage("theme/woodden/wood.jpg")
                 break
@@ -2416,6 +3268,23 @@ export class Library {
                   "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                 break
             }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              game.getDB("image", "player_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  var data = fileLoadedEvent.target.result
+                  node.style.backgroundImage = `url(${data})`
+                  node.className = "button character"
+                  node.parentNode.lastChild.classList.add("showdelete")
+                  node.style.backgroundSize = "100% 100%"
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
           },
           onclick(layout) {
             game.saveConfig("player_style", layout)
@@ -2423,7 +3292,23 @@ export class Library {
               ui.css.player_stylesheet.remove()
               delete ui.css.player_stylesheet
             }
-            if (layout !== "default") {
+            if (layout === "custom") {
+              game.getDB("image", "player_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.player_stylesheet) {
+                    ui.css.player_stylesheet.remove()
+                  }
+                  ui.css.player_stylesheet = lib.init.sheet(
+                    `#window .player{background-image:url("${fileLoadedEvent.target.result}");background-size:100% 100%;}`,
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            } else if (layout !== "default") {
               var str = ""
               switch (layout) {
                 case "wood":
@@ -2487,8 +3372,65 @@ export class Library {
             dragon_gold: "金龙",
             dragon_silver: "银龙",
             dragon_bronze: "玉龙",
+            custom: "自定",
             auto: "自动",
             default: "默认",
+          },
+          visualBar: (node, item, create, switcher) => {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            var deletepic
+            ui.create.filediv(".menubutton", "添加图片", node, (file) => {
+              if (file) {
+                game.putDB("image", "border_style", file, () => {
+                  game.getDB("image", "border_style", (fileToLoad) => {
+                    if (!fileToLoad) {
+                      return
+                    }
+                    var fileReader = new FileReader()
+                    fileReader.onload = (fileLoadedEvent) => {
+                      var data = fileLoadedEvent.target.result
+                      button.style.backgroundImage = `url(${data})`
+                      button.className = "button character"
+                      button.style.backgroundSize = "100% 100%"
+                      node.classList.add("showdelete")
+                    }
+                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                  })
+                })
+              }
+            }).inputNode.accept = "image/*"
+            deletepic = ui.create.div(
+              ".menubutton.deletebutton",
+              "删除图片",
+              node,
+              () => {
+                if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                  game.deleteDB("image", "border_style")
+                  button.style.backgroundImage = "none"
+                  button.className = "button character dashedmenubutton"
+                  node.classList.remove("showdelete")
+                  if (lib.config.border_style === "custom") {
+                    lib.configMenu.appearence.config.border_style.onclick(
+                      "default",
+                    )
+                    switcher.lastChild.innerHTML = "默认"
+                  }
+                  button.classList.add("transparent")
+                }
+              },
+            )
           },
           visualMenu: (node, link, name, config) => {
             node.className = "button character"
@@ -2506,6 +3448,23 @@ export class Library {
               node.setBackgroundImage(`theme/style/player/${link}1.png`)
               node.style.backgroundSize = "100% 100%"
             }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              game.getDB("image", "border_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  var data = fileLoadedEvent.target.result
+                  node.style.backgroundImage = `url(${data})`
+                  node.className = "button character"
+                  node.parentNode.lastChild.classList.add("showdelete")
+                  node.style.backgroundSize = "100% 100%"
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
           },
           onclick(layout) {
             game.saveConfig("border_style", layout)
@@ -2513,7 +3472,30 @@ export class Library {
               ui.css.border_stylesheet.remove()
               delete ui.css.border_stylesheet
             }
-            if (layout !== "default" && layout !== "auto") {
+            if (layout === "custom") {
+              game.getDB("image", "border_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.border_stylesheet) {
+                    ui.css.border_stylesheet.remove()
+                  }
+                  ui.css.border_stylesheet = lib.init.sheet()
+                  ui.css.border_stylesheet.id = "ui.css.border"
+                  ui.css.border_stylesheet.sheet.insertRule(
+                    `#window .player>.framebg{display:block;background-image:url("${fileLoadedEvent.target.result}")}`,
+                    0,
+                  )
+                  ui.css.border_stylesheet.sheet.insertRule(
+                    ".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}",
+                    0,
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            } else if (layout !== "default" && layout !== "auto") {
               ui.css.border_stylesheet = lib.init.sheet()
               if (layout.startsWith("dragon_")) {
                 layout = layout.slice(7)
@@ -2618,13 +3600,76 @@ export class Library {
             wood: "木纹",
             music: "音乐",
             simple: "简约",
+            custom: "自定",
             default: "默认",
+          },
+          visualBar: (node, item, create, switcher) => {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            var deletepic
+            ui.create.filediv(".menubutton", "添加图片", node, (file) => {
+              if (file) {
+                game.putDB("image", "menu_style", file, () => {
+                  game.getDB("image", "menu_style", (fileToLoad) => {
+                    if (!fileToLoad) {
+                      return
+                    }
+                    var fileReader = new FileReader()
+                    fileReader.onload = (fileLoadedEvent) => {
+                      var data = fileLoadedEvent.target.result
+                      button.style.backgroundImage = `url(${data})`
+                      button.style.backgroundSize = "cover"
+                      button.className = "button character"
+                      node.classList.add("showdelete")
+                    }
+                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                  })
+                })
+              }
+            }).inputNode.accept = "image/*"
+            deletepic = ui.create.div(
+              ".menubutton.deletebutton",
+              "删除图片",
+              node,
+              () => {
+                if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                  game.deleteDB("image", "menu_style")
+                  button.style.backgroundImage = "none"
+                  button.style.backgroundSize = "auto"
+                  button.className = "button character dashedmenubutton"
+                  node.classList.remove("showdelete")
+                  if (lib.config.menu_style === "custom") {
+                    lib.configMenu.appearence.config.menu_style.onclick(
+                      "default",
+                    )
+                    switcher.lastChild.innerHTML = "默认"
+                  }
+                  button.classList.add("transparent")
+                }
+              },
+            )
           },
           visualMenu: (node, link, name, config) => {
             node.className = "button character"
             node.style.backgroundSize = "auto"
             switch (link) {
               case "default":
+              case "custom": {
+                node.style.backgroundImage = "none"
+                node.classList.add("dashedmenubutton")
+                break
+              }
               case "wood":
                 node.setBackgroundImage("theme/woodden/wood2.png")
                 break
@@ -2636,6 +3681,23 @@ export class Library {
                   "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                 break
             }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              game.getDB("image", "menu_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  var data = fileLoadedEvent.target.result
+                  node.style.backgroundImage = `url(${data})`
+                  node.style.backgroundSize = "cover"
+                  node.className = "button character"
+                  node.parentNode.lastChild.classList.add("showdelete")
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
           },
           onclick(layout) {
             game.saveConfig("menu_style", layout)
@@ -2643,7 +3705,25 @@ export class Library {
               ui.css.menu_stylesheet.remove()
               delete ui.css.menu_stylesheet
             }
-            if (layout !== "default") {
+            if (layout === "custom") {
+              game.getDB("image", "menu_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.menu_stylesheet) {
+                    ui.css.menu_stylesheet.remove()
+                  }
+                  ui.css.menu_stylesheet = lib.init.sheet(
+                    'html #window>.dialog.popped,html .menu,html .menubg{background-image:url("' +
+                      fileLoadedEvent.target.result +
+                      '");background-size:cover}',
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            } else if (layout !== "default") {
               var str = ""
               switch (layout) {
                 case "wood":
@@ -2672,13 +3752,75 @@ export class Library {
             wood: "木纹",
             music: "音乐",
             simple: "简约",
+            custom: "自定",
             default: "默认",
+          },
+          visualBar: (node, item, create, switcher) => {
+            if (node.created) {
+              return
+            }
+            var button
+            for (var i = 0; i < node.parentNode.childElementCount; i++) {
+              if (node.parentNode.childNodes[i]._link === "custom") {
+                button = node.parentNode.childNodes[i]
+              }
+            }
+            if (!button) {
+              return
+            }
+            node.created = true
+            var deletepic
+            ui.create.filediv(".menubutton", "添加图片", node, (file) => {
+              if (file) {
+                game.putDB("image", "control_style", file, () => {
+                  game.getDB("image", "control_style", (fileToLoad) => {
+                    if (!fileToLoad) {
+                      return
+                    }
+                    var fileReader = new FileReader()
+                    fileReader.onload = (fileLoadedEvent) => {
+                      var data = fileLoadedEvent.target.result
+                      button.style.backgroundImage = `url(${data})`
+                      button.className = "button character controlbutton"
+                      node.classList.add("showdelete")
+                    }
+                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
+                  })
+                })
+              }
+            }).inputNode.accept = "image/*"
+            deletepic = ui.create.div(
+              ".menubutton.deletebutton",
+              "删除图片",
+              node,
+              () => {
+                if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
+                  game.deleteDB("image", "control_style")
+                  button.style.backgroundImage = "none"
+                  button.className =
+                    "button character controlbutton dashedmenubutton"
+                  node.classList.remove("showdelete")
+                  if (lib.config.control_style === "custom") {
+                    lib.configMenu.appearence.config.control_style.onclick(
+                      "default",
+                    )
+                    switcher.lastChild.innerHTML = "默认"
+                  }
+                  button.classList.add("transparent")
+                }
+              },
+            )
           },
           visualMenu: (node, link, name, config) => {
             node.className = "button character controlbutton"
             node.style.backgroundSize = ""
             switch (link) {
               case "default":
+              case "custom": {
+                node.style.backgroundImage = "none"
+                node.classList.add("dashedmenubutton")
+                break
+              }
               case "wood":
                 node.setBackgroundImage("theme/woodden/wood.jpg")
                 break
@@ -2690,6 +3832,22 @@ export class Library {
                   "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                 break
             }
+            if (link === "custom") {
+              node.classList.add("transparent")
+              game.getDB("image", "control_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  var data = fileLoadedEvent.target.result
+                  node.style.backgroundImage = `url(${data})`
+                  node.className = "button character controlbutton"
+                  node.parentNode.lastChild.classList.add("showdelete")
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
           },
           onclick(layout) {
             game.saveConfig("control_style", layout)
@@ -2697,7 +3855,25 @@ export class Library {
               ui.css.control_stylesheet.remove()
               delete ui.css.control_stylesheet
             }
-            if (layout !== "default") {
+            if (layout === "custom") {
+              game.getDB("image", "control_style", (fileToLoad) => {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = (fileLoadedEvent) => {
+                  if (ui.css.control_stylesheet) {
+                    ui.css.control_stylesheet.remove()
+                  }
+                  ui.css.control_stylesheet = lib.init.sheet(
+                    '#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("' +
+                      fileLoadedEvent.target.result +
+                      '")}',
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            } else if (layout !== "default") {
               var str = ""
               switch (layout) {
                 case "wood":
@@ -3280,13 +4456,29 @@ export class Library {
             map.custom_button_control_top.hide()
             map.custom_button_control_bottom.hide()
           }
-          map.image_background.show()
-          // if(lib.config.image_background=='custom'&&lib.db){
-          // 	map.import_background.show();
-          // }
-          // else{
-          // 	map.import_background.hide();
-          // }
+          if (lib.config.change_skin) {
+            map.change_skin_auto.show()
+          } else {
+            map.change_skin_auto.hide()
+          }
+          if (lib.config.image_background_random) {
+            map.image_background_blur.show()
+            map.image_background.hide()
+            // map.import_background.hide();
+          } else {
+            map.image_background.show()
+            if (lib.config.image_background === "default") {
+              map.image_background_blur.hide()
+            } else {
+              map.image_background_blur.show()
+            }
+            // if(lib.config.image_background=='custom'&&lib.db){
+            // 	map.import_background.show();
+            // }
+            // else{
+            // 	map.import_background.hide();
+            // }
+          }
           if (lib.config.layout === "long" || lib.config.layout === "mobile") {
             //map.textequip.show();
             map.cardshape.show()
@@ -3336,7 +4528,12 @@ export class Library {
       name: "显示",
       config: {
         update: (config, map) => {
-          if (lib.config.mode === "versus" || lib.config.mode === "boss") {
+          if (
+            lib.config.mode === "versus" ||
+            lib.config.mode === "chess" ||
+            lib.config.mode === "tafang" ||
+            lib.config.mode === "boss"
+          ) {
             map.show_handcardbutton.show()
           } else {
             map.show_handcardbutton.hide()
@@ -3417,6 +4614,11 @@ export class Library {
 					} else {
 						map.show_deckMonitor_online.hide();
 					}*/
+          if (lib.config.show_extensionmaker) {
+            map.show_extensionshare.show()
+          } else {
+            map.show_extensionshare.hide()
+          }
         },
         show_history: {
           name: "出牌记录栏",
@@ -4074,6 +5276,16 @@ export class Library {
           init: false,
           unfrequent: true,
         },
+        show_extensionmaker: {
+          name: "显示制作扩展",
+          init: true,
+          unfrequent: true,
+        },
+        show_extensionshare: {
+          name: "显示分享扩展",
+          init: true,
+          unfrequent: true,
+        },
         show_characternamepinyin: {
           name: "显示武将名注解",
           intro: "在武将资料卡显示武将名及其注解、性别、势力、体力等信息",
@@ -4177,6 +5389,9 @@ export class Library {
           } else {
             map.import_music.hide()
           }
+          map.clear_background_music[
+            get.is.object(lib.config.customBackgroundMusic) ? "show" : "hide"
+          ]()
           ui.background_music_setting = map.background_music
           map.background_music._link.config.updatex.call(
             map.background_music,
@@ -4266,6 +5481,32 @@ export class Library {
           onclick(volume) {
             game.saveConfig("volumn_background", parseInt(volume, 10))
             ui.backgroundMusic.volume = volume / 8
+          },
+        },
+        clear_background_music: {
+          name: "清除自定义背景音乐",
+          clear: true,
+          onclick() {
+            if (
+              confirm(
+                "是否清除已导入的所有自定义背景音乐？（该操作不可撤销！）",
+              )
+            ) {
+              for (var i in lib.config.customBackgroundMusic) {
+                lib.config.all.background_music.remove(i)
+                if (i.startsWith("cdv_")) {
+                  game.removeFile(`audio/background/${i}.mp3`)
+                } else {
+                  game.deleteDB("audio", i)
+                }
+              }
+              lib.config.customBackgroundMusic = null
+              game.saveConfig("customBackgroundMusic", null)
+              game.saveConfig("background_music", "music_off")
+              if (!_status._aozhan) {
+                game.playBackgroundMusic()
+              }
+            }
           },
         },
       },
@@ -4362,7 +5603,6 @@ export class Library {
               game.saveConfig("hiddenCardPack", [])
               game.saveConfig("hiddenPlayPack", [])
               game.saveConfig("hiddenBackgroundPack", [])
-
               setTimeout(() => {
                 this.firstChild.innerHTML = "重置隐藏内容"
                 setTimeout(() => {
@@ -4383,7 +5623,6 @@ export class Library {
               game.saveConfig("new_tutorial", false)
               game.saveConfig("prompt_hidebg")
               game.saveConfig("prompt_hidepack")
-
               setTimeout(() => {
                 this.firstChild.innerHTML = "重置新手向导"
               }, 500)
@@ -4435,6 +5674,52 @@ export class Library {
             }
           },
           clear: true,
+        },
+        remove_extension_onfig: {
+          name: "重置无效扩展",
+          clear: true,
+          async onclick() {
+            if (this.firstChild.innerHTML !== "已重置") {
+              const config = lib.config
+              if (get.is.object(config)) {
+                const extensionList = config.extensions
+                for (const name of extensionList) {
+                  const num = await game.promises.checkDir(`extension/${name}`)
+                  if (num !== 1) {
+                    game.removeExtension(name)
+                  } else {
+                    const all = await game.promises.getFileList(
+                      `extension/${name}`,
+                    )
+                    if (all?.[1].length) {
+                      const hasExtensionJs = all[1].includes("extension.js")
+                      const hasInfoJson = all[1].includes("info.json")
+
+                      if (!hasExtensionJs) {
+                        const message = hasInfoJson
+                          ? `扩展${name}有 info.json 但缺少 extension.js 文件`
+                          : `扩展${name}缺少必须的 extension.js 文件`
+                        console.error(message)
+                        game.removeExtension(name)
+                      }
+                    }
+                  }
+                }
+              }
+              this.firstChild.innerHTML = "已重置"
+              setTimeout(() => {
+                this.firstChild.innerHTML = "重置无效扩展"
+                setTimeout(() => {
+                  const ret = confirm(
+                    `检测完成，已为你清除无效配置，是否重启？`,
+                  )
+                  if (ret) {
+                    game.reload()
+                  }
+                })
+              }, 500)
+            }
+          },
         },
         redownload_game: {
           name: "重新下载游戏",
@@ -4518,6 +5803,278 @@ export class Library {
         // 	},
         // 	clear:true
         // }
+      },
+    },
+  }
+  extensionMenu = {
+    cardpile: {
+      enable: {
+        name: "开启",
+        init: false,
+        restart: true,
+      },
+      intro: {
+        name: "将杀闪等牌在牌堆中的比例维持在与军争牌堆相同，防止开启扩展包后被过多地稀释",
+        clear: true,
+        nopointer: true,
+      },
+      sha: {
+        name: "杀",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      huosha: {
+        name: "火杀",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      leisha: {
+        name: "雷杀",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      shan: {
+        name: "闪",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      tao: {
+        name: "桃",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      jiu: {
+        name: "酒",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      wuxie: {
+        name: "无懈可击",
+        init: "0.5",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      nanman: {
+        name: "南蛮入侵",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      wanjian: {
+        name: "万箭齐发",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      guohe: {
+        name: "过河拆桥",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      shunshou: {
+        name: "顺手牵羊",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      tiesuo: {
+        name: "铁索连环",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      hide: {
+        name: "隐藏此扩展",
+        clear: true,
+        onclick() {
+          if (this.firstChild.innerHTML === "隐藏此扩展") {
+            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
+            lib.config.hiddenPlayPack.add("cardpile")
+            if (!lib.config.prompt_hidepack) {
+              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+              game.saveConfig("prompt_hidepack", true)
+            }
+          } else {
+            this.firstChild.innerHTML = "隐藏此扩展"
+            lib.config.hiddenPlayPack.remove("cardpile")
+          }
+          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
+        },
+      },
+    },
+    boss: {
+      enable: {
+        name: "开启",
+        init: false,
+        restart: true,
+        onswitch: (bool) => {
+          if (bool) {
+            var storage = { boss: {}, versus: {}, translate: {} }
+            var loadversus = () => {
+              game.loadModeAsync("versus", (mode) => {
+                for (var i in mode.translate) {
+                  storage.translate[i] = mode.translate[i]
+                }
+                for (var i in mode.jiangeboss) {
+                  if (mode.jiangeboss[i].isBossAllowed) {
+                    storage.versus[i] = mode.jiangeboss[i]
+                  }
+                }
+                localStorage.setItem(
+                  "boss_storage_playpackconfig",
+                  JSON.stringify(storage),
+                )
+              })
+            }
+            game.loadModeAsync("boss", (mode) => {
+              for (var i in mode.translate) {
+                storage.translate[i] = mode.translate[i]
+              }
+              for (var i in mode.characterPack.mode_boss) {
+                if (mode.characterPack.mode_boss[i].isBossAllowed) {
+                  storage.boss[i] = mode.characterPack.mode_boss[i]
+                }
+              }
+              loadversus()
+            })
+          } else {
+            localStorage.removeItem("boss_storage_playpackconfig")
+          }
+        },
+      },
+      intro: {
+        name: "将剑阁和挑战模式的武将添加到其它模式",
+        clear: true,
+        nopointer: true,
+      },
+      enableai: {
+        name: "随机选将可用",
+        init: false,
+      },
+      hide: {
+        name: "隐藏此扩展",
+        clear: true,
+        onclick() {
+          if (this.firstChild.innerHTML === "隐藏此扩展") {
+            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
+            lib.config.hiddenPlayPack.add("boss")
+            if (!lib.config.prompt_hidepack) {
+              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+              game.saveConfig("prompt_hidepack", true)
+            }
+          } else {
+            this.firstChild.innerHTML = "隐藏此扩展"
+            lib.config.hiddenPlayPack.remove("boss")
+          }
+          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
+        },
+      },
+    },
+    coin: {
+      enable: {
+        name: "开启",
+        init: false,
+        restart: true,
+        onclick(bool) {
+          if (bool) {
+            lib.config.plays.add("coin")
+          } else {
+            lib.config.plays.remove("coin")
+          }
+          game.saveConfig("plays", lib.config.plays)
+        },
+      },
+      intro: {
+        name: "每完成一次对局，可获得一定数量的金币；金币可用于购买游戏特效",
+        clear: true,
+        nopointer: true,
+      },
+      display: {
+        name: "金币显示",
+        init: "text",
+        item: {
+          symbol: "符号",
+          text: "文字",
+        },
+        onclick(item) {
+          game.saveConfig("coin_display_playpackconfig", item)
+          if (game.changeCoin) {
+            game.changeCoin(0)
+          }
+        },
+      },
+      canvas: {
+        name: "特效置顶",
+        init: false,
+        onclick(bool) {
+          game.saveConfig("coin_canvas_playpackconfig", bool)
+          if (bool) {
+            ui.window.classList.add("canvas_top")
+          } else {
+            ui.window.classList.remove("canvas_top")
+          }
+        },
+      },
+      hide: {
+        name: "隐藏此扩展",
+        clear: true,
+        onclick() {
+          if (this.firstChild.innerHTML === "隐藏此扩展") {
+            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
+            lib.config.hiddenPlayPack.add("coin")
+            if (!lib.config.prompt_hidepack) {
+              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+              game.saveConfig("prompt_hidepack", true)
+            }
+          } else {
+            this.firstChild.innerHTML = "隐藏此扩展"
+            lib.config.hiddenPlayPack.remove("coin")
+          }
+          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
+        },
       },
     },
   }
@@ -4667,7 +6224,7 @@ export class Library {
         },
         connect_choice_zhu: {
           name: "主公候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -4684,7 +6241,7 @@ export class Library {
         },
         connect_limit_zhu: {
           name: "常备主候选武将数",
-          init: "5",
+          init: "off",
           restart: true,
           item: {
             off: "不限制",
@@ -5391,7 +6948,7 @@ export class Library {
         },
         choice_zhu: {
           name: "主公候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -5408,7 +6965,7 @@ export class Library {
         },
         limit_zhu: {
           name: "常备主候选武将数",
-          init: "5",
+          init: "off",
           restart: true,
           item: {
             off: "不限制",
@@ -6017,7 +7574,7 @@ export class Library {
         },
         connect_olfeiyang_four: {
           name: "四号位获得【飞扬】",
-          init: false,
+          init: true,
           frequent: true,
           intro:
             "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
@@ -6331,7 +7888,7 @@ export class Library {
         },
         olfeiyang_four: {
           name: "四号位获得【飞扬】",
-          init: false,
+          init: true,
           frequent: true,
           intro:
             "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
@@ -6587,6 +8144,11 @@ export class Library {
           init: true,
           intro: "禁止与自己版本不同的玩家进入房间",
         },
+        check_extension: {
+          name: "禁止扩展玩家进房",
+          init: false,
+          intro: "禁止开启了扩展的玩家进入房间",
+        },
         reset_banBlacklist: {
           name: "重置黑名单",
           onclick() {
@@ -6594,7 +8156,6 @@ export class Library {
               this.firstChild.innerHTML = "已重置"
               var banBlacklist = []
               game.saveConfig("banBlacklist", banBlacklist)
-
               setTimeout(() => {
                 this.firstChild.innerHTML = "重置黑名单"
               }, 1000)
@@ -7334,6 +8895,248 @@ export class Library {
         },
       },
     },
+    chess: {
+      name: "战棋",
+      config: {
+        chess_mode: {
+          name: "游戏模式",
+          init: "combat",
+          item: {
+            combat: "自由",
+            three: "统率",
+            leader: "君主",
+          },
+          restart: true,
+          frequent: true,
+        },
+        update: (config, map) => {
+          if (config.chess_mode === "leader") {
+            map.chess_leader_save.show()
+            map.chess_leader_clear.show()
+            map.chess_leader_allcharacter.show()
+            map.chess_character.hide()
+          } else {
+            map.chess_leader_save.hide()
+            map.chess_leader_clear.hide()
+            map.chess_leader_allcharacter.hide()
+            map.chess_character.show()
+          }
+          if (config.chess_mode === "combat") {
+            // map.battle_number.show();
+            // map.chess_ordered.show();
+            map.free_choose.show()
+            map.change_choice.show()
+          } else {
+            // map.battle_number.hide();
+            // map.chess_ordered.hide();
+            map.free_choose.hide()
+            map.change_choice.hide()
+          }
+        },
+        chess_leader_save: {
+          name: "选择历程",
+          init: "save1",
+          item: {
+            save1: "一",
+            save2: "二",
+            save3: "三",
+            save4: "四",
+            save5: "五",
+          },
+          restart: true,
+          frequent: true,
+        },
+        chess_leader_allcharacter: {
+          name: "启用全部角色",
+          init: true,
+          onclick(bool) {
+            if (confirm("调整该设置将清除所有进度，是否继续？")) {
+              for (var i = 1; i < 6; i++) {
+                game.save(`save${i}`, null, "chess")
+              }
+              game.saveConfig("chess_leader_allcharacter", bool, "chess")
+              if (get.mode() === "chess") {
+                game.reload()
+              }
+              return
+            }
+            this.classList.toggle("on")
+          },
+        },
+        chess_leader_clear: {
+          name: "清除进度",
+          onclick() {
+            if (this._clearing) {
+              for (var i = 1; i < 6; i++) {
+                game.save(`save${i}`, null, "chess")
+              }
+              game.reload()
+              return
+            }
+            this._clearing = true
+            this.firstChild.innerHTML = "单击以确认 (3)"
+            setTimeout(() => {
+              this.firstChild.innerHTML = "单击以确认 (2)"
+              setTimeout(() => {
+                this.firstChild.innerHTML = "单击以确认 (1)"
+                setTimeout(() => {
+                  this.firstChild.innerHTML = "清除进度"
+                  delete this._clearing
+                }, 1000)
+              }, 1000)
+            }, 1000)
+          },
+          clear: true,
+          frequent: true,
+        },
+        // chess_treasure:{
+        // 	name:'战场机关',
+        // 	init:'0',
+        // 	frequent:true,
+        // 	item:{
+        // 		'0':'关闭',
+        // 		'0.1':'较少出现',
+        // 		'0.2':'偶尔出现',
+        // 		'0.333':'时常出现',
+        // 		'0.5':'频繁出现',
+        // 	}
+        // },
+        chess_obstacle: {
+          name: "随机路障",
+          init: "0.2",
+          item: {
+            0: "关闭",
+            0.2: "少量",
+            0.333: "中量",
+            0.5: "大量",
+          },
+          frequent: true,
+        },
+        show_range: {
+          name: "显示卡牌范围",
+          init: true,
+        },
+        show_distance: {
+          name: "显示距离",
+          init: true,
+        },
+        chess_character: {
+          name: "战棋武将",
+          init: true,
+          frequent: true,
+        },
+        chess_card: {
+          name: "战棋卡牌",
+          init: true,
+          frequent: true,
+        },
+        free_choose: {
+          name: "自由选将",
+          init: true,
+          onclick(bool) {
+            game.saveConfig("free_choose", bool, this._link.config.mode)
+            if (
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
+            ) {
+              return
+            }
+            if (!ui.cheat2 && get.config("free_choose")) {
+              ui.create.cheat2()
+            } else if (ui.cheat2 && !get.config("free_choose")) {
+              ui.cheat2.close()
+              delete ui.cheat2
+            }
+          },
+        },
+        change_choice: {
+          name: "开启换将卡",
+          init: true,
+          onclick(bool) {
+            game.saveConfig("change_choice", bool, this._link.config.mode)
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
+              return
+            }
+            if (!ui.cheat && get.config("change_choice")) {
+              ui.create.cheat()
+            } else if (ui.cheat && !get.config("change_choice")) {
+              ui.cheat.close()
+              delete ui.cheat
+            }
+          },
+        },
+        chessscroll_speed: {
+          name: "边缘滚动速度",
+          init: "20",
+          intro: "鼠标移至屏幕边缘时自动滚屏",
+          item: {
+            0: "不滚动",
+            10: "10格/秒",
+            20: "20格/秒",
+            30: "30格/秒",
+          },
+        },
+      },
+    },
+    tafang: {
+      name: "塔防",
+      config: {
+        tafang_turn: {
+          name: "游戏胜利",
+          init: "10",
+          frequent: true,
+          item: {
+            10: "十回合",
+            20: "二十回合",
+            30: "三十回合",
+            1000: "无限",
+          },
+        },
+        // tafang_size:{
+        // 	name:'战场大小',
+        // 	init:'9',
+        // 	frequent:true,
+        // 	item:{
+        // 		'6':'小',
+        // 		'9':'中',
+        // 		'12':'大',
+        // 	}
+        // },
+        tafang_difficulty: {
+          name: "战斗难度",
+          init: "2",
+          frequent: true,
+          item: {
+            1: "简单",
+            2: "普通",
+            3: "困难",
+          },
+        },
+        show_range: {
+          name: "显示卡牌范围",
+          init: true,
+        },
+        show_distance: {
+          name: "显示距离",
+          init: true,
+        },
+        chessscroll_speed: {
+          name: "边缘滚动速度",
+          intro: "鼠标移至屏幕边缘时自动滚屏",
+          init: "20",
+          item: {
+            0: "不滚动",
+            10: "10格/秒",
+            20: "20格/秒",
+            30: "30格/秒",
+          },
+        },
+      },
+    },
     brawl: {
       name: "乱斗",
       config: {
@@ -7401,6 +9204,163 @@ export class Library {
           name: "创建场景",
           init: true,
           frequent: true,
+        },
+      },
+    },
+    stone: {
+      name: "炉石",
+      config: {
+        // update:function(config,map){
+        // 	if(config.stone_mode=='deck'){
+        // 		// map.deck_length.show();
+        // 		// map.deck_repeat.show();
+        // 		map.random_length.hide();
+        // 		map.skill_bar.show();
+        // 	}
+        // 	else{
+        // 		// map.deck_length.hide();
+        // 		// map.deck_repeat.hide();
+        // 		map.random_length.show();
+        // 		map.skill_bar.hide();
+        // 	}
+        // },
+        // stone_mode:{
+        // 	name:'游戏模式',
+        // 	init:'deck',
+        // 	item:{
+        // 		deck:'构筑',
+        // 		random:'随机'
+        // 	},
+        // 	restart:true,
+        // 	frequent:true,
+        // },
+        // deck_length:{
+        // 	name:'卡组长度',
+        // 	init:'30',
+        // 	item:{
+        // 		'30':'30张',
+        // 		'50':'50张',
+        // 		'80':'80张',
+        // 	},
+        // 	frequent:true,
+        // },
+        // deck_repeat:{
+        // 	name:'重复卡牌',
+        // 	init:'2',
+        // 	item:{
+        // 		'2':'2张',
+        // 		'3':'3张',
+        // 		'5':'5张',
+        // 		'80':'无限',
+        // 	},
+        // 	frequent:true,
+        // },
+        // random_length:{
+        // 	name:'随从牌数量',
+        // 	init:'1/80',
+        // 	item:{
+        // 		'1/120':'少',
+        // 		'1/80':'中',
+        // 		'1/50':'多',
+        // 	},
+        // 	frequent:true,
+        // },
+        battle_number: {
+          name: "出场人数",
+          init: "1",
+          frequent: true,
+          item: {
+            1: "一人",
+            2: "两人",
+            3: "三人",
+            4: "四人",
+            6: "六人",
+            8: "八人",
+            10: "十人",
+          },
+          onclick(num) {
+            game.saveConfig("battle_number", num, this._link.config.mode)
+            if (_status.connectMode) {
+              return
+            }
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
+              return
+            }
+            if (_status.event.getParent().changeDialog) {
+              _status.event.getParent().changeDialog()
+            }
+          },
+        },
+        mana_mode: {
+          name: "行动值变化",
+          init: "inc",
+          item: {
+            inf: "涨落",
+            inc: "递增",
+          },
+          frequent: true,
+        },
+        skill_bar: {
+          name: "怒气值",
+          init: true,
+          frequent: true,
+          restart: true,
+        },
+        double_character: {
+          name: "双将模式",
+          init: false,
+          frequent: true,
+          restart: () =>
+            _status.event.getParent().name !== "chooseCharacter" ||
+            _status.event.name !== "chooseButton",
+        },
+        free_choose: {
+          name: "自由选将",
+          init: true,
+          onclick(bool) {
+            game.saveConfig("free_choose", bool, this._link.config.mode)
+            if (_status.connectMode) {
+              return
+            }
+            if (
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
+            ) {
+              return
+            }
+            if (!ui.cheat2 && get.config("free_choose")) {
+              ui.create.cheat2()
+            } else if (ui.cheat2 && !get.config("free_choose")) {
+              ui.cheat2.close()
+              delete ui.cheat2
+            }
+          },
+        },
+        change_choice: {
+          name: "开启换将卡",
+          init: true,
+          onclick(bool) {
+            game.saveConfig("change_choice", bool, this._link.config.mode)
+            if (_status.connectMode) {
+              return
+            }
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
+              return
+            }
+            if (!ui.cheat && get.config("change_choice")) {
+              ui.create.cheat()
+            } else if (ui.cheat && !get.config("change_choice")) {
+              ui.cheat.close()
+              delete ui.cheat
+            }
+          },
         },
       },
     },
@@ -7882,6 +9842,80 @@ export class Library {
       next.die()
     },
     /**
+     * 在控制台输出每个扩展文件夹内的所有文件
+     *
+     * 需要node环境
+     *
+     * @param  { ...string } args 只需要显示的文件夹首字符
+     */
+    x(...args) {
+      /**
+       * @param { string } dir
+       * @param { (folders: string[], files: string[]) => any } callback
+       */
+      const gl = (dir, callback) => {
+        const files = [],
+          folders = []
+        // dir = '/Users/widget/Documents/extension/' + dir;
+        dir = lib.node.path.join(__dirname, "extension", dir)
+        lib.node.fs.promises
+          .readdir(dir)
+          .then((filelist) => {
+            for (let i = 0; i < filelist.length; i++) {
+              if (filelist[i][0] !== "." && filelist[i][0] !== "_") {
+                if (
+                  lib.node.fs.statSync(`${dir}/${filelist[i]}`).isDirectory()
+                ) {
+                  folders.push(filelist[i])
+                } else {
+                  files.push(filelist[i])
+                }
+              }
+            }
+            callback(folders, files)
+          })
+          .catch((e) => {
+            throw e
+          })
+      }
+      for (let i = 0; i < args.length; i++) {
+        args[i] = args[i][0]
+      }
+      gl("", (list) => {
+        if (args.length) {
+          for (let i = 0; i < list.length; i++) {
+            if (!args.includes(list[i][0])) {
+              list.splice(i--, 1)
+            }
+          }
+        }
+        if (list.length) {
+          for (let i = 0; i < list.length; i++) {
+            let str = list[i]
+            gl(str, (folders, files) => {
+              if (files.length > 1) {
+                for (let j = 0; j < files.length; j++) {
+                  if (
+                    typeof files[i] === "string" &&
+                    files[i].includes("extension.js")
+                  ) {
+                    files.splice(j--, 1)
+                  } else {
+                    if (j % 5 === 0) {
+                      str += "\n\t\t\t"
+                    }
+                    str += `"${files[j]}",`
+                  }
+                }
+                console.log(str.slice(0, str.length - 1))
+                game.print(str.slice(0, str.length - 1))
+              }
+            })
+          }
+        }
+      })
+    },
+    /**
      * 游戏设置变更为固定数据(不更改扩展设置)
      */
     cfg() {
@@ -8103,7 +10137,12 @@ export class Library {
         "xshixin",
         "qingzun",
       ]
-      const favmodes = ["versus|three", "versus|four", "versus|two"]
+      const favmodes = [
+        "versus|three",
+        "versus|four",
+        "versus|two",
+        "chess|combat",
+      ]
       for (let i = 0; i < mode.length; i++) {
         game.saveConfig(`${mode[i]}_banned`, banned)
         game.saveConfig(`${mode[i]}_bannedcards`, bannedcards)
@@ -8117,6 +10156,7 @@ export class Library {
       game.saveConfig("player_border", "slim")
       game.saveConfig("cards", lib.config.all.cards)
       game.saveConfig("characters", characters)
+      game.saveConfig("change_skin", false)
       game.saveConfig("show_splash", "off")
       game.saveConfig("show_favourite", false)
       game.saveConfig("animation", false)
@@ -8193,6 +10233,47 @@ export class Library {
       }
       ui.arena.classList.remove("selecting")
       ui.arena.classList.remove("tempnoe")
+    },
+    /**
+     * 替换皮肤
+     * @param { string } name 武将名称
+     * @param { number | true } [i] 指定game.players的第几个元素，不填指定为自己的下家。为true时切换玩家布局
+     * @param { string } [skin] 皮肤id
+     */
+    p(name, i, skin) {
+      const list = ["swd", "hs", "pal", "gjqt", "ow", "gw"]
+      if (!lib.character[name]) {
+        for (let j = 0; j < list.length; j++) {
+          if (lib.character[`${list[j]}_${name}`]) {
+            name = `${list[j]}_${name}`
+            break
+          }
+        }
+      }
+      let target
+      if (typeof i === "number") {
+        target = game.players[i]
+      } else {
+        target = game.me.next
+      }
+      if (!lib.character[name]) {
+        target.node.avatar.setBackground(name, "character")
+        target.node.avatar.show()
+      } else {
+        target.init(name)
+      }
+      if (skin) {
+        lib.config.skin[name] = skin - 1
+        // 换肤时skin - 1变成skin
+        ui.click.skin(target.node.avatar, name)
+      }
+      if (i === true) {
+        if (lib.config.layout === "long2") {
+          lib.init.layout("mobile")
+        } else {
+          lib.init.layout("long2")
+        }
+      }
     },
     /**
      * @overload
@@ -8500,6 +10581,55 @@ export class Library {
       }
     },
     /**
+     * 炉石模式可用，使用'spell_yexinglanghun'卡牌
+     * @param { boolean } [me] 决定是自己还是对手使用'spell_yexinglanghun'卡牌
+     */
+    uy(me) {
+      if (me) {
+        game.me.useCard({ name: "spell_yexinglanghun" }, game.me)
+      } else {
+        // player.getEnemy是炉石模式的函数
+        const enemy = game.me.getEnemy()
+        enemy.useCard({ name: "spell_yexinglanghun" }, enemy)
+      }
+    },
+    /**
+     * 炉石模式可用，使用`spell_${name}`卡牌
+     * @param { string } [name]
+     * @param { boolean } [act]
+     */
+    gs(name = "yexinglanghun", act) {
+      const card = game.createCard(`spell_${name}`)
+      game.me.node.handcards1.appendChild(card)
+      if (!act) {
+        game.me.actused = -99
+      }
+      ui.updatehl()
+      delete _status.event._buttonChoice
+      delete _status.event._cardChoice
+      delete _status.event._targetChoice
+      delete _status.event._skillChoice
+      setTimeout(game.check, 300)
+    },
+    /**
+     * 炉石模式可用，获得`stone_${name}_stonecharacter`卡牌
+     * @param { string } [name]
+     * @param { boolean } [act]
+     */
+    gc(name = "falifulong", act) {
+      var card = game.createCard(`stone_${name}_stonecharacter`)
+      game.me.node.handcards1.appendChild(card)
+      if (!act) {
+        game.me.actused = -99
+      }
+      ui.updatehl()
+      delete _status.event._buttonChoice
+      delete _status.event._cardChoice
+      delete _status.event._targetChoice
+      delete _status.event._skillChoice
+      setTimeout(game.check, 300)
+    },
+    /**
      * 进入/关闭快速自动测试模式(游戏速度最快)，只有游戏记录界面
      * @param { boolean | string } [bool]
      */
@@ -8639,6 +10769,7 @@ export class Library {
         if (
           !lib.config.forbidai.includes(key) &&
           !key.startsWith("boss_") &&
+          !key.startsWith("tafang_") &&
           !list2.includes(key)
         ) {
           log(get.translation(key), key)
@@ -9190,6 +11321,11 @@ export class Library {
       stratagem_fury: "怒气",
       _stratagem_add_buff: "强化",
       danqi_hufu: "虎符",
+      zhanfa: "战法",
+      zf_common: "普通",
+      zf_rare: "稀有",
+      zf_epic: "史诗",
+      zf_legend: "传说",
       assigned_tag: "已分配",
 
       phaseZhunbei: "准备阶段",
@@ -9941,7 +12077,9 @@ export class Library {
         }
         const doubleCharacter =
           lib.configOL.mode === "guozhan" ||
-          (lib.configOL.double_character && lib.configOL.mode === "identity") ||
+          (lib.configOL.double_character &&
+            (lib.configOL.mode === "identity" ||
+              lib.configOL.mode === "stone")) ||
           (lib.configOL.double_character_jiange &&
             lib.configOL.mode === "versus" &&
             _status.mode === "jiange")
@@ -9954,7 +12092,8 @@ export class Library {
         }
         const doubleCharacter =
           get.mode() === "guozhan" ||
-          (get.config("double_character") && lib.config.mode === "identity") ||
+          (get.config("double_character") &&
+            (lib.config.mode === "identity" || lib.config.mode === "stone")) ||
           (get.config("double_character_jiange") &&
             lib.config.mode === "versus" &&
             _status.mode === "jiange")
@@ -11245,6 +13384,11 @@ export class Library {
           this.send("denied", "version")
           lib.node.clients.remove(this)
           this.closed = true
+        } else if (
+          get.config("check_extension", "connect") &&
+          config.extension
+        ) {
+          this.send("denied", "extension")
         } else if (!_status.waitingForPlayer) {
           if (!config.nickname) {
             this.send("denied", "banned")
@@ -11443,7 +13587,6 @@ export class Library {
         if (lib.node.observing.includes(this)) {
           return
         }
-
         if (
           !this.id ||
           (!lib.playerOL[this.id] &&
@@ -11481,7 +13624,6 @@ export class Library {
         if (lib.node.observing.includes(this)) {
           return
         }
-
         if (
           !this.id ||
           (!lib.playerOL[this.id] &&
@@ -11682,6 +13824,9 @@ export class Library {
             avatar: lib.config.connect_avatar,
             nickname: get.connectNickname(),
             versionLocal: lib.version,
+            extension: lib.config.extensions.some(
+              (ext) => lib.config[`extension_${ext}_enable`],
+            ),
           },
           lib.config.banned_info,
         )
@@ -12644,6 +14789,14 @@ export class Library {
           case "offline":
             if (_status.paused && _status.event.name === "game") {
               setTimeout(game.resume, 500)
+            }
+            break
+          case "extension":
+            if (confirm("加入失败：房间禁止使用扩展！是否关闭所有扩展？")) {
+              const libexts = lib.config.extensions
+              for (let i = 0; i < libexts.length; i++) {
+                game.saveConfig(`extension_${libexts[i]}_enable`, false)
+              }
             }
             break
           default:

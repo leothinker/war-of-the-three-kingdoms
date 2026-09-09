@@ -567,6 +567,67 @@ export class Player extends HTMLDivElement {
     }
   }
   /**
+   * 是否拥有对应战法
+   * @param {string} id 战法的id
+   */
+  hasZhanfa(id) {
+    return this.getStorage("zhanfa").includes(id)
+  }
+  /**
+   * 获得对应战法
+   * @param {string} id 战法的id
+   */
+  addZhanfa(id) {
+    const skill = lib.zhanfa.getSkill(id)
+    if (!skill) {
+      console.warn(`不存在战法: ${id}`)
+      return
+    }
+    if (this.hasZhanfa(id)) {
+      return
+    }
+    game.log(this, "获得战法", `#g【${get.translation(id)}】`)
+    const card = game.createCard(id, "战法", "")
+    this.$draw(card, void 0, void 0, false)
+    this.addAdditionalSkill("zhanfa", skill, true)
+    this.markAuto("zhanfa", id)
+    const next = game.createEvent("addZhanfa", false, get.event())
+    next.player = this
+    next.zhanfaId = id
+    next.forceDie = true
+    next.includeOut = true
+    next.setContent(async (event, trigger, player) => {
+      await event.trigger(event.name)
+    })
+  }
+  /**
+   * 失去对应战法
+   * @param {string} id 战法的id
+   */
+  removeZhanfa(id) {
+    const skill = lib.zhanfa.getSkill(id)
+    if (!skill) {
+      console.warn(`不存在战法: ${id}`)
+      return
+    }
+    if (!this.hasZhanfa(id)) {
+      return
+    }
+    game.log(this, "失去战法", `#g【${get.translation(id)}】`)
+    const card = game.createCard(id, "战法", "")
+    this.$throw(card, 1000, void 0, void 0, false)
+    this.removeAdditionalSkill("zhanfa", skill)
+    this.unmarkAuto("zhanfa", id)
+    const next = game.createEvent("removeZhanfa", false, get.event())
+    next.player = this
+    next.zhanfaId = id
+    next.forceDie = true
+    next.includeOut = true
+    next.setContent(async (event, trigger, player) => {
+      await event.trigger(event.name)
+    })
+  }
+  /**
    * 获取一名角色的名字翻译
    * @param {boolean} forDialog 是否用于对话框显示，如【五谷丰登】/【惠民】之类多名角色选择卡牌的卡牌/技能的content中，方便知晓卡牌和角色的对应关系。默认为false。
    * @returns { string } 角色名字翻译，forDialog为true会返回HTML字符串，为对话框中的卡牌呈现类似卡牌动画信息的效果，否则根据player._tempTranslate、lib.translate[`${player.name}_ab`]、get.translation(player.name)的优先级返回纯文本。
@@ -1727,7 +1788,13 @@ export class Player extends HTMLDivElement {
    */
   hasDisabledSlot(type) {
     if (type === "horse" || type === "equip3_4") {
-      return this.hasDisabledSlot(3) && this.hasDisabledSlot(4)
+      return (
+        this.hasDisabledSlot(3) &&
+        (get.is.mountCombined() || this.hasDisabledSlot(4))
+      )
+    }
+    if (get.is.mountCombined() && type === "equip4") {
+      return false
     }
     return this.countDisabledSlot(type) > 0
   }
@@ -1750,6 +1817,9 @@ export class Player extends HTMLDivElement {
     if (typeof type === "number") {
       type = `equip${type}`
     }
+    if (get.is.mountCombined() && type === "equip4") {
+      return 0
+    }
     num = map[type]
     if (typeof num === "number" && num > 0) {
       return num
@@ -1763,7 +1833,12 @@ export class Player extends HTMLDivElement {
    */
   hasEmptySlot(type) {
     if (type === "horse" || type === "equip3_4") {
-      return this.hasEmptySlot(3) && this.hasEmptySlot(4)
+      return (
+        this.hasEmptySlot(3) && (get.is.mountCombined() || this.hasEmptySlot(4))
+      )
+    }
+    if (get.is.mountCombined() && type === "equip4") {
+      return false
     }
     return this.countEmptySlot(type) > 0
   }
@@ -1812,6 +1887,8 @@ export class Player extends HTMLDivElement {
       type = `equip${type}`
     } else if (type === "equip3_4") {
       type = "equip3"
+    } else if (get.is.mountCombined() && type === "equip4") {
+      return 0
     }
     return Math.max(
       0,
@@ -1834,11 +1911,17 @@ export class Player extends HTMLDivElement {
    */
   hasEnabledSlot(type) {
     if (type === "horse" || type === "equip3_4") {
-      return this.hasEnabledSlot(3) && this.hasEnabledSlot(4)
+      return (
+        this.hasEnabledSlot(3) &&
+        (get.is.mountCombined() || this.hasEnabledSlot(4))
+      )
     }
     // else if(type=='equip3_4'){
     // 	type='equip3';
     // }
+    if (get.is.mountCombined() && type === "equip4") {
+      return false
+    }
     return this.countEnabledSlot(type) > 0
   }
   /**
@@ -1859,6 +1942,9 @@ export class Player extends HTMLDivElement {
     }
     if (typeof type === "number") {
       type = `equip${type}`
+    }
+    if (get.is.mountCombined() && type === "equip4") {
+      return 0
     }
     let slots = 1
     num = map[type]
@@ -2118,6 +2204,9 @@ export class Player extends HTMLDivElement {
   $syncDisable(map) {
     //TODO:虚拟装备牌的添加暂时没有考虑到废除装备栏的情况，会出现排序错误的问题。需要手动设置排序。
     const suits = { equip3: "+1马栏", equip4: "-1马栏", equip6: "特殊栏" }
+    if (get.is.mountCombined()) {
+      suits.equip3 = "坐骑栏"
+    }
     if (!map) {
       map = this.disabledSlots || {}
     }
@@ -2198,8 +2287,19 @@ export class Player extends HTMLDivElement {
    */
   canEquip(name, replace) {
     const ranges = get.subtypes(name),
-      rangex = []
-    rangex.push(...new Set(ranges))
+      rangex = [],
+      combined = get.is.mountCombined()
+    if (combined) {
+      ranges.forEach((type) => {
+        if (type === "equip3" || type === "equip4") {
+          rangex.add("equip3_4")
+        } else {
+          rangex.add(type)
+        }
+      })
+    } else {
+      rangex.push(...new Set(ranges))
+    }
     if (get.itemtype(name) === "card") {
       const owner = get.owner(name, "judge")
       if (owner && !lib.filter.canBeGained(name, this, owner)) {
@@ -5475,7 +5575,7 @@ export class Player extends HTMLDivElement {
   /**
    * @param { string } [arg1='h']
    * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
-   * @returns { Iterable<Card> }
+   * @returns { Iterable<VCard> }
    */
   *iterableGetVCards(arg1, arg2) {
     if (typeof arg1 !== "string") {
@@ -5545,7 +5645,7 @@ export class Player extends HTMLDivElement {
   /**
    * @param { string } [arg1='h']
    * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
-   * @returns { Card[] }
+   * @returns { VCard[] }
    */
   getVCards(arg1, arg2) {
     return Array.from(this.iterableGetVCards(arg1, arg2))
@@ -8424,6 +8524,15 @@ export class Player extends HTMLDivElement {
       }
     }
     next.setContent("draw")
+    if (
+      lib.config.mode === "stone" &&
+      _status.mode === "deck" &&
+      next.drawDeck === undefined &&
+      !next.player.isMin() &&
+      next.num > 1
+    ) {
+      next.drawDeck = 1
+    }
     next.result = []
     next.gaintag ??= []
     return next
@@ -14084,7 +14193,7 @@ export class Player extends HTMLDivElement {
     return this.classList.contains("out")
   }
   isMin(distance) {
-    if (distance) {
+    if (distance && lib.config.mode !== "stone") {
       return false
     }
     if (this.forcemin) {
@@ -16577,7 +16686,10 @@ export class Player extends HTMLDivElement {
       const num = get.equipNum(card)
       let remove = false
       if (card.name.indexOf("empty_equip") === 0) {
-        if (!this.hasEmptySlot(num) || this.getEquips(num).length) {
+        if ((num === 4 || num === 3) && get.is.mountCombined()) {
+          remove =
+            !this.hasEmptySlot("equip3_4") || this.getEquips("equip3_4").length
+        } else if (!this.hasEmptySlot(num) || this.getEquips(num).length) {
           remove = true
         }
         if (remove) {
@@ -16613,11 +16725,19 @@ export class Player extends HTMLDivElement {
     })
     for (let i = 1; i <= 5; i++) {
       let add = false
-      add = this.hasEmptySlot(i) && !this.getEquips(i).length
+      if ((i === 4 || i === 3) && get.is.mountCombined()) {
+        add =
+          this.hasEmptySlot("equip3_4") && !this.getEquips("equip3_4").length
+      } else {
+        add = this.hasEmptySlot(i) && !this.getEquips(i).length
+      }
       if (
         add &&
         !cardsResume.some((card) => {
           const num = get.equipNum(card)
+          if ((i === 4 || i === 3) && get.is.mountCombined()) {
+            return num === 4 || num === 3
+          }
           return num === i
         })
       ) {

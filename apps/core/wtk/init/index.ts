@@ -1,12 +1,24 @@
 /// <reference types="vite/client" />
-import { _status, ai, game, get, lib, ui } from "wtk"
+import { _status, ai, game, get, lib, rootURL, ui } from "wtk"
 import { CacheContext } from "@/library/cache/cacheContext.js"
 import * as config from "@/util/config.js"
 import { setOnError } from "@/util/error.ts"
 import { userAgentLowerCase } from "@/util/index.js"
 import { initializeSandboxRealms, security } from "@/util/sandbox.js"
-import { importCardPack, importCharacterPack, importMode } from "./import.js"
-import { loadCard, loadCardPile, loadCharacter, loadMode } from "./loading.js"
+import {
+  importCardPack,
+  importCharacterPack,
+  importExtension,
+  importMode,
+} from "./import.js"
+import {
+  loadCard,
+  loadCardPile,
+  loadCharacter,
+  loadExtension,
+  loadMode,
+  loadPlay,
+} from "./loading.js"
 
 // 三国杀，启动！
 export async function boot() {
@@ -97,7 +109,10 @@ export async function boot() {
   }
 
   let layout = config.get("layout")
-  if (layout === "default") {
+  if (
+    layout === "default" ||
+    lib.layoutfixed.indexOf(config.get("mode")) !== -1
+  ) {
     layout = "mobile"
   }
   if (layout === "phone") {
@@ -229,6 +244,27 @@ export async function boot() {
     appearenceConfig.global_font.item.default = "默认"
   }
 
+  if (config.get("image_background_random")) {
+    if (_status.htmlbg) {
+      game.saveConfig("image_background", _status.htmlbg)
+    } else {
+      const list = Object.keys(
+        lib.configMenu.appearence.config.image_background.item,
+      ).filter((i) => i !== "default")
+      game.saveConfig(
+        "image_background",
+        list.randomGet(lib.config.image_background),
+      )
+    }
+    lib.init.background()
+    delete _status.htmlbg
+  }
+  if (config.get("extension_sources")) {
+    for (const name in config.get("extension_sources")) {
+      lib.configMenu.general.config.extension_source.item[name] = name
+    }
+  }
+
   // 三国杀更新日志
   await lib.init.promises.js("game", "update")
   if (window.wtk_update) {
@@ -315,6 +351,19 @@ export async function boot() {
       resolve(void 0)
     }
   })
+
+  const extensionlist = await getExtensionList()
+  if (extensionlist.length) {
+    _status.extensionLoading = []
+    _status.extensionLoaded = []
+    for (const i of extensionlist) {
+      await importExtension(i)
+    }
+    if (_status.extensionLoading) {
+      await Promise.all(_status.extensionLoading)
+    }
+    delete _status.extensionLoading
+  }
 
   if (Array.isArray(lib.onprepare) && lib.onprepare.length) {
     _status.onprepare = Object.freeze(
@@ -585,6 +634,10 @@ export async function boot() {
   if (lib.config.mode === "connect") {
     _status.connectMode = true
   } else {
+    if (lib.imported.play != null) {
+      Object.values(lib.imported.play).forEach(loadPlay)
+    }
+
     lib.card.list = lib.card.list.filter((cardData) => {
       if (!cardData[2]) {
         return false
@@ -623,6 +676,10 @@ export async function boot() {
     }
   }
 
+  if (Array.isArray(lib.extensions)) {
+    await Promise.allSettled(lib.extensions.map(loadExtension))
+  }
+
   if (lib.init.startBefore) {
     lib.init.startBefore()
     delete lib.init.startBefore
@@ -630,6 +687,12 @@ export async function boot() {
 
   ui.create.arena()
   game.createEvent("game", false).setContent(lib.init.start)
+  if (lib.mode[lib.config.mode] && lib.mode[lib.config.mode].fromextension) {
+    const startstr = currentMode.start.toString()
+    if (startstr.indexOf("onfree") === -1) {
+      setTimeout(lib.init.onfree, 500)
+    }
+  }
   delete lib.init.start
   if (Array.isArray(_status.onprepare) && _status.onprepare.length) {
     await Promise.allSettled(_status.onprepare)
@@ -637,6 +700,88 @@ export async function boot() {
   }
 
   game.loop()
+}
+
+async function getExtensionList() {
+  if (localStorage.getItem(`${lib.configprefix}disable_extension`)) return []
+
+  const autoImport = (() => {
+    if (!config.get("extension_auto_import")) {
+      return false
+    }
+    if (
+      !(
+        typeof game.getFileList === "function" &&
+        typeof game.checkFile === "function"
+      )
+    ) {
+      console.warn("没有文件系统操作权限，无法自动导入扩展。")
+      return false
+    }
+    return true
+  })()
+  const searchParamsImportExtension = new URLSearchParams(location.search).get(
+    "importExtensionName",
+  )
+
+  window.resetExtension = () => {
+    for (const ext of config.get("extensions")) {
+      game.promises.saveConfig(`extension_${ext}_enable`, false)
+    }
+    localStorage.setItem(`${lib.configprefix}disable_extension`, String(true))
+  }
+
+  const extensions: string[] = config.get("extensions")
+  const toLoad: string[] = []
+  toLoad.addArray(
+    config.get("plays").filter((i) => config.get("all").plays.includes(i)),
+  )
+  toLoad.addArray(extensions)
+
+  if (autoImport) {
+    const extensionPath = new URL("./extension/", rootURL)
+    const [extFolders] = await game.promises.getFileList(
+      get.relativePath(extensionPath),
+    )
+
+    const unimportedExtensions = extFolders.filter(
+      (folder) =>
+        !extensions.includes(folder) &&
+        !config.get("all").plays.includes(folder),
+    )
+
+    const promises = unimportedExtensions.map(async (ext) => {
+      const path = new URL(`./${ext}/`, extensionPath)
+      const file = new URL("./extension.js", path)
+      const tsFile = new URL("./extension.ts", path)
+
+      if (
+        (await game.promises.checkFile(get.relativePath(file))) === 1 ||
+        (await game.promises.checkFile(get.relativePath(tsFile))) === 1
+      ) {
+        extensions.push(ext)
+        toLoad.push(ext)
+        if (!config.has(`extension_${ext}_enable`)) {
+          await game.promises.saveConfig(`extension_${ext}_enable`, false)
+        }
+      }
+    })
+    await Promise.allSettled(promises)
+
+    await game.promises.saveConfig("extensions", extensions)
+  } else if (searchParamsImportExtension) {
+    extensions.push(searchParamsImportExtension)
+    toLoad.push(searchParamsImportExtension)
+    if (!config.has(`extension_${searchParamsImportExtension}_enable`)) {
+      await game.promises.saveConfig(
+        `extension_${searchParamsImportExtension}_enable`,
+        true,
+      )
+    }
+    await game.promises.saveConfig("extensions", extensions)
+  }
+
+  return toLoad
 }
 
 function initSheet() {
@@ -822,6 +967,9 @@ async function loadConfig() {
       result = {}
     }
     lib.init.background()
+    await game.promises
+      .removeFile("wtk.config.txt")
+      .catch((e) => console.error(e))
   } else {
     result = await game.getDB("config")
   }
@@ -1121,6 +1269,11 @@ async function createBackground() {
   }
 
   ui.background.style.backgroundImage = url
+  if (lib.config.image_background_blur) {
+    ui.background.style.filter = "blur(8px)"
+    ui.background.style.webkitFilter = "blur(8px)"
+    ui.background.style.transform = "scale(1.05)"
+  }
 }
 
 function createTouchDraggedFilter() {

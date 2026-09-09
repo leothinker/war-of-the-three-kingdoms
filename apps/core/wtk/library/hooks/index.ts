@@ -113,6 +113,8 @@ export const defaultHooks: {
       }
       if (!Array.isArray(lineColor) || lineColor.length !== 3) {
         lineColor = []
+      } else if (background.startsWith("ext:")) {
+        background = background.replace(/^ext:/, "extension/")
       }
       if (linked) {
         lib.linked.add(nature)

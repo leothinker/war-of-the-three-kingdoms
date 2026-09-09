@@ -1,7 +1,32 @@
 {
+  "extension_sources": {
+    "GitHub Proxy": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/libccy/wtk-extension/master/",
+    "FastGit": "https://raw.fgit.cf/libccy/wtk-extension/master/",
+    "GitHub": "https://raw.githubusercontent.com/libccy/wtk-extension/master/"
+  },
+  "extension_source": "GitHub Proxy",
   "forbidai": ["ns_liuzhang"],
   "forbidai_user": [],
   "forbidall": [],
+  "forbidstone": [
+    "zhugedan",
+    "lusu",
+    "chenlin",
+    "yuanshao",
+    "daqiao",
+    "re_daqiao",
+    "zhuran",
+    "huatuo",
+    "wangyi",
+    "caoang",
+    "guojia",
+    "re_guojia",
+    "shen_caocao",
+    "caopi",
+    "guansuo",
+    "xushi"
+  ],
+  "forbidchess": ["hetaihou"],
   "forbidboss": [],
   "forbiddouble": ["zhugedan", "dongzhuo", "wutugu", "zhangjian"],
   "forbidthreecard": ["qiankunbiao", "shenhuofeiya"],
@@ -44,6 +69,7 @@
       "connect",
       "brawl"
     ],
+    "stockextension": ["boss", "cardpile", "coin"],
     "layout": ["default", "newlayout"],
     "theme": ["woodden", "music", "simple"],
     "card_font": ["xiaozhuan", "huangcao", "caoshu", "xingshu"],
@@ -90,6 +116,7 @@
   "die_move": "flip",
   "skin": {},
   "gameRecord": {},
+  "extensionInfo": {},
   "autoskilllist": [],
   "hiddenModePack": [],
   "hiddenCharacterPack": [],
@@ -153,14 +180,7 @@
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
   "characters": ["refresh", "reshenhua", "yijiang", "sp"],
-  "moderned_characters": [
-    "standard",
-    "shenhua",
-    "refresh",
-    "reshenhua",
-    "shenwu",
-    "old"
-  ],
+  "moderned_characters": ["standard"],
   "moderned_modes": ["guozhan"],
   "connect_characters": ["standard", "shenhua", "refresh", "reshenhua", "old"],
   "connect_cards": [
@@ -174,6 +194,7 @@
     "zhulu"
   ],
   "plays": [],
+  "extensions": [],
   "banned": [],
   "bannedcards": [],
   "forbidlist": [],

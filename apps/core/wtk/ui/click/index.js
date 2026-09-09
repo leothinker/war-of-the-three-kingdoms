@@ -416,7 +416,6 @@ export class Click {
             button.textnode.innerHTML = "发状态(10)"
             button.intervaltext = button.textnode.innerHTML
             var num = 10
-
             button.input.disabled = true
             button.input.style.opacity = 0.6
             this.value = ""
@@ -483,6 +482,61 @@ export class Click {
         }
       }
     }
+  }
+  autoskin() {
+    if (!lib.config.change_skin) {
+      return
+    }
+    var players = game.filterPlayer()
+    var change = (player, num, callback) => {
+      if (num === "1") {
+        ui.click.skin(player.node.avatar, player.name, callback)
+      } else {
+        ui.click.skin(player.node.avatar2, player.name2, callback)
+      }
+    }
+    var finish = () => {
+      if (lib.config.change_skin_auto !== "off") {
+        _status.skintimeout = setTimeout(
+          ui.click.autoskin,
+          parseInt(lib.config.change_skin_auto, 10),
+        )
+      }
+    }
+    var autoskin = () => {
+      if (players.length) {
+        var player = players.randomRemove()
+        var list = []
+        if (player.name && !player.isUnseen(0)) {
+          list.push("1")
+        }
+        if (player.name2 && !player.isUnseen(1)) {
+          list.push("2")
+        }
+        if (list.length) {
+          change(player, list.randomRemove(), (bool) => {
+            if (bool) {
+              finish()
+            } else if (list.length) {
+              change(player, list[0], (bool) => {
+                if (bool) {
+                  finish()
+                } else {
+                  autoskin()
+                }
+              })
+            } else {
+              autoskin()
+            }
+          })
+        } else {
+          autoskin()
+        }
+      } else {
+        finish()
+      }
+    }
+    autoskin()
   }
   skin(avatar, name, callback) {
     let nowSkin = "defaultSkin"
@@ -1442,7 +1496,6 @@ export class Click {
     }
     this.delete()
     var button = this._poppedorigin
-
     setTimeout(() => {
       if (button._uiintro === this) {
         delete button._uiintro
@@ -3079,7 +3132,6 @@ export class Click {
     if (!ui.menuContainer) {
       return
     }
-
     var player = this.parentNode
     if (!game.players.includes(player) && !game.dead.includes(player)) {
       return
@@ -3116,7 +3168,6 @@ export class Click {
     if (!ui.menuContainer) {
       return
     }
-
     var player = this.parentNode
     if (!game.players.includes(player) && !game.dead.includes(player)) {
       return
@@ -3626,7 +3677,6 @@ export class Click {
       if (_status.logvtimeout) {
         clearTimeout(_status.logvtimeout)
       }
-
       _status.logvtimeout = setTimeout(() => {
         if (!_status.currentlogv) {
           _status.currentlogv = this
@@ -3734,6 +3784,151 @@ export class Click {
       gzbool = true
     }
     let refreshSkin = null
+    if (lib.config.change_skin) {
+      let node, avatars
+      const info = get.character(name),
+        src = get.skinPath(name)
+      if (src) {
+        const createButtons = (list) => {
+          if (!list.length) {
+            return
+          }
+          if (list.length >= 6) {
+            avatars.classList.add("scroll")
+            if (lib.config.touchscreen) {
+              lib.setScroll(avatars)
+            }
+          }
+          for (const i of ["originSkin", ...list]) {
+            const button = ui.create.div(avatars, function () {
+              playerbg.classList.remove("scroll")
+              if (this._link) {
+                const skinname = this._skinName,
+                  src = this._link
+                lib.config.skin[nameskin] = [skinname, src]
+                if (lib.characterSubstitute[nameskin]) {
+                  for (const nameList of lib.characterSubstitute[nameskin]) {
+                    const subName = nameList[0],
+                      [fold, prefix] = skinname.split(".")
+                    lib.config.skin[subName] = [
+                      skinname,
+                      `${src.split("/").slice(0, -1).join("/")}/${fold}/${subName}.${prefix}`,
+                    ]
+                  }
+                }
+                bg.style.backgroundImage = this.style.backgroundImage
+                if (sourcenode) {
+                  sourcenode.style.backgroundImage = this.style.backgroundImage
+                }
+                if (avatar) {
+                  avatar.style.backgroundImage = this.style.backgroundImage
+                }
+                game.saveConfig("skin", lib.config.skin)
+              } else {
+                delete lib.config.skin[nameskin]
+                if (lib.characterSubstitute[nameskin]) {
+                  for (const nameList of lib.characterSubstitute[nameskin]) {
+                    const subName = nameList[0]
+                    delete lib.config.skin[subName]
+                  }
+                }
+                if (
+                  gzbool &&
+                  lib.character[nameskin2].hasSkinInGuozhan &&
+                  lib.config.mode_config.guozhan.guozhanSkin
+                ) {
+                  bg.setBackground(audioName || nameskin2, "character")
+                  if (sourcenode) {
+                    sourcenode.setBackground(
+                      audioName || nameskin2,
+                      "character",
+                    )
+                  }
+                  if (avatar) {
+                    avatar.setBackground(audioName || nameskin2, "character")
+                  }
+                } else {
+                  bg.setBackground(audioName || nameskin, "character")
+                  if (sourcenode) {
+                    sourcenode.setBackground(audioName || nameskin, "character")
+                  }
+                  if (avatar) {
+                    avatar.setBackground(audioName || nameskin, "character")
+                  }
+                }
+                game.saveConfig("skin", lib.config.skin)
+              }
+              if (refreshSkin) {
+                refreshSkin()
+              }
+              if (applyViewMode) {
+                applyViewMode("intro")
+              }
+            })
+            if (i === "originSkin") {
+              if (
+                gzbool &&
+                lib.character[nameskin2].hasSkinInGuozhan &&
+                lib.config.mode_config.guozhan.guozhanSkin
+              ) {
+                button.setBackground(
+                  audioName || nameskin2,
+                  "character",
+                  "noskin",
+                )
+              } else {
+                button.setBackground(
+                  audioName || nameskin,
+                  "character",
+                  "noskin",
+                )
+              }
+            } else {
+              const [skinname, src] = i
+              button._link = src
+              button._skinName = skinname
+              if (name === audioName) {
+                button.setBackgroundImage(src)
+              } else {
+                const [fold, prefix] = skinname.split(".")
+                button.setBackgroundImage(
+                  `${src.split("/").slice(0, -1).join("/")}/${fold}/${audioName}.${prefix}`,
+                )
+              }
+            }
+          }
+        }
+        const defaultFolder = src
+        game.getFileList(
+          defaultFolder,
+          (folders, files) => {
+            if (files.length && !node) {
+              node = ui.create.div(".changeskin", "可换肤", playerbg)
+              avatars = ui.create.div(".avatars", playerbg)
+              changeskinfunc = () => {
+                playerbg.classList.add("scroll")
+                if (node._created) {
+                  return
+                }
+                node._created = true
+                game.getFileList(
+                  defaultFolder,
+                  (folders, files) => {
+                    const list = files.map((file) => {
+                      const src = `${defaultFolder}${file}`
+                      return [file, src]
+                    })
+                    createButtons(list)
+                  },
+                  () => {},
+                )
+              }
+            }
+          },
+          () => {},
+        )
+      }
+    }
     var ban = ui.create.div(
       ".menubutton.large.ban.character",
       uiintro,
@@ -3986,7 +4181,6 @@ export class Click {
             var playername = this.linkname
             const audioName = this.linkAudioName
             const skinName = bg.tempSkin || audioName
-
             if (info.derivation) {
               var derivation = info.derivation
               if (typeof derivation === "string") {
@@ -4241,6 +4435,8 @@ export class Click {
               resolve(`${lib.assetURL}image/card/${imageName}.png`)
             } else if (image.startsWith("db:")) {
               game.getDB("image", image.slice(3)).then(resolve, reject)
+            } else if (image.startsWith("ext:")) {
+              resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`)
             } else {
               resolve(`${lib.assetURL}${image}`)
             }
@@ -4279,6 +4475,9 @@ export class Click {
                     }
                     if (image.startsWith("db:")) {
                       return await game.getDB("image", image.slice(3))
+                    }
+                    if (image.startsWith("ext:")) {
+                      return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`
                     }
                     return `${lib.assetURL}${image}`
                   })
@@ -4319,6 +4518,9 @@ export class Click {
                 }
                 if (image.startsWith("db:")) {
                   return await game.getDB("image", image.slice(3))
+                }
+                if (image.startsWith("ext:")) {
+                  return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`
                 }
                 return `${lib.assetURL}${image}`
               })
@@ -4432,7 +4634,6 @@ export class Click {
             var playername = this.linkname
             const audioName2 = this.linkAudioName
             const skinName2 = bg.tempSkin || audioName2
-
             let derivations = info.derivation
             if (derivations) {
               if (typeof derivations === "string") {
@@ -4953,7 +5154,6 @@ export class Click {
         uiintro._onclose()
       }
     }
-
     _status.removePop = (node) => {
       if (node === this) {
         return false
@@ -5196,7 +5396,6 @@ export class Click {
     ) {
       return
     }
-
     var num = this._scrollnum || 6
     var speed = this._scrollspeed || 16
     clearInterval(this.interval)

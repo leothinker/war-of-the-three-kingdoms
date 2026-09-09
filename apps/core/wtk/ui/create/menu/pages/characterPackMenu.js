@@ -60,6 +60,27 @@ export const characterPackMenu = (connectMenu) => {
       var node = start.firstChild.childNodes[i]
       if (node.mode) {
         if (node.mode.startsWith("mode_")) {
+          // 扩展武将包开启逻辑
+          if (node.mode.startsWith("mode_extension")) {
+            const extName = node.mode.slice(15)
+            if (
+              !game.hasExtension(extName) ||
+              !game.hasExtensionLoaded(extName)
+            ) {
+              continue
+            }
+            if (lib.config[`extension_${extName}_characters_enable`] === true) {
+              node.classList.remove("off")
+              if (node.link) {
+                node.link.firstChild.classList.add("on")
+              }
+            } else {
+              node.classList.add("off")
+              if (node.link) {
+                node.link.firstChild.classList.remove("on")
+              }
+            }
+          }
           continue
         }
         if (node.mode === "custom") {
@@ -95,21 +116,31 @@ export const characterPackMenu = (connectMenu) => {
   }
   var togglePack = function (bool) {
     var name = this._link.config._name
+    // 扩展武将包开启逻辑
+    if (name.startsWith("mode_extension")) {
+      const extName = name.slice(15)
+      if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) {
+        return false
+      }
+      game.saveExtensionConfig(extName, "characters_enable", bool)
+    }
     // 原逻辑
-    if (connectMenu) {
-      if (!bool) {
-        lib.config.connect_characters.add(name)
+    else {
+      if (connectMenu) {
+        if (!bool) {
+          lib.config.connect_characters.add(name)
+        } else {
+          lib.config.connect_characters.remove(name)
+        }
+        game.saveConfig("connect_characters", lib.config.connect_characters)
       } else {
-        lib.config.connect_characters.remove(name)
+        if (bool) {
+          lib.config.characters.add(name)
+        } else {
+          lib.config.characters.remove(name)
+        }
+        game.saveConfig("characters", lib.config.characters)
       }
-      game.saveConfig("connect_characters", lib.config.connect_characters)
-    } else {
-      if (bool) {
-        lib.config.characters.add(name)
-      } else {
-        lib.config.characters.remove(name)
-      }
-      game.saveConfig("characters", lib.config.characters)
     }
     updateNodes()
   }
@@ -153,12 +184,29 @@ export const characterPackMenu = (connectMenu) => {
           }
         }
       }
-      // list.sort(lib.sort.character)
+      list.sort(lib.sort.character)
       var list2 = list.slice(0)
       var cfgnode = createConfig({
         name: "开启",
         _name: mode,
         init: (() => {
+          // 扩展武将包开启逻辑
+          if (mode.startsWith("mode_extension")) {
+            const extName = mode.slice(15)
+            if (
+              !game.hasExtension(extName) ||
+              !game.hasExtensionLoaded(extName)
+            ) {
+              return false
+            }
+            // 这块或许应该在加载扩展时候写
+            if (
+              lib.config[`extension_${extName}_characters_enable`] === undefined
+            ) {
+              game.saveExtensionConfig(extName, "characters_enable", true)
+            }
+            return lib.config[`extension_${extName}_characters_enable`] === true
+          }
           // 原逻辑
 
           return connectMenu
@@ -182,6 +230,14 @@ export const characterPackMenu = (connectMenu) => {
         cfgnodeAI.style.marginTop = "0px"
         page.appendChild(cfgnode)
         page.appendChild(cfgnodeAI)
+      } else if (mode.startsWith("mode_extension")) {
+        // 排除4个基本扩展
+        // 给扩展的武将包加一个开启关闭的功能
+        if (!lib.config.all.stockextension.includes(mode.slice(15))) {
+          page.appendChild(cfgnode)
+          cfgnodeAI.style.marginTop = "0px"
+        }
+        page.appendChild(cfgnodeAI)
       } else {
         page.style.paddingTop = "8px"
       }
@@ -196,6 +252,7 @@ export const characterPackMenu = (connectMenu) => {
         }
         if (
           mode.startsWith("mode_") &&
+          !mode.startsWith("mode_extension_") &&
           mode !== "mode_favourite" &&
           mode !== "mode_banned"
         ) {
@@ -295,7 +352,11 @@ export const characterPackMenu = (connectMenu) => {
                 updateActive()
               },
             }
-            if (mode.startsWith("mode_") && !mode.startsWith("mode_guozhan")) {
+            if (
+              mode.startsWith("mode_") &&
+              !mode.startsWith("mode_extension_") &&
+              !mode.startsWith("mode_guozhan")
+            ) {
               cfgnodeY.clear = true
               delete cfgnodeY.onclick
             }
@@ -475,7 +536,11 @@ export const characterPackMenu = (connectMenu) => {
       game.saveConfig(
         "characters",
         Object.keys(lib.characterPack).filter((mode) => {
-          return !mode.startsWith("mode_")
+          return (
+            !mode.startsWith("mode_") ||
+            (mode.startsWith("mode_extension_") &&
+              lib.config.all.stockextension.includes(mode.slice(15)))
+          )
         }),
       )
       updateNodes()

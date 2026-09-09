@@ -9,7 +9,7 @@ export type AsynchronizedType<T> = T extends Promise<unknown> ? T : Promise<T>
 export type Asynchronized<T extends (...args: any[]) => any> = T extends (
   ...args: infer Args
 ) => infer Return
-  ? (...args: infer Args) => AsynchronizedType<Return>
+  ? (...args: Args) => AsynchronizedType<Return>
   : never
 /**
  * 防抖函数喵

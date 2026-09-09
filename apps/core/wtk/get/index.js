@@ -1640,6 +1640,16 @@ export class Get {
     }
     return `###${str}###${lib.translate[`${skill}_info`]}`
   }
+  url(master) {
+    var url = lib.config.updateURL || lib.updateURL
+    if (url[url.length - 1] !== "/") {
+      url += "/"
+    }
+    if (master !== "nodev") {
+      return `${url}master/`
+    }
+    return `${url}v${lib.version}/`
+  }
   round(num, f) {
     var round = 10 ** f
     return Math.round(num * round) / round
@@ -2603,7 +2613,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     var card
     try {
-      var info = JSON.parse(info.slice(10))
+      var info = JSON.parse(info.slice(13))
       var id = info.shift()
       if (!id) {
         card = ui.create.card()
@@ -2640,7 +2650,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return `_wtk_player:${player.playerid}`
   }
   infoPlayerOL(info) {
-    return lib.playerOL ? lib.playerOL[info.slice(12)] || info : info
+    return lib.playerOL ? lib.playerOL[info.slice(15)] || info : info
   }
   playersInfoOL(players) {
     return Array.from(players || []).map(get.playerInfoOL)
@@ -2900,7 +2910,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if ("sandbox" in window) {
       console.log("[infoFuncOL] info:", info)
     }
-    const str = get.pureFunctionStr(info.slice(10), true) // 清洗函数并阻止注入
+    const str = get.pureFunctionStr(info.slice(13), true) // 清洗函数并阻止注入
     if ("sandbox" in window) {
       console.log("[infoFuncOL] pured:", str)
     }
@@ -2957,7 +2967,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   infoEventOL(item) {
     const evt = new lib.element.GameEvent()
     try {
-      Object.entries(JSON.parse(item.slice(11))).forEach((entry) => {
+      Object.entries(JSON.parse(item.slice(14))).forEach((entry) => {
         const key = entry[0]
         if (typeof evt[key] !== "function") {
           evt[key] = get.parsedResult(entry[1])
@@ -2985,7 +2995,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   }
   infoVCardOL(item) {
     // @ts-expect-error ignore
-    const rawCard = JSON.parse(item.slice(11))
+    const rawCard = JSON.parse(item.slice(14))
     const datas = Object.entries(rawCard).reduce((vcard, entry) => {
       const key = entry[0]
       vcard[key] = get.parsedResult(entry[1])
@@ -6066,7 +6076,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro.add(viewInfo)
         }
       }
-      if (lib.skin && (!simple || get.is.phoneLayout())) {
+      if (
+        (lib.config.change_skin || lib.skin) &&
+        (!simple || get.is.phoneLayout())
+      ) {
         ;[node.name1, node.name2].forEach((nameskin, index) => {
           if (nameskin) {
             createButtons(nameskin, (src) => {
@@ -6397,9 +6410,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
                 var dist = lib.card[name].distance
                 if (dist.attackFrom) {
                   added = true
+                  const range = get.owner(node)
+                    ? get.owner(node).getEquipRange([node[node.cardSymbol]])
+                    : -dist.attackFrom + 1
                   uiintro.add(
-                    `<div class="text center">攻击范围：${get.owner(node)?.getEquipRange([node[node.cardSymbol]])}</div>`,
-                  ) //(-dist.attackFrom + 1)
+                    `<div class="text center">攻击范围：${range}</div>`,
+                  ) //
                 }
               }
               if (!added) {
@@ -6712,7 +6728,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           })
           uiintro.add(viewInfo)
         }
-        if (lib.skin && (!simple || get.is.phoneLayout())) {
+        if (
+          (lib.config.change_skin || lib.skin) &&
+          (!simple || get.is.phoneLayout())
+        ) {
           const nameskin = node.link
           if (nameskin) {
             createButtons(nameskin, (src) => {
@@ -8210,10 +8229,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       ext = ".jpg",
       subfolder = "default"
     let dbimage = null,
+      extimage = null,
       modeimage = null,
       nameinfo = get.character(name),
       gzbool = false
     if (nameinfo.skinPath) {
+      if (nameinfo.skinPath.startsWith("ext:")) {
+        return nameinfo.skinPath.replace(/^ext:/, "extension/")
+      }
       return nameinfo.skinPath
     }
     const mode = get.mode()
@@ -8252,6 +8275,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             imgPrefixUrl = value.slice(4)
             break
           }
+          if (value.startsWith("ext:")) {
+            extimage = value
+            break
+          }
           if (value.startsWith("db:")) {
             dbimage = value
             break
@@ -8269,6 +8296,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     if (imgPrefixUrl) {
       src = imgPrefixUrl
+    } else if (extimage) {
+      src = extimage.replace(/^ext:/, "extension/")
     } else if (dbimage) {
       src = dbimage.slice(3)
     } else if (modeimage) {

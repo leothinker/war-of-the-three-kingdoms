@@ -392,7 +392,9 @@ export class Card extends HTMLDivElement {
       if (typeof img !== "string") {
         img = null
       } else {
-        if (
+        if (img.startsWith("ext:")) {
+          img = img.replace(/^ext:/, "extension/")
+        } else if (
           ["character:"].some((prefix) => img.startsWith(prefix)) ||
           ["background", "card"].includes(img)
         ) {
@@ -872,7 +874,6 @@ export class Card extends HTMLDivElement {
     this.fixed = true
     if (!this._listeningEnd || this._transitionEnded) {
       this.moveTo(player)
-
       setTimeout(() => {
         this.delete()
       }, 200)

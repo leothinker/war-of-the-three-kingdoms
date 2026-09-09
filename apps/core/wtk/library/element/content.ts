@@ -817,7 +817,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const cards = []
     event.cards = cards
     const slots = []
-    slots.addArray(event.slots)
+    if (get.is.mountCombined()) {
+      for (const slot of event.slots) {
+        if (slot === "equip3" || slot === "equip4") {
+          slots.add("equip3_4")
+        } else {
+          slots.add(slot)
+        }
+      }
+    } else {
+      slots.addArray(event.slots)
+    }
 
     slots.sort()
     if (!slots.length) {
@@ -956,7 +966,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     const slotsx = []
-    slotsx.addArray(slots)
+    if (get.is.mountCombined()) {
+      for (const slot of slots) {
+        if (slot === "equip3" || slot === "equip4") {
+          slotsx.add("equip3_4")
+        } else {
+          slotsx.add(slot)
+        }
+      }
+    } else {
+      slotsx.addArray(slots)
+    }
     slotsx.sort()
 
     for (const slot of slotsx) {
@@ -1010,7 +1030,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (types.length > 0) {
       const slots = types
       const slotsx = []
-      slotsx.addArray(slots)
+      if (get.is.mountCombined()) {
+        slots.forEach((type) => {
+          if (type === "equip3" || type === "equip4") {
+            slotsx.add("equip3_4")
+          } else {
+            slotsx.add(type)
+          }
+        })
+      } else {
+        slotsx.addArray(slots)
+      }
       slotsx.sort()
       for (const slot of slotsx) {
         const left = player.countEquipableSlot(slot)
@@ -1373,7 +1403,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     let targets: Player[] = list.filter((target) => target.hasCards("h"))
 
     let result: Partial<Result> | Partial<Result>[]
-    if (targets.length >= 2) {
+    if (targets.length) {
       if (event.fixedResult) {
         targets = targets.removeArray(event.fixedResult.map((i) => i[0]))
       }
@@ -1707,7 +1737,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           ui.backgroundMusic.pause()
         }
         if (lib.config.background_audio) {
-          game.playAudio("effect", beatmap.filename)
+          if (beatmap.filename.startsWith("ext:")) {
+            game.playAudio(beatmap.filename)
+          } else {
+            game.playAudio("effect", beatmap.filename)
+          }
         }
       },
       player,
@@ -1737,7 +1771,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const custom_mapping = Array.isArray(beatmap.mapping)
       const mapping = custom_mapping ? beatmap.mapping.slice() : beatmap.mapping
       let hitsound = beatmap.hitsound || "hitsound.wav"
-      hitsound = `${lib.assetURL}audio/effect/${hitsound}`
+      if (hitsound.startsWith("ext:")) {
+        hitsound = `${lib.assetURL}extension/${hitsound.slice(4)}`
+      } else {
+        hitsound = `${lib.assetURL}audio/effect/${hitsound}`
+      }
       const hitsound_audio = new Audio(hitsound)
       hitsound_audio.volume = 0.25
       let abs = 1
@@ -1972,7 +2010,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (!lib.config.background_audio) {
             return
           }
-          game.playAudio("effect", beatmap.filename)
+          if (beatmap.filename.startsWith("ext:")) {
+            game.playAudio(beatmap.filename)
+          } else {
+            game.playAudio("effect", beatmap.filename)
+          }
         },
         Math.floor(speed * 100 * (0.9 + beatmap.judgebar_height)) +
           beatmap.current,
@@ -2003,7 +2045,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const skip = () => {
           Array.from(ui.window.getElementsByTagName("audio")).forEach(
             (audio) => {
-              if (audio.currentSrc.includes(beatmap.filename)) {
+              if (
+                audio.currentSrc.includes(
+                  beatmap.filename.startsWith("ext:")
+                    ? beatmap.name
+                    : beatmap.filename,
+                )
+              ) {
                 audio.remove()
               }
             },
@@ -3597,7 +3645,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       const realList = list.filter((current) => player.hasEnabledSlot(current))
       if (event.horse) {
-        if (list.includes("equip3") && list.includes("equip4")) {
+        if (
+          list.includes("equip3") &&
+          (get.is.mountCombined() || list.includes("equip4"))
+        ) {
           list.push("equip3_4")
           realList.push("equip3_4")
         }
@@ -3655,7 +3706,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (event.horse) {
-        if (list.includes("equip3") && list.includes("equip4")) {
+        if (
+          list.includes("equip3") &&
+          (get.is.mountCombined() || list.includes("equip4"))
+        ) {
           list.push("equip3_4")
         }
         list.remove("equip3")

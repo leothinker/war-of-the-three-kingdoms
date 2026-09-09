@@ -152,6 +152,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
     subfolder = subfolder || "default"
     if (type) {
       let dbimage: string | null = null,
+        extimage: string | null = null,
         modeimage: string | null = null,
         nameinfo,
         gzbool = false
@@ -193,6 +194,10 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
               imgPrefixUrl = value.slice(4)
               break
             }
+            if (value.startsWith("ext:")) {
+              extimage = value
+              break
+            }
             if (value.startsWith("db:")) {
               dbimage = value
               break
@@ -212,6 +217,8 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
         src = lib.config.skin[name][1]
       } else if (imgPrefixUrl) {
         src = imgPrefixUrl
+      } else if (extimage) {
+        src = extimage.replace(/^ext:/, "extension/")
       } else if (dbimage) {
         this.setBackgroundDB(dbimage.slice(3)).then(lib.filter.none)
         return this

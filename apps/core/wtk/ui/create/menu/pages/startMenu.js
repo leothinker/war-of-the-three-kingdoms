@@ -233,6 +233,11 @@ export const startMenu = (connectMenu) => {
             init: false,
             connect: true,
           }
+          infoconfig.connect_mount_combine = {
+            name: "合并坐骑栏",
+            init: false,
+            connect: true,
+          }
         }
         for (var j in infoconfig) {
           if (j === "update") {

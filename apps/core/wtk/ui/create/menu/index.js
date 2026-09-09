@@ -574,5 +574,7 @@ export function menu(connectMenu) {
 
   if (menuTimeout) {
     clearTimeout(menuTimeout)
+    delete window.resetExtension
+    localStorage.removeItem(`${lib.configprefix}disable_extension`, true)
   }
 }

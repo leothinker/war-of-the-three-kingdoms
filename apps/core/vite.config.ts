@@ -28,7 +28,11 @@ export default defineConfig({
       "/checkDir": `http://127.0.0.1:${port.server}`,
       "/readFile": `http://127.0.0.1:${port.server}`,
       "/readFileAsText": `http://127.0.0.1:${port.server}`,
+      "/writeFile": `http://127.0.0.1:${port.server}`,
+      "/removeFile": `http://127.0.0.1:${port.server}`,
       "/getFileList": `http://127.0.0.1:${port.server}`,
+      "/createDir": `http://127.0.0.1:${port.server}`,
+      "/removeDir": `http://127.0.0.1:${port.server}`,
     },
   },
 })

@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "exclude": ["dist", "output", "node_modules"],
+  "exclude": ["dist", "output", "node_modules", "extension"],
   "compilerOptions": {
     "lib": ["dom", "WebWorker", "ESNext"],
     "paths": {
@@ -9,6 +9,7 @@
     },
     "typeRoots": ["./typings", "./node_modules/@types"],
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "checkJs": true,
     "noEmit": true,
     "disableSizeLimit": true,
