@@ -151,6 +151,23 @@ const translates = {
 
   rumo: "入魔",
   rumo_info: "入魔后，每轮结束时，若本轮你未造成过伤害，你失去1点体力。",
+
+  luoguanzhong: "罗贯中",
+  zhuhun: "著魂",
+  zhuhun_info:
+    "游戏开始时，你随机亮出四张未加入游戏的武将牌，确认后洗混扣置（仅对你可见），然后你摸等量的牌并在每张扣置的武将牌上正面朝上放置一张手牌，称为“魂”。",
+  jingshi: "经世",
+  jingshi_info: `其他角色回合开始时，其可以根据“魂”的提示猜测并翻开一张扣置的武将牌，若猜对，你摸两张牌并可以交给其两张牌。当所有武将牌被翻开后，你移去这些牌并再次发动${get.poptip("zhuhun")}。`,
+  ranhan: "染瀚",
+  ranhan_info: `出牌阶段限一次，你可以弃置场上任意张花色各不同的牌，将游戏外的${get.poptip("huhaibi")}置入装备区。`,
+  huhaibi: "湖海笔",
+  huhaibi_info:
+    "结束阶段或当此牌置入你的装备区后，你可以调整笔上势力的顺序；笔上相邻势力的角色互相造成的伤害+1；此牌离开你的装备区时销毁。",
+  huhaibi_skill: "湖海笔",
+  huhaibi_skill_info:
+    "结束阶段或当此牌置入你的装备区后，你可以调整笔上势力的顺序；笔上相邻势力的角色互相造成的伤害+1；此牌离开你的装备区时销毁。",
+  huhaibi_append:
+    '<span class="text" style="font-family: yuanli">话说天下大势，分久必合，合久必分。</span>',
 }
 
 export default translates

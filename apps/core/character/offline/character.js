@@ -42,12 +42,18 @@ const characters = {
     skills: ["mark_shouli", "mark_hengwu"],
     groupInGuozhan: "shu",
   },
-  dm_diaochan: {
-    sex: "female",
+  // dm_diaochan: {
+  //   sex: "female",
+  //   group: "qun",
+  //   hp: 3,
+  //   skills: ["huanhuo", "olqingshi"],
+  //   names: "null|null",
+  // },
+  luoguanzhong: {
+    sex: "male",
     group: "qun",
-    hp: 3,
-    skills: ["huanhuo", "olqingshi"],
-    names: "null|null",
+    hp: 4,
+    skills: ["zhuhun", "jingshi", "ranhan"],
   },
 }
 

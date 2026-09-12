@@ -6,4 +6,5 @@ export default {
   shen_machao: "神威天将军",
   mark_shen_machao: "神威天将军",
   dm_diaochan: "倾世的魅影",
+  luoguanzhong: "湖海散人",
 }

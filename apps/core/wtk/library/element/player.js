@@ -15696,7 +15696,7 @@ export class Player extends HTMLDivElement {
           ["name", "suit", "number", "nature"].every((key) => {
             const card = curEvent.cards[0]
             if (key === "nature") {
-              if (card.nature === void 0 && curEvent.card.nature === false) {
+              if (card.nature == void 0 && curEvent.card.nature === false) {
                 return true
               }
             }
@@ -15708,11 +15708,11 @@ export class Player extends HTMLDivElement {
       //////////////////////////////////////更改部分结束喵///////////////////////////////////////
     }
     var node
-    if (card === void 0 || card.length === 0) return
+    if (card == void 0 || card.length === 0) return
     var cardx = card.copy("thrown")
     if (id) cardx.node.throw_id = id
     node = this.$throwordered(cardx, nosource, cardsetion)
-    if (time !== void 0) {
+    if (time != void 0) {
       node.fixed = true
       setTimeout(() => {
         node.delete()

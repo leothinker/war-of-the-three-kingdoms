@@ -45,15 +45,15 @@ export class Audio {
     info?: AudioInfo | SkillInfo
     args?: any[]
   }): Audio {
-    if (skill === void 0) {
+    if (skill == void 0) {
       throw new ReferenceError(`skill is not defined`)
     }
 
     const formatedPlayer =
-      player !== void 0 ? Audio.formatPlayer(player) : void 0
+      player != void 0 ? Audio.formatPlayer(player) : void 0
 
     let formatedInfo: SkillInfo | undefined
-    if (info !== void 0 && (typeof info !== "object" || Array.isArray(info))) {
+    if (info != void 0 && (typeof info !== "object" || Array.isArray(info))) {
       formatedInfo = { audio: info }
     } else {
       formatedInfo = info
@@ -77,12 +77,12 @@ export class Audio {
     info?: AudioInfo
     args?: any[]
   }): Audio {
-    if (player === void 0) {
+    if (player == void 0) {
       throw new ReferenceError(`player is not defined`)
     }
 
     let formatedInfo
-    if (info !== void 0 && (typeof info !== "object" || Array.isArray(info))) {
+    if (info != void 0 && (typeof info !== "object" || Array.isArray(info))) {
       formatedInfo = { dieAudios: info }
     } else {
       formatedInfo = info
@@ -127,7 +127,7 @@ export class Audio {
   }
 
   static toText(list: TextMap[]): string[] {
-    return list.map((data) => data.text).filter((text) => text !== void 0)
+    return list.map((data) => data.text).filter((text) => text != void 0)
   }
 
   #Audio: AudioBase
@@ -163,7 +163,7 @@ export class Audio {
     }
     const key = this.#Audio.getCacheKey()
     const result = Audio.#audioCache[key]
-    if (result !== void 0) {
+    if (result != void 0) {
       this.#audioList = JSON.parse(JSON.stringify(result))
     } else {
       const result = this.parseAudio(this.name, this.#audioInfo)
@@ -241,12 +241,12 @@ export class Audio {
     const list = audioInfoString.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/) // [path, number|true, ext]
     if (list) {
       let [, path, audioNum, ext] = list
-      if (path === void 0) {
+      if (path == void 0) {
         path = this.#Audio.defaultPath
       } else {
         path = `${path}/`
       }
-      if (ext === void 0) {
+      if (ext == void 0) {
         ext = ".mp3"
       } else {
         ext = `.${ext}`
@@ -322,7 +322,7 @@ class SkillAudio implements AudioBase {
       type: this.type,
       name: this.name,
       filteredAudioName: this.filteredAudioName || void 0,
-      player: this.filteredAudioName2 !== void 0 ? this.player : void 0,
+      player: this.filteredAudioName2 != void 0 ? this.player : void 0,
     }
     return JSON.stringify(result)
   }
@@ -335,7 +335,7 @@ class SkillAudio implements AudioBase {
   ) {
     this.name = name
 
-    if (info !== void 0) {
+    if (info != void 0) {
       this.info = info
       this.useCache = false
     } else if (this.isExist(this.name)) {
@@ -381,7 +381,7 @@ class SkillAudio implements AudioBase {
     if (this.info.logAudio2) {
       const key = this.getName((name) => !!this.info.logAudio2?.[name])
       const logAudio2 = this.info.logAudio2[key]
-      if (logAudio2 !== void 0) {
+      if (logAudio2 != void 0) {
         this.filteredLogAudio2 = logAudio2
         this.useCache = false
       }
@@ -389,7 +389,7 @@ class SkillAudio implements AudioBase {
     if (this.info.audioname2) {
       const key = this.getName((name) => !!this.info.audioname2?.[name])
       const audioname2 = this.info.audioname2[key]
-      if (audioname2 !== void 0) {
+      if (audioname2 != void 0) {
         this.filteredAudioName2 = audioname2
       }
     }
@@ -405,7 +405,7 @@ class SkillAudio implements AudioBase {
     if (this.filteredLogAudio2 && args) {
       return this.filteredLogAudio2(...args)
     }
-    if (this.filteredAudioName2 !== void 0) {
+    if (this.filteredAudioName2 != void 0) {
       return this.filteredAudioName2
     }
     if (this.info.logAudio && args) {
@@ -418,7 +418,7 @@ class SkillAudio implements AudioBase {
       }
       return result
     }
-    if (this.info.audio !== void 0) {
+    if (this.info.audio != void 0) {
       return this.info.audio
     }
     return this.defaultInfo
@@ -427,7 +427,7 @@ class SkillAudio implements AudioBase {
     return new SkillAudio(
       name,
       this.player,
-      info !== void 0 ? { audio: info } : void 0,
+      info != void 0 ? { audio: info } : void 0,
       this.audioname,
     )
   }
@@ -508,7 +508,7 @@ class DieAudio implements AudioBase {
   constructor(player: FormatedPlayer, info?: any) {
     this.player = player
 
-    if (info !== void 0) {
+    if (info != void 0) {
       this.useCache = false
       this.name = player.name
       this.info = info
@@ -551,7 +551,7 @@ class DieAudio implements AudioBase {
       return this.defaultInfo
     }
     const audioInfo = this.info.dieAudios
-    if (audioInfo === void 0) {
+    if (audioInfo == void 0) {
       return this.defaultInfo
     }
     if (Array.isArray(audioInfo) && audioInfo.length === 0) {
@@ -562,7 +562,7 @@ class DieAudio implements AudioBase {
   getReferenceAudio(name: string, info?: AudioInfo): DieAudio {
     return new DieAudio(
       Audio.formatPlayer(name),
-      info !== void 0 ? { dieAudios: info } : void 0,
+      info != void 0 ? { dieAudios: info } : void 0,
     )
   }
   textMap(path: string, ext: string, name: string): TextMap {

@@ -5,6 +5,7 @@ const characterSort = {
   extra_decade: ["shen_machao"],
   offline_daoju: ["mark_shen_machao"],
   offline_demonized: ["dm_diaochan"],
+  offline_chunqiu: ["luoguanzhong"],
 }
 
 const characterSortTranslate = {
@@ -14,6 +15,7 @@ const characterSortTranslate = {
   extra_decade: "神·武",
   offline_daoju: "神马超道具礼盒",
   offline_demonized: "魔",
+  offline_chunqiu: "春秋演墨",
 }
 
 export { characterSort, characterSortTranslate }
