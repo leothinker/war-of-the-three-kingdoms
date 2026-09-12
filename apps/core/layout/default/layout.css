@@ -169,25 +169,6 @@ table {
 #window.noclick_important .noclick_click_important div {
   pointer-events: auto !important;
 }
-#window.blur_ui #arena.paused,
-#window.blur_ui #arena.menupaused,
-#window.blur_ui #historybar.paused,
-#window.blur_ui #historybar.menupaused,
-#window.blur_ui #arena.unfocus,
-#window.blur_ui #arena.right,
-#window.blur_ui.shortcutpaused > #arena,
-#window.blur_ui.shortcutpaused > #historybar {
-  filter: blur(3px);
-  -webkit-filter: blur(3px);
-}
-#window.blur_ui #arena.menupaused,
-#window.blur_ui #historybar.menupaused {
-  opacity: 0.6;
-}
-#window.blur_ui #arena.thrownhighlight > .card.thrown:not(.thrownhighlight) {
-  filter: blur(2px);
-  -webkit-filter: blur(2px);
-}
 
 #time {
   width: 100%;
@@ -423,38 +404,6 @@ table {
 #splash[data-radius_size="reduce"] > div > div,
 #splash[data-radius_size="reduce"] > div {
   border-radius: 4px;
-}
-#splash[data-radius_size="off"] > div > div,
-#splash[data-radius_size="off"] > div {
-  border-radius: 0px;
-}
-#splash[data-radius_size="increase"] > div > div,
-#splash[data-radius_size="increase"] > div {
-  border-radius: 12px;
-}
-
-/* 启动页style2 */
-#splash[data-splash_style="style2"] > div {
-  width: 250px;
-  height: 350px;
-  top: calc(50% - 175px);
-}
-#splash[data-splash_style="style2"] > div:first-child {
-  margin-left: 15px;
-}
-#splash[data-splash_style="style2"] > div:last-child {
-  margin-right: 15px;
-}
-#splash[data-splash_style="style2"] > div > .splashtext {
-  font-family: "shousha";
-  font-size: 65px;
-}
-#splash[data-splash_style="style2"].slim > div > .splashtext {
-  right: 10px;
-  bottom: 5px;
-}
-#splash[data-splash_style="style2"].slim > div > .avatar {
-  width: 240px;
 }
 
 #arena.playerhidden > .player,
@@ -1460,12 +1409,6 @@ body > .background.land {
 #window[data-radius_size="reduce"] .card > .cardframebg {
   border-radius: 4px;
 }
-#window[data-radius_size="increase"] .card > .cardframebg {
-  border-radius: 16px;
-}
-#window[data-radius_size="off"] .card > .cardframebg {
-  border-radius: 0;
-}
 .card > .cardframebg[data-auto="gold"] {
   background-image: url("../../theme/style/card/image/border_gold.jpg");
 }
@@ -1507,12 +1450,6 @@ body > .background.land {
 
 #window[data-radius_size="reduce"] .card > .cardavatar {
   border-radius: 3px;
-}
-#window[data-radius_size="off"] .card > .cardavatar {
-  border-radius: 0px;
-}
-#window[data-radius_size="increase"] .card > .cardavatar {
-  border-radius: 14px;
 }
 
 div:not(.handcards):not(.handcards-container) > .card:not(.thrown) > .info,
@@ -1865,12 +1802,6 @@ div.select-all:not(.card):not(.player) {
 }
 #window[data-radius_size="reduce"] > .dialog.popped {
   border-radius: 4px;
-}
-#window[data-radius_size="off"] > .dialog.popped {
-  border-radius: 0px;
-}
-#window[data-radius_size="increase"] > .dialog.popped {
-  border-radius: 12px;
 }
 #window > .dialog.popped > .bar {
   display: none !important;
@@ -3737,12 +3668,6 @@ div.select-all:not(.card):not(.player) {
 #window[data-radius_size="reduce"] #me > .fakeme.avatar {
   border-radius: 4px;
 }
-#window[data-radius_size="off"] #me > .fakeme.avatar {
-  border-radius: 0px;
-}
-#window[data-radius_size="increase"] #me > .fakeme.avatar {
-  border-radius: 16px;
-}
 .card.removing {
   transform: scale(0);
 }
@@ -4087,16 +4012,6 @@ div:hover > .intro {
 #mebg.target {
   transform: none !important;
 }
-#arena[data-target_shake="shake"] .target {
-  transform: rotate(-3deg);
-}
-#arena[data-target_shake="shake"] .target2 {
-  transform: rotate(3deg);
-}
-#arena[data-target_shake="zoom"] .target,
-#arena[data-target_shake="zoom"] .target2 {
-  transform: scale(1.03);
-}
 
 .content > .config.line2 {
   transform: translateX(-5px);
@@ -4146,15 +4061,6 @@ div:hover > .intro {
     rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 #window[data-radius_size="reduce"] .shadowed {
-  border-radius: 4px;
-}
-#window[data-radius_size="off"] .shadowed {
-  border-radius: 0px;
-}
-#window[data-radius_size="increase"] .shadowed {
-  border-radius: 16px;
-}
-#window[data-radius_size="default"] .shadowed.reduce_radius {
   border-radius: 4px;
 }
 
@@ -5029,6 +4935,45 @@ div[data-decoration="bronze"]::after {
   color: #a82424;
 }
 
+.card[data-card-type="zhanfa"] > .image {
+  background-size: 75%;
+  background-position: bottom right;
+  background-repeat: no-repeat;
+}
+
+.card.zf_common > .name,
+.card.zf_common > .info,
+.card.zf_rare > .name,
+.card.zf_rare > .info,
+.card.zf_epic > .name,
+.card.zf_epic > .info,
+.card.zf_legend > .name,
+.card.zf_legend > .info {
+  /*background-color: #59392b;
+	color: white;*/
+  font-weight: bolder;
+}
+
+.card.zf_common {
+  border: 2px solid #59392b;
+  filter: drop-shadow(0 0 10px #59392b);
+}
+
+.card.zf_rare {
+  border: 2px solid #5d3c77;
+  filter: drop-shadow(0 0 10px #5d3c77);
+}
+
+.card.zf_epic {
+  border: 2px solid #af572a;
+  filter: drop-shadow(0 0 10px #af572a);
+}
+
+.card.zf_legend {
+  border: 2px solid #b0293e;
+  filter: drop-shadow(0 0 10px #b0293e);
+}
+
 .config > .toggle.onoff {
   height: 100%;
   width: 30px;
@@ -5676,18 +5621,6 @@ div[data-decoration="bronze"]::after {
   border-radius: 4px;
 }
 
-#window[data-radius_size="off"] .dialog.scroll1,
-#window[data-radius_size="off"] .dialog.scroll2,
-#window[data-radius_size="off"] .dialog.withbg {
-  border-radius: 0px;
-}
-
-#window[data-radius_size="increase"] .dialog.scroll1,
-#window[data-radius_size="increase"] .dialog.scroll2,
-#window[data-radius_size="increase"] .dialog.withbg {
-  border-radius: 16px;
-}
-
 #window[data-radius_size="reduce"] #system > div > div,
 #window[data-radius_size="reduce"] #mebg,
 #window[data-radius_size="reduce"] .control,
@@ -5710,52 +5643,6 @@ div[data-decoration="bronze"]::after {
   .player[data-position="0"]
   .equips {
   border-radius: 4px;
-}
-
-#window[data-radius_size="off"] #system > div > div,
-#window[data-radius_size="off"] #mebg,
-#window[data-radius_size="off"] .control,
-#window[data-radius_size="off"] .player,
-#window[data-radius_size="off"] .player > .turned,
-#window[data-radius_size="off"] .player::after,
-#window[data-radius_size="off"] .card,
-#window[data-radius_size="off"] .card::after,
-#window[data-radius_size="off"] .avatar,
-#window[data-radius_size="off"] .avatar2,
-#window[data-radius_size="off"] .button,
-#window[data-radius_size="off"] .button::after,
-#window[data-radius_size="off"] #window > .dialog.popped,
-#window[data-radius_size="off"] .player.unseen .equips:not(*:empty),
-#window[data-radius_size="off"] .menu,
-#window[data-radius_size="off"] .left.pane > .menubutton,
-#window[data-radius_size="off"] #splash > div,
-#window[data-radius_size="off"].mobile:not(.chess)
-  .player[data-position="0"]
-  .equips {
-  border-radius: 0px;
-}
-
-#window[data-radius_size="increase"] #system > div > div,
-#window[data-radius_size="increase"] #mebg,
-#window[data-radius_size="increase"] .control,
-#window[data-radius_size="increase"] .player,
-#window[data-radius_size="increase"] .player > .turned,
-#window[data-radius_size="increase"] .player::after,
-#window[data-radius_size="increase"] .card,
-#window[data-radius_size="increase"] .card::after,
-#window[data-radius_size="increase"] .avatar,
-#window[data-radius_size="increase"] .avatar2,
-#window[data-radius_size="increase"] .button,
-#window[data-radius_size="increase"] .button::after,
-#window[data-radius_size="increase"] #window > .dialog.popped,
-#window[data-radius_size="increase"] .player.unseen .equips:not(*:empty),
-#window[data-radius_size="increase"] .menu,
-#window[data-radius_size="increase"] .left.pane > .menubutton,
-#window[data-radius_size="increase"] #splash > div,
-#window[data-radius_size="increase"].mobile:not(.chess)
-  .player[data-position="0"]
-  .equips {
-  border-radius: 16px;
 }
 
 .loading-screen {
@@ -6346,7 +6233,7 @@ progress.progress::-webkit-progress-value {
   background: rgb(0, 117, 255);
 }
 /* 给poptip增加下划线和加粗 */
-#window wtk-poptip {
+#window noname-poptip {
   text-decoration: underline;
   font-weight: bolder;
 }

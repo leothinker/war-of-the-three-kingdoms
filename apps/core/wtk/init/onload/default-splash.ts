@@ -23,9 +23,7 @@ export class DefaultSplash implements IOnloadSplash {
       node.classList.add("touch")
       lib.setScroll(node)
     }
-    if (lib.config.player_border !== "wide") {
-      node.classList.add("slim")
-    }
+    node.classList.add("slim")
 
     node.dataset.radius_size = lib.config.radius_size
     node.dataset.splash_style = lib.config.splash_style
@@ -76,7 +74,6 @@ export class DefaultSplash implements IOnloadSplash {
       ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
     } else if (
       game.layout === "mobile" &&
-      lib.config.layout !== "mobile" &&
       lib.layoutfixed.indexOf(mode) === -1
     ) {
       game.layout = lib.config.layout

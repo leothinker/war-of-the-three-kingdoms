@@ -358,7 +358,7 @@ const skills = {
           .map((i) => `[${get.translation(i)}]`)
           .join("<br>")
         const skillnode = ui.create.caption(
-          `<div class="text" data-nature=${get.groupnature(info[1], "raw")}m style="font-family: ${lib.config.name_font || "xinwei"},xinwei">${skillstr}</div>`,
+          `<div class="text" data-nature=${get.groupnature(info[1], "raw")}m style="font-family: ${"xingkai"},xinwei">${skillstr}</div>`,
           node,
         )
         skillnode.style.left = "2px"

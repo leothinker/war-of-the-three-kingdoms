@@ -43,15 +43,11 @@ export class Create {
    * 让卡牌旋转
    */
   cardSpinning(card) {
-    if (lib.config.cardback_style !== "default") {
-      card.style.transitionProperty = "none"
-      ui.refresh(card)
-      card.classList.add("infohidden")
-      ui.refresh(card)
-      card.style.transitionProperty = ""
-    } else {
-      card.classList.add("infohidden")
-    }
+    card.style.transitionProperty = "none"
+    ui.refresh(card)
+    card.classList.add("infohidden")
+    ui.refresh(card)
+    card.style.transitionProperty = ""
     card.style.transition = "all 0s"
     card.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
     const onEnd01 = () => {
@@ -367,7 +363,7 @@ export class Create {
     let cardName = get.name(card)
     const cardNature = get.nature(card)
     let tempname = get.translation(cardName)
-    const cardTempNameConfig = lib.config.cardtempname
+    const cardTempNameConfig = "image"
     const node =
       getApplyNode._tempName || ui.create.div(".tempname", getApplyNode)
     let datasetNature = ""
@@ -1977,7 +1973,7 @@ export class Create {
     )
     if (heightset) {
       //这里如果dialog的高度较低的话，会显示不全下面的分页按钮，所以我增加了50px，后面遇到高度问题，可以研究更完美的方案，在这里更改。
-      dialog.style.height = `${(game.layout === "long2" || game.layout === "nova" ? 380 : 350) + 50}px`
+      dialog.style.height = `${(game.layout === "long2" ? 380 : 350) + 50}px`
       dialog._scrollset = true
     }
     dialog.getCurrentCapt = function (link, capt, noalph) {
@@ -2677,78 +2673,27 @@ export class Create {
     ui.arena.setNumber = function (num) {
       this.dataset.number = num
       ui.updatePlayerPositions()
-      // if(game.layout=='nova'&&parseInt(num)<7){
-      // 	ui.arena.classList.add('player_autolong');
-      // }
-      // else if(lib.config.player_height_nova!='long'){
-      // 	ui.arena.classList.remove('player_autolong');
-      // }
-      // if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
-      //     this.classList.add('fewplayer');
-      // }
-      // else{
-      //     this.classList.remove('fewplayer');
-      // }
     }
 
     if (lib.config.low_performance) {
       ui.window.classList.add("low_performance")
     }
-    if (game.layout === "mobile" || game.layout === "long") {
+    if (game.layout === "mobile") {
       ui.arena.classList.add("mobile")
     }
-    if (game.layout === "long" || game.layout === "long2") {
+    if (game.layout === "long2") {
       ui.arena.classList.add("long")
     }
-    if (game.layout === "default") {
-      ui.arena.classList.add("oldlayout")
-    }
-    if (
-      lib.config.player_border !== "wide" ||
-      game.layout === "long" ||
-      game.layout === "long2"
-    ) {
-      ui.arena.classList.add("slim_player")
-    }
-    if (lib.config.player_border === "slim") {
-      ui.arena.classList.add("uslim_player")
-    }
-    if (lib.config.player_border === "narrow") {
-      ui.arena.classList.add("mslim_player")
-    }
-    if (
-      lib.config.player_border === "normal" &&
-      lib.config.mode !== "brawl" &&
-      (game.layout === "long" || game.layout === "long2")
-    ) {
-      ui.arena.classList.add("lslim_player")
-    }
+    ui.arena.classList.add("slim_player")
+    ui.arena.classList.add("uslim_player")
     ui.window.dataset.player_border = lib.config.player_border
-    ui.window.dataset.radius_size = lib.config.radius_size || "default"
-    if (game.layout === "long" || game.layout === "mobile") {
+    ui.window.dataset.radius_size = lib.config.radius_size || "reduce"
+    if (game.layout === "mobile") {
       //if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
       ui.arena.classList.add("textequip")
     }
-    if (
-      game.layout === "long" ||
-      game.layout === "long2" ||
-      game.layout === "mobile" ||
-      game.layout === "nova"
-    ) {
-      if (lib.config.cardshape === "oblong") {
-        ui.window.classList.add("oblongcard")
-        ui.arena.classList.add("oblongcard")
-      }
-    }
-    if (lib.config.blur_ui) {
-      ui.window.classList.add("blur_ui")
-    }
-    if (lib.config.glass_ui) {
-      ui.window.classList.add("glass_ui")
-    }
-    if (lib.config.custom_button) {
-      lib.configMenu.appearence.config.custom_button.onclick("skip")
-    }
+    ui.window.classList.add("oblongcard")
+    ui.arena.classList.add("oblongcard")
 
     if (lib.config.show_statusbar_ios === "overlay") {
       document.body.classList.add("statusbar")
@@ -2783,10 +2728,6 @@ export class Create {
     lib.init.cssstyles()
 
     ui.arena.dataset.player_height = lib.config.player_height || "default"
-    ui.arena.dataset.player_height_nova =
-      lib.config.player_height_nova || "default"
-    // if(lib.config.player_height_nova=='long') ui.arena.classList.add('player_autolong');
-    ui.arena.dataset.target_shake = lib.config.target_shake || "off"
     ui.backgroundMusic = document.createElement("audio")
     ui.backgroundMusic.volume = lib.config.volumn_background / 8
     game.playBackgroundMusic()
@@ -2806,23 +2747,8 @@ export class Create {
       },
       { once: true },
     )
-    if (lib.config.cursor_style === "pointer") {
-      ui.window.classList.add("nopointer")
-    }
-    if (lib.config.turned_style === false) {
-      ui.arena.classList.add("hide_turned")
-    }
-    if (lib.config.link_style2 !== "chain") {
-      ui.arena.classList.add("nolink")
-    }
     if (lib.config.show_name === false) {
       ui.arena.classList.add("hide_name")
-    }
-    if (lib.config.change_skin_auto !== "off") {
-      _status.skintimeout = setTimeout(
-        ui.click.autoskin,
-        parseInt(lib.config.change_skin_auto, 10),
-      )
     }
     if (lib.config.border_style?.startsWith("dragon_")) {
       ui.arena.dataset.framedecoration = lib.config.border_style.slice(7)
@@ -3425,12 +3351,6 @@ export class Create {
       var left2 = "calc(100% - 245px)"
       var top1 = "210px"
       var top2 = "calc(100% - 245px)"
-      if (game.layout === "default") {
-        left1 = "265px"
-        top1 = "160px"
-        left2 = "calc(100% - 330px)"
-        top2 = "calc(100% - 235px)"
-      }
       if (this.position === 1 || this.position === 2) {
         this.style.top = top2
       } else {
@@ -3637,28 +3557,26 @@ export class Create {
     if (func) {
       node.listen(func)
     }
-    if (lib.config.button_press) {
-      node.addEventListener(
-        lib.config.touchscreen ? "touchstart" : "mousedown",
-        (e) => {
-          if (!node.classList.contains("hidden")) {
-            node.classList.add("pressdown")
-          }
-        },
-      )
-      node.addEventListener(
-        lib.config.touchscreen ? "touchend" : "mouseup",
-        (e) => {
-          node.classList.remove("pressdown")
-        },
-      )
-      node.addEventListener(
-        lib.config.touchscreen ? "touchmove" : "mousemove",
-        (e) => {
-          node.classList.remove("pressdown")
-        },
-      )
-    }
+    node.addEventListener(
+      lib.config.touchscreen ? "touchstart" : "mousedown",
+      (e) => {
+        if (!node.classList.contains("hidden")) {
+          node.classList.add("pressdown")
+        }
+      },
+    )
+    node.addEventListener(
+      lib.config.touchscreen ? "touchend" : "mouseup",
+      (e) => {
+        node.classList.remove("pressdown")
+      },
+    )
+    node.addEventListener(
+      lib.config.touchscreen ? "touchmove" : "mousemove",
+      (e) => {
+        node.classList.remove("pressdown")
+      },
+    )
     return node
   }
   pause() {
@@ -3737,11 +3655,7 @@ export class Create {
     blank: (item, type, position, noclick, node) => {
       node = ui.create.div(".button.card.blank", position)
       node.link = item
-      if (
-        get.position(item) === "j" &&
-        item.viewAs &&
-        lib.config.cardtempname !== "off"
-      ) {
+      if (get.position(item) === "j" && item.viewAs) {
         node.classList.add("infoflip")
         node.classList.add("infohidden")
         ui.create
@@ -3784,8 +3698,7 @@ export class Create {
       if (
         (itemPosition === "e" || itemPosition === "j") &&
         item.viewAs &&
-        item.viewAs !== item.name &&
-        lib.config.cardtempname !== "off"
+        item.viewAs !== item.name
       ) {
         ui.create.cardTempName(item, node)
       }
@@ -3855,74 +3768,40 @@ export class Create {
         }
         var infoitem = get.character(item)
         node.node.name.innerHTML = get.slimName(item)
-        if (
-          lib.config.buttoncharacter_style === "default" ||
-          lib.config.buttoncharacter_style === "simple"
-        ) {
-          if (lib.config.buttoncharacter_style === "simple") {
-            node.node.group.style.display = "none"
-          }
-          node.classList.add("newstyle")
-          node.node.name.dataset.nature = get.groupnature(
-            get.bordergroup(infoitem),
-          )
-          node.node.group.dataset.nature = get.groupnature(
-            get.bordergroup(infoitem),
-            "raw",
-          )
-          ui.create.div(node.node.hp)
-          var hp = infoitem.hp,
-            maxHp = infoitem.maxHp,
-            hujia = infoitem.hujia
-          var str = get.numStr(hp)
-          if (hp !== maxHp) {
-            str += "/"
-            str += get.numStr(maxHp)
-          }
-          var textnode = ui.create.div(".text", str, node.node.hp)
-          if (infoitem[2] === 0) {
-            node.node.hp.hide()
-          } else if (get.infoHp(infoitem[2]) <= 3) {
-            node.node.hp.dataset.condition = "mid"
-          } else {
-            node.node.hp.dataset.condition = "high"
-          }
-          if (hujia > 0) {
-            ui.create.div(node.node.hp, ".shield")
-            ui.create.div(".text", get.numStr(hujia), node.node.hp)
-          }
+        node.classList.add("newstyle")
+        node.node.name.dataset.nature = get.groupnature(
+          get.bordergroup(infoitem),
+        )
+        node.node.group.dataset.nature = get.groupnature(
+          get.bordergroup(infoitem),
+          "raw",
+        )
+        ui.create.div(node.node.hp)
+        var hp = infoitem.hp,
+          maxHp = infoitem.maxHp,
+          hujia = infoitem.hujia
+        var str = get.numStr(hp)
+        if (hp !== maxHp) {
+          str += "/"
+          str += get.numStr(maxHp)
+        }
+        var textnode = ui.create.div(".text", str, node.node.hp)
+        if (infoitem[2] === 0) {
+          node.node.hp.hide()
+        } else if (get.infoHp(infoitem[2]) <= 3) {
+          node.node.hp.dataset.condition = "mid"
         } else {
-          var hp = infoitem.hp,
-            maxHp = infoitem.maxHp,
-            shield = infoitem.hujia
-          if (maxHp > 14) {
-            if (hp !== maxHp || shield > 0) {
-              node.node.hp.innerHTML = infoitem[2]
-            } else {
-              node.node.hp.innerHTML = get.numStr(infoitem[2])
-            }
-            node.node.hp.classList.add("text")
-          } else {
-            for (var i = 0; i < maxHp; i++) {
-              var next = ui.create.div("", node.node.hp)
-              if (i >= hp) {
-                next.classList.add("exclude")
-              }
-            }
-            for (var i = 0; i < shield; i++) {
-              ui.create.div(node.node.hp, ".shield")
-            }
-          }
+          node.node.hp.dataset.condition = "high"
+        }
+        if (hujia > 0) {
+          ui.create.div(node.node.hp, ".shield")
+          ui.create.div(".text", get.numStr(hujia), node.node.hp)
         }
         if (node.node.hp.childNodes.length === 0) {
           node.node.name.style.top = "8px"
         }
         if (node.node.name.querySelectorAll("br").length >= 4) {
           node.node.name.classList.add("long")
-          if (lib.config.buttoncharacter_style === "old") {
-            node.addEventListener("mouseenter", ui.click.buttonnameenter)
-            node.addEventListener("mouseleave", ui.click.buttonnameleave)
-          }
         }
         node.node.intro.innerHTML = lib.config.intro
         if (!noclick) {

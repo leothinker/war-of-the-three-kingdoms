@@ -62,7 +62,6 @@ export default () => {
             e.preventDefault()
           }
           const ip = node.textContent
-          game.requireSandboxOn(ip)
           game.saveConfig("last_ip", ip)
           game.connect(ip, (success) => {
             if (success) {

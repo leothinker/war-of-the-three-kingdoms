@@ -186,9 +186,6 @@ export const defaultHooks: {
 
   checkCard: [
     function updateTempname(card, event) {
-      if (lib.config.cardtempname === "off") {
-        return
-      }
       if (
         get.name(card) === card.name &&
         get.is.sameNature(get.nature(card), card.nature, true)
@@ -196,9 +193,7 @@ export const defaultHooks: {
         return
       }
       const node = ui.create.cardTempName(card)
-      if (lib.config.cardtempname !== "default") {
-        node.classList.remove("vertical")
-      }
+      node.classList.remove("vertical")
     },
   ],
 
@@ -388,32 +383,25 @@ export const defaultHooks: {
       if (!player.node.tipContainer) {
         return
       }
+      //如果全是空的装备栏
       if (
-        (lib.config.layout === "mobile" || lib.config.layout === "long") &&
-        player.dataset.position === "0"
+        Array.from(player.node.equips.children).every((e) =>
+          e.classList.contains("emptyequip"),
+        )
       ) {
         player.style.removeProperty("--bottom")
       } else {
-        //如果全是空的装备栏
-        if (
-          Array.from(player.node.equips.children).every((e) =>
-            e.classList.contains("emptyequip"),
-          )
-        ) {
-          player.style.removeProperty("--bottom")
-        } else {
-          const eqipContainerTop = player.node.equips.offsetTop
-          let equipTop = 0
-          for (const equip of Array.from(player.node.equips.children)) {
-            if (!equip.classList.contains("emptyequip")) {
-              equipTop = equip.offsetTop
-              break
-            }
+        const eqipContainerTop = player.node.equips.offsetTop
+        let equipTop = 0
+        for (const equip of Array.from(player.node.equips.children)) {
+          if (!equip.classList.contains("emptyequip")) {
+            equipTop = equip.offsetTop
+            break
           }
-          const top = equipTop + eqipContainerTop
-          const bottom = player.getBoundingClientRect().height - top
-          player.style.setProperty("--bottom", `${bottom}px`)
         }
+        const top = equipTop + eqipContainerTop
+        const bottom = player.getBoundingClientRect().height - top
+        player.style.setProperty("--bottom", `${bottom}px`)
       }
     },
   ],

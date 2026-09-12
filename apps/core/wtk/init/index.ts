@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { _status, ai, game, get, lib, rootURL, ui } from "wtk"
+import { _status, ai, game, get, lib, ui } from "wtk"
 import { CacheContext } from "@/library/cache/cacheContext.js"
 import * as config from "@/util/config.js"
 import { setOnError } from "@/util/error.ts"
@@ -104,16 +104,8 @@ export async function boot() {
   }
 
   let layout = config.get("layout")
-  if (
-    layout === "default" ||
-    lib.layoutfixed.indexOf(config.get("mode")) !== -1
-  ) {
+  if (lib.layoutfixed.indexOf(config.get("mode")) !== -1) {
     layout = "mobile"
-  }
-  if (layout === "phone") {
-    layout = "mobile"
-    game.saveConfig("layout", "mobile")
-    game.saveConfig("phonelayout", true)
   }
   game.layout = layout
 
@@ -161,17 +153,6 @@ export async function boot() {
     lib.translate.identity = "身份"
     config.get("gameRecord").identity ??= { data: {} }
   }
-  if (pack.background) {
-    const background = lib.configMenu.appearence.config.image_background.item
-    for (const name in pack.background) {
-      if (config.get("hiddenBackgroundPack").includes(name)) continue
-      background[name] = pack.background[name]
-    }
-    for (const name of config.get("customBackgroundPack")) {
-      background[name] = name.slice(name.indexOf("_") + 1)
-    }
-    background.default = "默认"
-  }
   if (pack.music) {
     const music = lib.configMenu.audio.config.background_music.item
     if (
@@ -194,39 +175,24 @@ export async function boot() {
     music.music_random = "随机播放"
     music.music_off = "关闭"
   }
-  if (pack.theme) {
-    for (const name in pack.theme) {
-      lib.configMenu.appearence.config.theme.item[name] = pack.theme[name]
-    }
-  }
   if (pack.font) {
     ui.css.fontsheet = lib.init.sheet()
-    const appearenceConfig = lib.configMenu.appearence.config,
-      fontSheet = ui.css.fontsheet.sheet,
-      suitsFont = config.get("suits_font")
+    const fontSheet = ui.css.fontsheet.sheet
     Object.keys(pack.font).forEach((value) => {
       const font = pack.font[value]
-      appearenceConfig.name_font.item[value] = font
-      appearenceConfig.identity_font.item[value] = font
-      appearenceConfig.cardtext_font.item[value] = font
-      appearenceConfig.global_font.item[value] = font
       fontSheet.insertRule(
         `@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,
         0,
       )
-      if (suitsFont) {
-        fontSheet.insertRule(
-          `@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,
-          0,
-        )
-      }
-    })
-    if (suitsFont) {
       fontSheet.insertRule(
-        `@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,
+        `@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,
         0,
       )
-    }
+    })
+    fontSheet.insertRule(
+      `@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,
+      0,
+    )
     fontSheet.insertRule(
       `@font-face {font-family: 'WTKSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,
       0,
@@ -235,25 +201,8 @@ export async function boot() {
       `@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`,
       0,
     )
-    appearenceConfig.cardtext_font.item.default = "默认"
-    appearenceConfig.global_font.item.default = "默认"
   }
 
-  if (config.get("image_background_random")) {
-    if (_status.htmlbg) {
-      game.saveConfig("image_background", _status.htmlbg)
-    } else {
-      const list = Object.keys(
-        lib.configMenu.appearence.config.image_background.item,
-      ).filter((i) => i !== "default")
-      game.saveConfig(
-        "image_background",
-        list.randomGet(lib.config.image_background),
-      )
-    }
-    lib.init.background()
-    delete _status.htmlbg
-  }
   if (config.get("extension_sources")) {
     for (const name in config.get("extension_sources")) {
       lib.configMenu.general.config.extension_source.item[name] = name
@@ -542,10 +491,6 @@ export async function boot() {
     }),
   ]
 
-  lib.onloadSplashes.forEach((splash) => {
-    lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name
-  })
-
   localStorage.removeItem(`${lib.configprefix}directstart`)
   if (!lib.imported.mode?.[lib.config.mode]) {
     window.inSplash = true
@@ -700,21 +645,6 @@ export async function boot() {
 async function getExtensionList() {
   if (localStorage.getItem(`${lib.configprefix}disable_extension`)) return []
 
-  const autoImport = (() => {
-    if (!config.get("extension_auto_import")) {
-      return false
-    }
-    if (
-      !(
-        typeof game.getFileList === "function" &&
-        typeof game.checkFile === "function"
-      )
-    ) {
-      console.warn("没有文件系统操作权限，无法自动导入扩展。")
-      return false
-    }
-    return true
-  })()
   const searchParamsImportExtension = new URLSearchParams(location.search).get(
     "importExtensionName",
   )
@@ -733,38 +663,7 @@ async function getExtensionList() {
   )
   toLoad.addArray(extensions)
 
-  if (autoImport) {
-    const extensionPath = new URL("./extension/", rootURL)
-    const [extFolders] = await game.promises.getFileList(
-      get.relativePath(extensionPath),
-    )
-
-    const unimportedExtensions = extFolders.filter(
-      (folder) =>
-        !extensions.includes(folder) &&
-        !config.get("all").plays.includes(folder),
-    )
-
-    const promises = unimportedExtensions.map(async (ext) => {
-      const path = new URL(`./${ext}/`, extensionPath)
-      const file = new URL("./extension.js", path)
-      const tsFile = new URL("./extension.ts", path)
-
-      if (
-        (await game.promises.checkFile(get.relativePath(file))) === 1 ||
-        (await game.promises.checkFile(get.relativePath(tsFile))) === 1
-      ) {
-        extensions.push(ext)
-        toLoad.push(ext)
-        if (!config.has(`extension_${ext}_enable`)) {
-          await game.promises.saveConfig(`extension_${ext}_enable`, false)
-        }
-      }
-    })
-    await Promise.allSettled(promises)
-
-    await game.promises.saveConfig("extensions", extensions)
-  } else if (searchParamsImportExtension) {
+  if (searchParamsImportExtension) {
     extensions.push(searchParamsImportExtension)
     toLoad.push(searchParamsImportExtension)
     if (!config.has(`extension_${searchParamsImportExtension}_enable`)) {
@@ -780,27 +679,6 @@ async function getExtensionList() {
 }
 
 function initSheet() {
-  const player_style = config.get("player_style")
-  if (player_style && player_style !== "default" && player_style !== "custom") {
-    let str = ""
-    switch (player_style) {
-      case "wood":
-        str = `url("${lib.assetURL}theme/woodden/wood.jpg")`
-        break
-      case "music":
-        str = "linear-gradient(#4b4b4b, #464646)"
-        break
-      case "simple":
-        str = "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
-        break
-    }
-    ui.css.player_stylesheet = lib.init.sheet(
-      `#window .player{ 
-				background-image:"${str}"
-			}`,
-    )
-  }
-
   const border_style = config.get("border_style")
   if (
     border_style &&
@@ -828,81 +706,16 @@ function initSheet() {
     )
   }
 
-  const control_style = config.get("control_style")
-  if (
-    control_style &&
-    control_style !== "default" &&
-    control_style !== "custom"
-  ) {
-    let str = ""
-    switch (control_style) {
-      case "wood":
-        str = `url("${lib.assetURL}theme/woodden/wood.jpg")`
-        break
-      case "music":
-        str =
-          "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
-        break
-      case "simple":
-        str =
-          "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px"
-        break
-    }
-    if (control_style === "wood") {
-      ui.css.control_stylesheet = lib.init.sheet(
-        `#window .control,
-				#window .menubutton,
-				#window #system>div>div,
-				#window #system>div>.pressdown2 {
-					background-image:${str}
-				}`,
-      )
-    } else {
-      ui.css.control_stylesheet = lib.init.sheet(
-        `#window .control,
-				.menubutton:not(.active):not(.highlight):not(.red):not(.blue),
-				#window #system>div>div { 
-					background-image:${str}
-				}`,
-      )
-    }
-  }
-
-  const menu_style = config.get("menu_style")
-  if (menu_style && menu_style !== "default" && menu_style !== "custom") {
-    let str = ""
-    switch (menu_style) {
-      case "wood":
-        str = `url("${lib.assetURL}theme/woodden/wood2.png")`
-        break
-      case "music":
-        str =
-          "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
-        break
-      case "simple":
-        str =
-          "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px"
-        break
-    }
-    ui.css.menu_stylesheet = lib.init.sheet(
-      `html #window>.dialog.popped,
+  const str =
+    "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
+  ui.css.menu_stylesheet = lib.init.sheet(
+    `html #window>.dialog.popped,
 			html .menu,html .menubg {
 				background-image:${str}
 			}`,
-    )
-  }
+  )
 
-  const zhishixian = config.get("zhishixian")
   game.zsOriginLineXy = game.linexy
-  if (zhishixian && zhishixian !== "default") {
-    const layout = zhishixian
-    game.saveConfig("zhishixian", zhishixian)
-    if (layout === "default") {
-      game.linexy = game.zsOriginLineXy
-    } else {
-      game.linexy = game[`zs${layout}LineXy`]
-    }
-  }
 }
 
 async function loadConfig() {
@@ -1238,37 +1051,7 @@ async function createBackground() {
   document.body.insertBefore(ui.background, document.body.firstChild)
   document.body.onresize = ui.updatexr
 
-  if (!lib.config.image_background) {
-    return
-  }
-  if (lib.config.image_background === "default") {
-    return
-  }
-
-  let url = `url("${lib.assetURL}image/background/${lib.config.image_background}.jpg")`
-
-  if (lib.config.image_background.startsWith("custom_")) {
-    try {
-      const fileToLoad = await game.getDB("image", lib.config.image_background)
-      const fileReader = new FileReader()
-      const fileLoadedEvent = await new Promise((resolve) => {
-        fileReader.onload = resolve
-        fileReader.readAsDataURL(fileToLoad, "UTF-8")
-      })
-      const data = fileLoadedEvent.target.result
-      url = `url("${data}")`
-    } catch (e) {
-      console.error(e)
-      url = "none"
-    }
-  }
-
-  ui.background.style.backgroundImage = url
-  if (lib.config.image_background_blur) {
-    ui.background.style.filter = "blur(8px)"
-    ui.background.style.webkitFilter = "blur(8px)"
-    ui.background.style.transform = "scale(1.05)"
-  }
+  return
 }
 
 function createTouchDraggedFilter() {

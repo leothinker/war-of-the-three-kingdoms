@@ -3966,7 +3966,7 @@ game.import("card", () => ({
           game.broadcastAll(
             (target, card, gain2) => {
               target.addSkill("jiu")
-              if (!target.node.jiu && lib.config.jiu_effect) {
+              if (!target.node.jiu) {
                 target.node.jiu = ui.create.div(
                   ".playerjiu",
                   target.node.avatar,

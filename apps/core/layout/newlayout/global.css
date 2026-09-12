@@ -138,20 +138,8 @@
 #window[data-radius_size="reduce"] .player.fullskin2 .avatar {
   border-radius: 4px 0 0 4px;
 }
-#window[data-radius_size="off"] .player.fullskin2 .avatar {
-  border-radius: 0 0 0 0;
-}
-#window[data-radius_size="increase"] .player.fullskin2 .avatar {
-  border-radius: 16px 0 0 16px;
-}
 #window[data-radius_size="reduce"] .player.fullskin2 .avatar2 {
   border-radius: 0 4px 4px 0;
-}
-#window[data-radius_size="off"] .player.fullskin2 .avatar2 {
-  border-radius: 0 0 0 0;
-}
-#window[data-radius_size="increase"] .player.fullskin2 .avatar2 {
-  border-radius: 0 16px 16px 0;
 }
 .player.fullskin2 .avatar2 {
   top: 10px;
@@ -428,17 +416,6 @@
 .player.linked > .judges,
 .player.linked > .marks {
   transform: rotate(90deg) translateX(10px);
-}
-#arena[data-target_shake="shake"] .linked.target {
-  transform: rotate(-93deg);
-}
-#arena[data-target_shake="shake"] .linked.target2 {
-  transform: rotate(-87deg);
-}
-
-#arena[data-target_shake="zoom"] .linked.target,
-#arena[data-target_shake="zoom"] .linked.target2 {
-  transform: scale(1.03) rotate(-90deg);
 }
 
 .player.acted.linked .identity {

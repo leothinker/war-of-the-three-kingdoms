@@ -484,59 +484,7 @@ export class Click {
     }
   }
   autoskin() {
-    if (!lib.config.change_skin) {
-      return
-    }
-    var players = game.filterPlayer()
-    var change = (player, num, callback) => {
-      if (num === "1") {
-        ui.click.skin(player.node.avatar, player.name, callback)
-      } else {
-        ui.click.skin(player.node.avatar2, player.name2, callback)
-      }
-    }
-    var finish = () => {
-      if (lib.config.change_skin_auto !== "off") {
-        _status.skintimeout = setTimeout(
-          ui.click.autoskin,
-          parseInt(lib.config.change_skin_auto, 10),
-        )
-      }
-    }
-    var autoskin = () => {
-      if (players.length) {
-        var player = players.randomRemove()
-        var list = []
-        if (player.name && !player.isUnseen(0)) {
-          list.push("1")
-        }
-        if (player.name2 && !player.isUnseen(1)) {
-          list.push("2")
-        }
-        if (list.length) {
-          change(player, list.randomRemove(), (bool) => {
-            if (bool) {
-              finish()
-            } else if (list.length) {
-              change(player, list[0], (bool) => {
-                if (bool) {
-                  finish()
-                } else {
-                  autoskin()
-                }
-              })
-            } else {
-              autoskin()
-            }
-          })
-        } else {
-          autoskin()
-        }
-      } else {
-        finish()
-      }
-    }
-    autoskin()
+    return
   }
   skin(avatar, name, callback) {
     let nowSkin = "defaultSkin"
@@ -910,31 +858,6 @@ export class Click {
         clientX: rect.left + rect.width,
         clientY: rect.top,
       })
-      // var nodes=[];
-      // _status.clickingidentity=[this.parentNode,nodes];
-      // var num=1;
-      // var dy=30;
-      // if(get.is.phoneLayout()){
-      // 	dy=45;
-      // }
-      // for(var i in list){
-      // 	if(this.firstChild.innerHTML!=list[i]){
-      // 		var node=ui.create.div('.identity.hidden.pointerdiv',this.parentNode,ui.click.identity2);
-      // 		ui.create.div(node).innerHTML=list[i];
-      // 		node.dataset.color=i;
-      // 		ui.refresh(node);
-      // 		node.show();
-      // 		var transstr='translateY('+((num++)*dy)+'px)';
-      // 		if(get.is.phoneLayout()){
-      // 			transstr+=' scale(1.3)';
-      // 		}
-      // 		if(get.is.newLayout()&&this.parentNode.classList.contains('linked')){
-      // 			transstr+=' rotate(90deg)';
-      // 		}
-      // 		node.style.transform=transstr;
-      // 		nodes.push(node);
-      // 	}
-      // }
     }
   }
   identity2() {
@@ -2524,7 +2447,6 @@ export class Click {
     }
   }
   cardmouseenter() {
-    if (!lib.config.spread_card) return
     if (this.parentNode?.parentNode?.parentNode !== ui.me) return
     if (ui.selected.cards.length) return
     ui._handcardHover = this
@@ -3710,18 +3632,8 @@ export class Click {
     if (_status.dragged) {
       return
     }
-    if (lib.config.theme !== "simple") {
-      ui.window.classList.add("shortcutpaused")
-      ui.menuContainer.classList.add("forceopaque")
-    } else {
-      ui.window.classList.add("systempaused")
-      ui.menuContainer.classList.add("transparent2")
-    }
-    if (lib.config.blur_ui) {
-      ui.arena.classList.add("blur")
-      ui.system.classList.add("blur")
-      ui.menuContainer.classList.add("blur")
-    }
+    ui.window.classList.add("systempaused")
+    ui.menuContainer.classList.add("transparent2")
     var layer = ui.create.div(".popup-container")
     var clicklayer = function (e) {
       if (_status.touchpopping) {
@@ -3784,151 +3696,6 @@ export class Click {
       gzbool = true
     }
     let refreshSkin = null
-    if (lib.config.change_skin) {
-      let node, avatars
-      const info = get.character(name),
-        src = get.skinPath(name)
-      if (src) {
-        const createButtons = (list) => {
-          if (!list.length) {
-            return
-          }
-          if (list.length >= 6) {
-            avatars.classList.add("scroll")
-            if (lib.config.touchscreen) {
-              lib.setScroll(avatars)
-            }
-          }
-          for (const i of ["originSkin", ...list]) {
-            const button = ui.create.div(avatars, function () {
-              playerbg.classList.remove("scroll")
-              if (this._link) {
-                const skinname = this._skinName,
-                  src = this._link
-                lib.config.skin[nameskin] = [skinname, src]
-                if (lib.characterSubstitute[nameskin]) {
-                  for (const nameList of lib.characterSubstitute[nameskin]) {
-                    const subName = nameList[0],
-                      [fold, prefix] = skinname.split(".")
-                    lib.config.skin[subName] = [
-                      skinname,
-                      `${src.split("/").slice(0, -1).join("/")}/${fold}/${subName}.${prefix}`,
-                    ]
-                  }
-                }
-                bg.style.backgroundImage = this.style.backgroundImage
-                if (sourcenode) {
-                  sourcenode.style.backgroundImage = this.style.backgroundImage
-                }
-                if (avatar) {
-                  avatar.style.backgroundImage = this.style.backgroundImage
-                }
-                game.saveConfig("skin", lib.config.skin)
-              } else {
-                delete lib.config.skin[nameskin]
-                if (lib.characterSubstitute[nameskin]) {
-                  for (const nameList of lib.characterSubstitute[nameskin]) {
-                    const subName = nameList[0]
-                    delete lib.config.skin[subName]
-                  }
-                }
-                if (
-                  gzbool &&
-                  lib.character[nameskin2].hasSkinInGuozhan &&
-                  lib.config.mode_config.guozhan.guozhanSkin
-                ) {
-                  bg.setBackground(audioName || nameskin2, "character")
-                  if (sourcenode) {
-                    sourcenode.setBackground(
-                      audioName || nameskin2,
-                      "character",
-                    )
-                  }
-                  if (avatar) {
-                    avatar.setBackground(audioName || nameskin2, "character")
-                  }
-                } else {
-                  bg.setBackground(audioName || nameskin, "character")
-                  if (sourcenode) {
-                    sourcenode.setBackground(audioName || nameskin, "character")
-                  }
-                  if (avatar) {
-                    avatar.setBackground(audioName || nameskin, "character")
-                  }
-                }
-                game.saveConfig("skin", lib.config.skin)
-              }
-              if (refreshSkin) {
-                refreshSkin()
-              }
-              if (applyViewMode) {
-                applyViewMode("intro")
-              }
-            })
-            if (i === "originSkin") {
-              if (
-                gzbool &&
-                lib.character[nameskin2].hasSkinInGuozhan &&
-                lib.config.mode_config.guozhan.guozhanSkin
-              ) {
-                button.setBackground(
-                  audioName || nameskin2,
-                  "character",
-                  "noskin",
-                )
-              } else {
-                button.setBackground(
-                  audioName || nameskin,
-                  "character",
-                  "noskin",
-                )
-              }
-            } else {
-              const [skinname, src] = i
-              button._link = src
-              button._skinName = skinname
-              if (name === audioName) {
-                button.setBackgroundImage(src)
-              } else {
-                const [fold, prefix] = skinname.split(".")
-                button.setBackgroundImage(
-                  `${src.split("/").slice(0, -1).join("/")}/${fold}/${audioName}.${prefix}`,
-                )
-              }
-            }
-          }
-        }
-        const defaultFolder = src
-        game.getFileList(
-          defaultFolder,
-          (folders, files) => {
-            if (files.length && !node) {
-              node = ui.create.div(".changeskin", "可换肤", playerbg)
-              avatars = ui.create.div(".avatars", playerbg)
-              changeskinfunc = () => {
-                playerbg.classList.add("scroll")
-                if (node._created) {
-                  return
-                }
-                node._created = true
-                game.getFileList(
-                  defaultFolder,
-                  (folders, files) => {
-                    const list = files.map((file) => {
-                      const src = `${defaultFolder}${file}`
-                      return [file, src]
-                    })
-                    createButtons(list)
-                  },
-                  () => {},
-                )
-              }
-            }
-          },
-          () => {},
-        )
-      }
-    }
     var ban = ui.create.div(
       ".menubutton.large.ban.character",
       uiintro,

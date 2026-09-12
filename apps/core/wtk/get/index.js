@@ -3272,15 +3272,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns {string}
    */
   prefixSpan(prefix, name) {
-    const config = lib.config.buttoncharacter_prefix
-    if (config === "off") {
-      return ""
-    }
-    if (config === "simple") {
-      const span = document.createElement("span")
-      span.innerHTML = prefix
-      return span.outerHTML
-    }
     const namePrefix = lib.namePrefix.get(prefix),
       exists = Boolean(namePrefix)
     if (exists && "getSpan" in namePrefix) {
@@ -6054,10 +6045,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro.add(viewInfo)
         }
       }
-      if (
-        (lib.config.change_skin || lib.skin) &&
-        (!simple || get.is.phoneLayout())
-      ) {
+      if (lib.skin && (!simple || get.is.phoneLayout())) {
         ;[node.name1, node.name2].forEach((nameskin, index) => {
           if (nameskin) {
             createButtons(nameskin, (src) => {
@@ -6706,10 +6694,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           })
           uiintro.add(viewInfo)
         }
-        if (
-          (lib.config.change_skin || lib.skin) &&
-          (!simple || get.is.phoneLayout())
-        ) {
+        if (lib.skin && (!simple || get.is.phoneLayout())) {
           const nameskin = node.link
           if (nameskin) {
             createButtons(nameskin, (src) => {

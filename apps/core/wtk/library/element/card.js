@@ -781,8 +781,7 @@ export class Card extends HTMLDivElement {
         this.parentNode.parentNode.parentNode === ui.me &&
         (!_status.mousedown || _status.mouseleft) &&
         (!this.parentNode.parentNode.classList.contains("scrollh") ||
-          game.layout === "long2" ||
-          game.layout === "nova")
+          game.layout === "long2")
       ) {
         if (bool) {
           this.style.transform = `${this._transform} translateY(-20px)`

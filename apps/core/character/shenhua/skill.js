@@ -922,15 +922,11 @@ const skills = {
           game.broadcastAll(
             (card, player) => {
               _status.guhuoNode = card.copy("thrown")
-              if (lib.config.cardback_style !== "default") {
-                _status.guhuoNode.style.transitionProperty = "none"
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.classList.add("infohidden")
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.style.transitionProperty = ""
-              } else {
-                _status.guhuoNode.classList.add("infohidden")
-              }
+              _status.guhuoNode.style.transitionProperty = "none"
+              ui.refresh(_status.guhuoNode)
+              _status.guhuoNode.classList.add("infohidden")
+              ui.refresh(_status.guhuoNode)
+              _status.guhuoNode.style.transitionProperty = ""
               _status.guhuoNode.style.transform =
                 "perspective(600px) rotateY(180deg) translateX(0)"
               player.$throwordered2(_status.guhuoNode)
@@ -5828,7 +5824,7 @@ const skills = {
           .map((i) => `[${get.translation(i)}]`)
           .join("<br>")
         const skillnode = ui.create.caption(
-          `<div class="text" data-nature=${get.groupnature(info[1], "raw")}m style="font-family: ${lib.config.name_font || "xinwei"},xinwei">${skillstr}</div>`,
+          `<div class="text" data-nature=${get.groupnature(info[1], "raw")}m style="font-family: ${"xingkai"},xinwei">${skillstr}</div>`,
           node,
         )
         skillnode.style.left = "2px"

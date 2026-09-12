@@ -1,4 +1,4 @@
-import { _status, game, get, lib, ui } from "wtk"
+import { _status, game, get, lib } from "wtk"
 import {
   AsyncFunction,
   AsyncGeneratorFunction,
@@ -642,57 +642,17 @@ export class Is {
    */
   mobileMe(player) {
     return (
-      (game.layout === "mobile" || game.layout === "long") &&
+      game.layout === "mobile" &&
       !game.chess &&
       player &&
       player.dataset.position === "0"
     )
   }
-  newLayout() {
-    return game.layout !== "default"
-  }
   phoneLayout() {
     if (!lib.config.phonelayout) {
       return false
     }
-    return (
-      game.layout === "mobile" ||
-      game.layout === "long" ||
-      game.layout === "long2" ||
-      game.layout === "nova"
-    )
-  }
-  singleHandcard() {
-    return (
-      game.singleHandcard ||
-      game.layout === "mobile" ||
-      game.layout === "long" ||
-      game.layout === "long2" ||
-      game.layout === "nova"
-    )
-  }
-  /**
-   * @param { Player } player
-   */
-  linked2(player) {
-    if (game.chess) {
-      return true
-    }
-    if (lib.config.link_style2 !== "rotate") {
-      return true
-    }
-    // if(game.chess) return false;
-    if (
-      game.layout === "long" ||
-      game.layout === "long2" ||
-      game.layout === "nova"
-    ) {
-      return true
-    }
-    if (player.dataset.position === "0") {
-      return ui.arena.classList.contains("oblongcard")
-    }
-    return false
+    return true
   }
   /**
    * @param { {} } obj

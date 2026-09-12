@@ -1072,11 +1072,6 @@ export class Game {
     ui.background.delete()
     const uiBackground = (ui.background = ui.create.div(".background")),
       style = uiBackground.style
-    if (lib.config.image_background_blur) {
-      style.filter = "blur(8px)"
-      style.webkitFilter = "blur(8px)"
-      style.transform = "scale(1.05)"
-    }
     document.body.insertBefore(uiBackground, document.body.firstChild)
     if (background.startsWith("blob:") || background.startsWith("data:")) {
       uiBackground.setBackgroundImage(background)
@@ -3776,7 +3771,7 @@ ${e instanceof Error ? e.stack : String(e)}`)
     jiuNode: (player, bool) => {
       //Powered by 升麻
       if (bool) {
-        if (!player.node.jiu && lib.config.jiu_effect) {
+        if (!player.node.jiu) {
           player.node.jiu = ui.create.div(".playerjiu", player.node.avatar)
           player.node.jiu2 = ui.create.div(".playerjiu", player.node.avatar2)
         }
@@ -3949,10 +3944,8 @@ ${e instanceof Error ? e.stack : String(e)}`)
         if (glowing) {
           glowing.classList.remove("glow_phase")
         }
-        if (lib.config.glow_phase) {
-          player.classList.add("glow_phase")
-          // player.dataset.glow_phase=lib.config.glow_phase;
-        }
+        player.classList.add("glow_phase")
+        // player.dataset.glow_phase=lib.config.glow_phase;
       } else {
         console.log(player)
       }
@@ -5195,7 +5188,7 @@ ${e instanceof Error ? e.stack : String(e)}`)
       if (game.chess) {
         dialog.classList.add("center")
       }
-      if ((game.layout === "long2" || game.layout === "nova") && !game.chess) {
+      if (game.layout === "long2" && !game.chess) {
         ui.arena.classList.add("choose-character")
         if (ui.me) {
           ui.me.hide()
@@ -5206,10 +5199,8 @@ ${e instanceof Error ? e.stack : String(e)}`)
         if (ui.autonode) {
           ui.autonode.hide()
         }
-        if (lib.config.radius_size !== "off") {
-          if (ui.historybar) {
-            ui.historybar.style.borderRadius = "0 0 0 4px"
-          }
+        if (ui.historybar) {
+          ui.historybar.style.borderRadius = "0 0 0 4px"
         }
       }
     },
@@ -6981,14 +6972,12 @@ ${e instanceof Error ? e.stack : String(e)}`)
     if (ui.time3) {
       clearInterval(ui.time3.interval)
     }
-    if ((game.layout === "long2" || game.layout === "nova") && !game.chess) {
+    if (game.layout === "long2" && !game.chess) {
       ui.arena.classList.add("choose-character")
       ui.me.hide()
       ui.mebg.hide()
       ui.autonode.hide()
-      if (lib.config.radius_size !== "off") {
-        ui.historybar.style.borderRadius = "0 0 0 4px"
-      }
+      ui.historybar.style.borderRadius = "0 0 0 4px"
     }
     if (game.online) {
       const dialog = ui.create.dialog()
@@ -8332,13 +8321,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
     if (!lib.layoutfixed.includes(name)) {
       if (lib.config.layout !== game.layout) {
         lib.init.layout(lib.config.layout)
-      } else if (lib.config.mode === "brawl") {
-        if (
-          lib.config.player_border === "normal" &&
-          (game.layout === "long" || game.layout === "long2")
-        ) {
-          ui.arena.classList.add("lslim_player")
-        }
       }
     }
     game.loadModeAsync(name, async (exports) => {
@@ -9011,7 +8993,7 @@ ${e instanceof Error ? e.stack : String(e)}`)
               event.avatars[i],
               get.slimName(name),
             )
-            event.avatars[i].nodename.style.fontFamily = lib.config.name_font
+            event.avatars[i].nodename.style.fontFamily = "xingkai"
             event.avatars[i].index = i + event.config.width
             event.avatars[i].addTempClass("start")
             event.nodes[event.avatars[i].index].style.display = "none"
