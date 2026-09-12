@@ -359,57 +359,25 @@ export class LibInit {
     }
     ui.css.styles = lib.init.sheet()
     ui.css.styles.sheet.insertRule(
-      `#arena .player>.name,#arena .button.character>.name {font-family: ${lib.config.name_font || "xinwei"},xinwei}`,
+      `#arena .player>.name,#arena .button.character>.name {font-family: ${"xingkai"},xinwei}`,
       0,
     )
     ui.css.styles.sheet.insertRule(
-      `#arena .player>.name,.button.character>.name {font-family: ${lib.config.name_font || "xinwei"},xinwei}`,
+      `#arena .player>.name,.button.character>.name {font-family: ${"xingkai"},xinwei}`,
       0,
     )
     ui.css.styles.sheet.insertRule(
-      `#arena .player .identity>div {font-family: ${lib.config.identity_font || "huangcao"},xinwei}`,
+      `#arena .player .identity>div {font-family: ${"huangcao"},xinwei}`,
       0,
     )
     ui.css.styles.sheet.insertRule(
-      `.button.character.newstyle>.identity {font-family: ${lib.config.identity_font || "huangcao"},xinwei}`,
+      `.button.character.newstyle>.identity {font-family: ${"huangcao"},xinwei}`,
       0,
     )
-    if (lib.config.cardtext_font && lib.config.cardtext_font !== "default") {
-      ui.css.styles.sheet.insertRule(
-        `.card div:not(.info):not(.background) {font-family: ${lib.config.cardtext_font};}`,
-        0,
-      )
-    }
-    if (lib.config.global_font && lib.config.global_font !== "default") {
-      ui.css.styles.sheet.insertRule(
-        `#window {font-family: ${lib.config.global_font},xinwei}`,
-        0,
-      )
-      ui.css.styles.sheet.insertRule(
-        "#window #control{font-family: STHeiti,SimHei,Microsoft JhengHei,Microsoft YaHei,WenQuanYi Micro Hei,Suits,Helvetica,Arial,sans-serif}",
-        0,
-      )
-    }
-    switch (lib.config.glow_phase) {
-      case "yellow":
-        ui.css.styles.sheet.insertRule(
-          "#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(217, 152, 62) 0 0 15px, rgb(217, 152, 62) 0 0 15px !important;}",
-          0,
-        )
-        break
-      case "green":
-        ui.css.styles.sheet.insertRule(
-          "#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}",
-          0,
-        )
-        break
-      case "purple":
-        ui.css.styles.sheet.insertRule(
-          "#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(189, 62, 170) 0 0 15px, rgb(189, 62, 170) 0 0 15px !important;}",
-          0,
-        )
-        break
-    }
+    ui.css.styles.sheet.insertRule(
+      "#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(217, 152, 62) 0 0 15px, rgb(217, 152, 62) 0 0 15px !important;}",
+      0,
+    )
   }
 
   layout(layout, nosave) {
@@ -428,50 +396,24 @@ export class LibInit {
     ui.arena.hide()
     new Promise((resolve) => setTimeout(resolve, 500))
       .then(() => {
-        if (game.layout === "default") {
-          ui.css.layout.href = ""
-        } else {
-          ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
-        }
-        if (game.layout === "mobile" || game.layout === "long") {
+        ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
+        if (game.layout === "mobile") {
           ui.arena.classList.add("mobile")
         } else {
           ui.arena.classList.remove("mobile")
         }
-        if (
-          game.layout === "mobile" ||
-          game.layout === "long" ||
-          game.layout === "long2" ||
-          game.layout === "nova"
-        ) {
-          if (game.me?.node.handcards2.childNodes.length) {
-            while (game.me.node.handcards2.childNodes.length) {
-              game.me.node.handcards1.appendChild(
-                game.me.node.handcards2.firstChild,
-              )
-            }
+        if (game.me?.node.handcards2.childNodes.length) {
+          while (game.me.node.handcards2.childNodes.length) {
+            game.me.node.handcards1.appendChild(
+              game.me.node.handcards2.firstChild,
+            )
           }
         }
-        if (game.layout === "default") {
-          ui.arena.classList.add("oldlayout")
-        } else {
-          ui.arena.classList.remove("oldlayout")
-        }
-        if (
-          lib.config.cardshape === "oblong" &&
-          (game.layout === "long" ||
-            game.layout === "mobile" ||
-            game.layout === "long2" ||
-            game.layout === "nova")
-        ) {
-          ui.arena.classList.add("oblongcard")
-          ui.window.classList.add("oblongcard")
-        } else {
-          ui.arena.classList.remove("oblongcard")
-          ui.window.classList.remove("oblongcard")
-        }
+        ui.arena.classList.remove("oldlayout")
+        ui.arena.classList.add("oblongcard")
+        ui.window.classList.add("oblongcard")
         //if(lib.config.textequip=='text'&&(game.layout=='long'||game.layout=='mobile')){
-        if (game.layout === "long" || game.layout === "mobile") {
+        if (game.layout === "mobile") {
           ui.arena.classList.add("textequip")
         } else {
           ui.arena.classList.remove("textequip")
@@ -484,51 +426,20 @@ export class LibInit {
           ui.arena.classList.remove("phone")
         }
         for (var i = 0; i < game.players.length; i++) {
-          if (get.is.linked2(game.players[i])) {
-            if (game.players[i].classList.contains("linked")) {
-              game.players[i].classList.remove("linked")
-              game.players[i].classList.add("linked2")
-            }
-          } else {
-            if (game.players[i].classList.contains("linked2")) {
-              game.players[i].classList.remove("linked2")
-              game.players[i].classList.add("linked")
-            }
+          if (game.players[i].classList.contains("linked")) {
+            game.players[i].classList.remove("linked")
+            game.players[i].classList.add("linked2")
           }
         }
-        if (game.layout === "long" || game.layout === "long2") {
+        if (game.layout === "long2") {
           ui.arena.classList.add("long")
         } else {
           ui.arena.classList.remove("long")
         }
-        if (
-          lib.config.player_border !== "wide" ||
-          game.layout === "long" ||
-          game.layout === "long2"
-        ) {
-          ui.arena.classList.add("slim_player")
-        } else {
-          ui.arena.classList.remove("slim_player")
-        }
-        if (
-          lib.config.player_border === "normal" &&
-          lib.config.mode !== "brawl" &&
-          (game.layout === "long" || game.layout === "long2")
-        ) {
-          ui.arena.classList.add("lslim_player")
-        } else {
-          ui.arena.classList.remove("lslim_player")
-        }
-        if (lib.config.player_border === "slim") {
-          ui.arena.classList.add("uslim_player")
-        } else {
-          ui.arena.classList.remove("uslim_player")
-        }
-        if (lib.config.player_border === "narrow") {
-          ui.arena.classList.add("mslim_player")
-        } else {
-          ui.arena.classList.remove("mslim_player")
-        }
+        ui.arena.classList.add("slim_player")
+        ui.arena.classList.remove("lslim_player")
+        ui.arena.classList.add("uslim_player")
+        ui.arena.classList.remove("mslim_player")
         ui.updatej()
         ui.updatem()
         return new Promise((resolve) => setTimeout(resolve, 100))
@@ -555,36 +466,7 @@ export class LibInit {
   }
 
   background() {
-    if (lib.config.image_background_random) {
-      var list = []
-      for (var i in lib.configMenu.appearence.config.image_background.item) {
-        if (i === "default") {
-          continue
-        }
-        list.push(i)
-      }
-      list.remove(lib.config.image_background)
-      localStorage.setItem(
-        `${lib.configprefix}background`,
-        JSON.stringify(list),
-      )
-    } else if (
-      lib.config.image_background &&
-      lib.config.image_background !== "default" &&
-      !lib.config.image_background.startsWith("custom_")
-    ) {
-      localStorage.setItem(
-        `${lib.configprefix}background`,
-        lib.config.image_background,
-      )
-    } else if (
-      lib.config.image_background === "default" &&
-      lib.config.theme === "simple"
-    ) {
-      localStorage.setItem(`${lib.configprefix}background`, "ol_bg")
-    } else {
-      localStorage.removeItem(`${lib.configprefix}background`)
-    }
+    localStorage.setItem(`${lib.configprefix}background`, "ol_bg")
   }
 
   /**

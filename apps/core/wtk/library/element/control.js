@@ -52,29 +52,27 @@ export class Control extends HTMLDivElement {
       ui.click.control2,
     )
 
-    if (lib.config.button_press) {
-      control.addEventListener(
-        lib.config.touchscreen ? "touchstart" : "mousedown",
-        function () {
-          if (this.classList.contains("disabled")) {
-            return
-          }
-          this.classList.add("controlpressdown")
-          if (typeof this._offset === "number") {
-            this.style.transform = `translateX(${this._offset}px) scale(0.97)`
-          }
-        },
-      )
-      control.addEventListener(
-        lib.config.touchscreen ? "touchend" : "mouseup",
-        function () {
-          this.classList.remove("controlpressdown")
-          if (typeof this._offset === "number") {
-            this.style.transform = `translateX(${this._offset}px)`
-          }
-        },
-      )
-    }
+    control.addEventListener(
+      lib.config.touchscreen ? "touchstart" : "mousedown",
+      function () {
+        if (this.classList.contains("disabled")) {
+          return
+        }
+        this.classList.add("controlpressdown")
+        if (typeof this._offset === "number") {
+          this.style.transform = `translateX(${this._offset}px) scale(0.97)`
+        }
+      },
+    )
+    control.addEventListener(
+      lib.config.touchscreen ? "touchend" : "mouseup",
+      function () {
+        this.classList.remove("controlpressdown")
+        if (typeof this._offset === "number") {
+          this.style.transform = `translateX(${this._offset}px)`
+        }
+      },
+    )
 
     ui.updatec()
     // @ts-expect-error ignore

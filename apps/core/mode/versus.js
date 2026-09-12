@@ -2743,8 +2743,6 @@ export default () => {
           ui.control.style.transition = "all 0s"
           if (get.is.phoneLayout()) {
             ui.control.style.top = "calc(100% - 80px)"
-          } else if (game.layout === "newlayout") {
-            ui.control.style.top = "calc(100% - 30px)"
           } else {
             ui.control.style.top = "calc(100% - 70px)"
           }
@@ -9253,7 +9251,7 @@ export default () => {
                   target.addSkill("jiu")
                 }
                 game.addVideo("jiuNode", target, true)
-                if (!target.node.jiu && lib.config.jiu_effect) {
+                if (!target.node.jiu) {
                   target.node.jiu = ui.create.div(
                     ".playerjiu",
                     target.node.avatar,

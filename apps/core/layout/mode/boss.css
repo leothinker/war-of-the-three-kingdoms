@@ -13,23 +13,8 @@
   border-radius: 4px;
 }
 
-#window[data-radius_size="off"] #bosslist > .player {
-  border-radius: 0px;
-}
-
-#window[data-radius_size="increase"] #bosslist > .player {
-  border-radius: 20px;
-}
-
 #window #bosslist > .player {
   border-radius: 10px;
-}
-
-#window[data-player_border="normal"] #bosslist > .player > .avatar {
-  left: 8px;
-  top: 8px;
-  width: 164px;
-  height: 200px;
 }
 
 #window[data-player_border="slim"] #bosslist > .player > .avatar {

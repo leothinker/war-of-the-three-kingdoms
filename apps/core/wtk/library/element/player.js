@@ -81,7 +81,7 @@ export class Player extends HTMLDivElement {
     const config = { childList: true }
     observer.observe(node.equips, config)
     node.expansions.style.display = "none"
-    const chainLength = game.layout === "default" ? 64 : 40
+    const chainLength = 40
     for (let repetition = 0; repetition < chainLength; repetition++) {
       ui.create.div(node.chain.firstChild, ".cardbg").style.transform =
         `translateX(${repetition * 5 - 5}px)`
@@ -494,7 +494,6 @@ export class Player extends HTMLDivElement {
       return false
     }
     const cards1 = []
-    const cards2 = !get.is.singleHandcard() ? [] : null
 
     if (typeof sort === "function") {
       hs.sort(sort)
@@ -528,17 +527,10 @@ export class Player extends HTMLDivElement {
     this.node.handcards2.style.visibility = "hidden"
     hs.forEach((card) => {
       const sort = lib.config.sort_card(card)
-      if (sort < 0 && cards2) {
-        cards2.unshift(card)
-      } else {
-        cards1.unshift(card)
-      }
+      cards1.unshift(card)
     })
 
     this.node.handcards1.prepend(...cards1)
-    if (cards2) {
-      this.node.handcards2.prepend(...cards2)
-    }
     this.node.handcards1.style.visibility = "visible"
     this.node.handcards2.style.visibility = "visible"
     if (this === game.me) {
@@ -745,10 +737,7 @@ export class Player extends HTMLDivElement {
         .replace(/(?:♥︎|♦︎)/g, '<span style="color: red; ">$&</span>')
         .replace(/\n/g, "<br>")
       player.tips.get(index).css(css)
-      const double =
-        player.classList.contains("fullskin2") && lib.config.layout !== "long2"
-      const width = player.node.avatar.clientWidth
-      const w = width * (double ? 2 : 1)
+      const w = player.node.avatar.clientWidth
       player.style.setProperty("--w", `${w}px`)
       //检查tip的高度，使其不覆盖装备
       game.callHook("checkTipBottom", [player])
@@ -3130,16 +3119,8 @@ export class Player extends HTMLDivElement {
    */
   trySkillAnimate(name, popname, checkShow) {
     game.callHook("checkSkillAnimate", [this, name, popname])
-    if (
-      !game.online &&
-      lib.config.skill_animation_type !== "off" &&
-      lib.skill[name]?.skillAnimation
-    ) {
-      if (lib.config.skill_animation_type === "default") {
-        checkShow = checkShow || "main"
-      } else {
-        checkShow = false
-      }
+    if (!game.online && lib.skill[name]?.skillAnimation) {
+      checkShow = checkShow || "main"
       if (lib.skill[name].textAnimation) {
         checkShow = false
       }
@@ -3896,7 +3877,7 @@ export class Player extends HTMLDivElement {
       info = get.convertedCharacter(["", "", 1, [], []])
     }
 
-    if (!game.minskin && get.is.newLayout() && !info.isMinskin) {
+    if (!game.minskin && !info.isMinskin) {
       this.classList.remove("minskin")
       this.node.avatar.setBackground(character, "character")
     } else {
@@ -4983,12 +4964,6 @@ export class Player extends HTMLDivElement {
       if (maxHp === Infinity) {
         hp.innerHTML =
           this.hp === Infinity ? "∞" : `${this.hp}<br>/<br>∞<div></div>`
-        /*
-			} else if (game.layout == "default" && maxHp > 14) {
-				hp.innerHTML = this.hp + "/" + maxHp;
-				hp.classList.add("text");
-			} else if (get.is.newLayout() && (maxHp > 9 || (maxHp > 5 && this.classList.contains("minskin")) || ((game.layout == "mobile" || game.layout == "long") && this.dataset.position == 0 && maxHp > 7))) {
-			 */
       } else if (maxHp > 5) {
         hp.innerHTML = `${this.hp}<br>/<br>${maxHp}<div></div>`
         if (this.hp === 0) {
@@ -5008,9 +4983,7 @@ export class Player extends HTMLDivElement {
         }
         for (var i = 0; i < maxHp; i++) {
           var index = i
-          if (get.is.newLayout()) {
-            index = maxHp - i - 1
-          }
+          index = maxHp - i - 1
           if (i < this.hp) {
             hp.childNodes[index].classList.remove("lost")
           } else {
@@ -9101,11 +9074,7 @@ export class Player extends HTMLDivElement {
       if (this === game.me) {
         cards[i].classList.add("drawinghidden")
       }
-      if (get.is.singleHandcard() || sort > 0) {
-        cards1.push(cards[i])
-      } else {
-        cards2.push(cards[i])
-      }
+      cards1.push(cards[i])
     }
     //插入回手牌去
     this.node.handcards1.prepend(...cards1)
@@ -9167,11 +9136,7 @@ export class Player extends HTMLDivElement {
       if (this === game.me) {
         cards[i].classList.add("drawinghidden")
       }
-      if (get.is.singleHandcard()) {
-        addLast(cards[i], this.node.handcards1)
-      } else {
-        addLast(cards[i], this.node.handcards2)
-      }
+      addLast(cards[i], this.node.handcards1)
     }
     if (this === game.me || _status.video) {
       ui.updatehl()
@@ -11562,18 +11527,10 @@ export class Player extends HTMLDivElement {
     }
   }
   addLink() {
-    if (get.is.linked2(this)) {
-      this.classList.add("linked2")
-    } else {
-      this.classList.add("linked")
-    }
+    this.classList.add("linked2")
   }
   removeLink() {
-    if (get.is.linked2(this)) {
-      this.classList.remove("linked2")
-    } else {
-      this.classList.remove("linked")
-    }
+    this.classList.remove("linked2")
   }
   /**
    * 能否对target使用card
@@ -14173,10 +14130,7 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   isLinked() {
-    if (get.is.linked2(this)) {
-      return this.classList.contains("linked2")
-    }
-    return this.classList.contains("linked")
+    return this.classList.contains("linked2")
   }
   /**
    * 返回玩家是否是翻面状态
@@ -15205,9 +15159,6 @@ export class Player extends HTMLDivElement {
     }
   }
   $draw(num, init, config, cardsetion) {
-    if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
-      cardsetion = get.cardsetion(this)
-    }
     if (init !== false && init !== "nobroadcast") {
       game.broadcast(
         (player, num, init, config, cardsetion) => {
@@ -15399,16 +15350,6 @@ export class Player extends HTMLDivElement {
     }
   }
   $compareMultiple(card1, targets, cards, cardsetions) {
-    if (!cardsetions && lib.config.card_animation_info) {
-      var cardsetions = {},
-        cardsetion_targets = [this]
-      cardsetion_targets.addArray(targets)
-      for (const target of cardsetion_targets) {
-        const id = target.playerid,
-          cardsetion = get.cardsetion(target)
-        cardsetions[id] = cardsetion
-      }
-    }
     game.broadcast(
       (player, card1, targets, cards, cardsetions) => {
         player.$compareMultiple(card1, targets, cards, cardsetions)
@@ -15431,15 +15372,11 @@ export class Player extends HTMLDivElement {
       "perspective(600px) rotateY(180deg)",
       true,
     )
-    if (lib.config.cardback_style !== "default") {
-      node1.style.transitionProperty = "none"
-      ui.refresh(node1)
-      node1.classList.add("infohidden")
-      ui.refresh(node1)
-      node1.style.transitionProperty = ""
-    } else {
-      node1.classList.add("infohidden")
-    }
+    node1.style.transitionProperty = "none"
+    ui.refresh(node1)
+    node1.classList.add("infohidden")
+    ui.refresh(node1)
+    node1.style.transitionProperty = ""
 
     node1.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
     if (cardsetions) {
@@ -15518,15 +15455,11 @@ export class Player extends HTMLDivElement {
               node2.node.cardsetion = next
             }
           }
-          if (lib.config.cardback_style !== "default") {
-            node2.style.transitionProperty = "none"
-            ui.refresh(node2)
-            node2.classList.add("infohidden")
-            ui.refresh(node2)
-            node2.style.transitionProperty = ""
-          } else {
-            node2.classList.add("infohidden")
-          }
+          node2.style.transitionProperty = "none"
+          ui.refresh(node2)
+          node2.classList.add("infohidden")
+          ui.refresh(node2)
+          node2.style.transitionProperty = ""
           node2.style.transform =
             "perspective(600px) rotateY(180deg) translateX(0)"
           var onEnd02 = () => {
@@ -15556,15 +15489,6 @@ export class Player extends HTMLDivElement {
     }, 200)
   }
   $compare(card1, target, card2, cardsetions) {
-    if (!cardsetions && lib.config.card_animation_info) {
-      var cardsetions = {},
-        cardsetion_targets = [this, target]
-      for (const targetx of cardsetion_targets) {
-        const id = targetx.playerid,
-          cardsetion = get.cardsetion(targetx)
-        cardsetions[id] = cardsetion
-      }
-    }
     game.broadcast(
       (player, target, card1, card2, cardsetions) => {
         player.$compare(card1, target, card2, cardsetions)
@@ -15587,15 +15511,11 @@ export class Player extends HTMLDivElement {
       "perspective(600px) rotateY(180deg)",
       true,
     )
-    if (lib.config.cardback_style !== "default") {
-      node1.style.transitionProperty = "none"
-      ui.refresh(node1)
-      node1.classList.add("infohidden")
-      ui.refresh(node1)
-      node1.style.transitionProperty = ""
-    } else {
-      node1.classList.add("infohidden")
-    }
+    node1.style.transitionProperty = "none"
+    ui.refresh(node1)
+    node1.classList.add("infohidden")
+    ui.refresh(node1)
+    node1.style.transitionProperty = ""
     if (cardsetions) {
       var next = ui.create.div(
         ".cardsetion",
@@ -15642,15 +15562,11 @@ export class Player extends HTMLDivElement {
         "perspective(600px) rotateY(180deg)",
         true,
       )
-      if (lib.config.cardback_style !== "default") {
-        node2.style.transitionProperty = "none"
-        ui.refresh(node2)
-        node2.classList.add("infohidden")
-        ui.refresh(node2)
-        node2.style.transitionProperty = ""
-      } else {
-        node2.classList.add("infohidden")
-      }
+      node2.style.transitionProperty = "none"
+      ui.refresh(node2)
+      node2.classList.add("infohidden")
+      ui.refresh(node2)
+      node2.style.transitionProperty = ""
       if (cardsetions) {
         var next = ui.create.div(
           ".cardsetion",
@@ -15692,15 +15608,6 @@ export class Player extends HTMLDivElement {
     }, 200)
   }
   $throw(card, time, init, nosource, cardsetion, id) {
-    if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
-      let source = this
-      if (["useCard", "respond"].includes(get.event().name)) {
-        source = get.player()
-        cardsetion = get.cardsetion(source)
-        if (!get.event().id) get.event().id = get.id()
-        if (!id) id = get.event().id
-      }
-    }
     if (typeof card === "number") {
       var tmp = card
       card = []
@@ -15789,214 +15696,23 @@ export class Player extends HTMLDivElement {
           ["name", "suit", "number", "nature"].every((key) => {
             const card = curEvent.cards[0]
             if (key === "nature") {
-              if (card.nature == void 0 && curEvent.card.nature === false) {
+              if (card.nature === void 0 && curEvent.card.nature === false) {
                 return true
               }
             }
             return card[key] === curEvent.card[key]
           })
-        // 是否允许显示转化牌的详情并且是转化牌哦
-        if (
-          lib.config.card_animation_info &&
-          nodes.length &&
-          (!isCard || !isCard2) &&
-          curEvent.cards?.length >= 1
-        ) {
-          // 如果是useCard或者respond事件里面，并且正准备抛出要转化的实体牌哦
-          // 因为抛出的实体牌数组就是event.cards哦，所以我们直接比对
-          // 如果以后改了（应该不至于改喵）这里也要同步更改喵
-          async function makeViewAsCard(event, lastCardid) {
-            const vcard = event.card
-            const throwns = Array.from(
-              ui.arena.querySelectorAll(".card.thrown"),
-            ).reverse()
-            const lastCard = throwns.find((c) => {
-              return c._cardid === lastCardid
-            })
-            if (!lastCard) return
-            const curCards = event.cards
-
-            // 定义异步工具函数喵
-            function waitForTransition(node, time) {
-              return new Promise((resolve) => {
-                node.listenTransition(() => {
-                  resolve()
-                }, time)
-              })
-            }
-
-            async function waitForAnimationFrame(count = 1) {
-              function waitForSingleFrame() {
-                return new Promise((resolve) => {
-                  requestAnimationFrame(() => {
-                    resolve()
-                  })
-                })
-              }
-
-              for (let i = 0; i < count; i++) {
-                await waitForSingleFrame()
-              }
-            }
-
-            function waitForAnimation(node, keyframes, options) {
-              return new Promise((resolve) => {
-                node.animate(keyframes, options).onfinish = () => {
-                  resolve()
-                }
-              })
-            }
-
-            function reinitClonedCard(card, data) {
-              const Card = lib.element.Card
-              const oldPrototype = Reflect.getPrototypeOf(card)
-              Reflect.setPrototypeOf(card, Card.prototype)
-              // 防止报错的东西喵
-              card.node.name2 = {}
-              card.node.range = {}
-              // 因为这是复制的div哦喵 _(:з」∠)_
-              card.init(data)
-              delete card.node.name2
-              delete card.node.range
-              Reflect.setPrototypeOf(card, oldPrototype)
-            }
-
-            // 等待动画之后添加喵
-            await waitForTransition(lastCard, 500)
-
-            // 创建一张实体假牌用于显示信息哦
-            const number = get.number(vcard, false)
-            let vcardStr = "转化",
-              vcardSkill
-            if (event.skill) {
-              vcardSkill = event.skill
-            } else {
-              const modSkills = Object.values(event.modSkill).find((name) => {
-                return name && lib.translate[name]
-              })
-              if (modSkills) {
-                vcardSkill = modSkills
-                vcardStr = "视为"
-              }
-            }
-            if (typeof vcardSkill !== "string" || !lib.translate[vcardSkill]) {
-              vcardSkill = ""
-            }
-            const suit = get.suit(vcard, false),
-              color = get.color(vcard, false),
-              color2 = color === "red" ? "red" : "black"
-            const initData = [
-              suit,
-              Number.isFinite(number) && number != null
-                ? String(number)
-                : `<span style="color:${color2}">${vcardStr}</span>`,
-              get.name(vcard, false),
-              get.nature(vcard, false),
-            ]
-
-            // 创建卡牌变化的动画
-            const position = lastCard.node.cardsetion
-            const initMask = ui.create.div(".initmask")
-
-            // 如果可能，我们尽量不遮挡cardsetion（牌的使用信息）
-            if (position) lastCard.insertBefore(initMask, position)
-            else lastCard.appendChild(initMask)
-
-            // 等待动画完成喵
-            await waitForAnimation(initMask, [{ opacity: 0 }, { opacity: 1 }], {
-              duration: 150,
-              fill: "forwards",
-              iterations: 1,
-            })
-
-            // 趁玩家不注意偷偷把牌换掉喵~
-            reinitClonedCard(lastCard, initData)
-
-            // 等待动画完成喵
-            await waitForAnimation(initMask, [{ opacity: 1 }, { opacity: 0 }], {
-              duration: 150,
-              fill: "forwards",
-              iterations: 1,
-            })
-
-            // 然后把换牌遮罩移除喵
-            initMask.remove()
-
-            // 我们让创建的假牌不受父节点点击穿透的影响哦
-            lastCard.style.pointerEvents = "all"
-
-            lastCard.addEventListener(
-              lib.config.touchscreen ? "touchend" : "click",
-              (e) => {
-                lastCard._customintro = (uiintro, evt) => {
-                  delete lastCard._customintro
-
-                  const newUiintro = get.nodeintro(lastCard, false, evt)
-
-                  if (!newUiintro) {
-                    return false
-                  }
-                  newUiintro.add(
-                    `<div class="text center">由${get.translation(vcardSkill)}${vcardStr}</div>`,
-                  )
-                  newUiintro.add(curCards)
-
-                  const first = newUiintro.content.firstElementChild
-                  const buttons = newUiintro.content.lastElementChild
-                  newUiintro.content.insertBefore(buttons, first.nextSibling)
-
-                  // 偷天换日喵！没办法哦，谁叫这个函数不可以直接返回uiintro喵
-                  uiintro.contentContainer.insertBefore(
-                    newUiintro.content,
-                    uiintro.content,
-                  )
-                  uiintro.contentContainer.removeChild(uiintro.content)
-                  uiintro.content = newUiintro.content
-                  newUiintro.close()
-                }
-
-                if (e.changedTouches?.[0]) {
-                  e = e.changedTouches[0]
-                }
-
-                return ui.click.intro.call(lastCard, e)
-              },
-              true,
-            )
-          }
-
-          let lastNode = nodes[nodes.length - 1]
-          if (get.event().lose_map) {
-            const id = this.playerid
-            const ids = []
-            for (const key in get.event().lose_map) {
-              if (key !== "noowner" && get.event().lose_map[key].length > 0) {
-                ids.add(key)
-              }
-            }
-            if (ids.indexOf(id) === -1 || ids.indexOf(id) !== ids.length - 1) {
-              lastNode = {
-                _cardid: -1,
-              }
-            }
-          }
-          // 如果本次的抛出动画没有被广播那我们的广播就没有意义哦
-          // 不过一般都会广播的吧喵？
-          if (init !== "nobroadcast")
-            game.broadcastAll(makeViewAsCard, curEvent, lastNode?._cardid)
-          else makeViewAsCard(curEvent, lastNode._cardid)
-        }
       }
 
       return nodes[nodes.length - 1] // 不用管这个是不是存在，因为原来的代码也不一定存在喵 _(:з」∠)_
       //////////////////////////////////////更改部分结束喵///////////////////////////////////////
     }
     var node
-    if (card == void 0 || card.length === 0) return
+    if (card === void 0 || card.length === 0) return
     var cardx = card.copy("thrown")
     if (id) cardx.node.throw_id = id
     node = this.$throwordered(cardx, nosource, cardsetion)
-    if (time != void 0) {
+    if (time !== void 0) {
       node.fixed = true
       setTimeout(() => {
         node.delete()
@@ -16007,58 +15723,6 @@ export class Player extends HTMLDivElement {
   }
   $throwordered() {
     const $throwordered2 = this.$throwordered2.apply(this, arguments)
-    if (lib.config.card_animation_info) {
-      const node = arguments[0]
-      let eventInfo = arguments[2]
-      if (eventInfo == null) {
-        eventInfo = get.cardsetion(this)
-      }
-      if (eventInfo?.length) {
-        game.broadcastAll(
-          (node, eventInfo, id) => {
-            if (!node?.node) {
-              node = [...ui.arena.childNodes].find((c) => {
-                if (
-                  c.classList.contains("thrown") &&
-                  c.classList.contains("card")
-                ) {
-                  if (c._cardid === id && !c.selectedt) {
-                    c.selectedt = true
-                    return true
-                  }
-                }
-              })
-            }
-            if (!node?.node) {
-              return
-            }
-            node.classList.add("infoflip")
-            const next = ui.create.div(".cardsetion", eventInfo, node)
-            next.style.setProperty("display", "block", "important")
-            if (node.node) {
-              if (node.node.cardsetion) {
-                node.node.cardsetion.remove()
-                delete node.node.cardsetion
-              }
-              node.node.cardsetion = next
-            }
-          },
-          node,
-          eventInfo,
-          node._cardid,
-        )
-        node.classList.add("infoflip")
-        const next = ui.create.div(".cardsetion", eventInfo, node)
-        next.style.setProperty("display", "block", "important")
-        if (node.node) {
-          if (node.node.cardsetion) {
-            node.node.cardsetion.remove()
-            delete node.node.cardsetion
-          }
-          node.node.cardsetion = next
-        }
-      }
-    }
     return $throwordered2
     // if(lib.config.low_performance){
     // 	return this.$throwordered2.apply(this,arguments);
@@ -16523,14 +16187,6 @@ export class Player extends HTMLDivElement {
     return this.$give.apply(this, args)
   }
   $give(card, player, log, init, cardsetion) {
-    if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
-      const evt = get.cardsetion(null, true)
-      if (evt && evt.player === player) {
-        cardsetion = get.cardsetion(player)
-      } else {
-        cardsetion = get.cardsetion(this)
-      }
-    }
     if (init !== false) {
       game.broadcast(
         (source, card, player, init, cardsetion) => {
@@ -17147,9 +16803,6 @@ export class Player extends HTMLDivElement {
     return this
   }
   $gain(card, log, init, cardsetion) {
-    if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
-      cardsetion = get.cardsetion(this)
-    }
     if (init !== false) {
       game.broadcast(
         (player, card, init, cardsetion) => {
@@ -17239,9 +16892,6 @@ export class Player extends HTMLDivElement {
     }
   }
   $gain2(cards, log, cardsetion) {
-    if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
-      cardsetion = get.cardsetion(this)
-    }
     if (log === true) {
       game.log(this, "获得了", cards)
     }
@@ -17680,7 +17330,7 @@ export class Player extends HTMLDivElement {
       this,
       source,
     )
-    if (source && source !== this && lib.config.damage_shake) {
+    if (source && source !== this) {
       var left, top
       if (source.getTop() === this.getTop()) {
         left = 20
@@ -17706,7 +17356,7 @@ export class Player extends HTMLDivElement {
           this.node.avatar.style.transform = `translate(${left}px,${top}px)`
           this.node.avatar2.style.transform = `translate(${left}px,${top}px)`
         }
-      } else if (this.classList.contains("linked") && get.is.newLayout()) {
+      } else if (this.classList.contains("linked")) {
         this.style.transform = `translate(${left}px,${top}px) rotate(-90deg)`
       } else if (this._chesstransform) {
         this.style.transform = `translate(${left + this._chesstransform[0]}px,${top + this._chesstransform[1]}px)`
@@ -17728,7 +17378,7 @@ export class Player extends HTMLDivElement {
           this.node.avatar.style.transform = `scale(${zoom1})`
           this.node.avatar2.style.transform = `scale(${zoom1})`
         }
-      } else if (this.classList.contains("linked") && get.is.newLayout()) {
+      } else if (this.classList.contains("linked")) {
         this.style.transform = `scale(${zoom2}) rotate(-90deg)`
       } else if (game.chess && this._chesstransform) {
         this.style.transform = `translate(${this._chesstransform[0]}px,${this._chesstransform[1]}px) scale(${zoom2})`
@@ -17743,9 +17393,7 @@ export class Player extends HTMLDivElement {
     game.broadcast((player) => {
       player.$die()
     }, this)
-    if (lib.config.die_move !== "off") {
-      this.$dieflip(lib.config.die_move)
-    }
+    this.$dieflip("flip")
     if (this.$dieAfter) {
       this.$dieAfter()
     }
@@ -17772,7 +17420,7 @@ export class Player extends HTMLDivElement {
     }
     var transform = `translate(${left}px,${top}px) rotate(${Math.random() * 20 - 10}deg) `
     if (type === "flip") {
-      if (game.layout === "long" || game.layout === "long2") {
+      if (game.layout === "long2") {
         transform += "rotateY(180deg)"
       } else {
         transform +=

@@ -395,15 +395,11 @@ const skills = {
           game.broadcastAll(
             (card, player) => {
               _status.ylygguhuoNode = card.copy("thrown")
-              if (lib.config.cardback_style !== "default") {
-                _status.ylygguhuoNode.style.transitionProperty = "none"
-                ui.refresh(_status.ylygguhuoNode)
-                _status.ylygguhuoNode.classList.add("infohidden")
-                ui.refresh(_status.ylygguhuoNode)
-                _status.ylygguhuoNode.style.transitionProperty = ""
-              } else {
-                _status.ylygguhuoNode.classList.add("infohidden")
-              }
+              _status.ylygguhuoNode.style.transitionProperty = "none"
+              ui.refresh(_status.ylygguhuoNode)
+              _status.ylygguhuoNode.classList.add("infohidden")
+              ui.refresh(_status.ylygguhuoNode)
+              _status.ylygguhuoNode.style.transitionProperty = ""
               _status.ylygguhuoNode.style.transform =
                 "perspective(600px) rotateY(180deg) translateX(0)"
               player.$throwordered2(_status.ylygguhuoNode)

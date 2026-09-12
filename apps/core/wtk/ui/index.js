@@ -186,7 +186,6 @@ export class UI {
    */
   getSpreadOffset(cards, options = {}) {
     const result = { spreadIndex: -1, spreadLeft: 0, spreadRight: 0 }
-    if (!lib.config.spread_card) return result
 
     const cardWidth = options.cardWidth || 112
     const currentMargin = options.currentMargin || cardWidth
@@ -282,10 +281,9 @@ export class UI {
     if (staylefts.length) {
       var fullwidth = 0
       var fullright =
-        game.layout === "long" ||
         game.layout === "long2" ||
         game.chess ||
-        (game.layout !== "nova" && parseInt(ui.arena.dataset.number, 10) <= 5)
+        parseInt(ui.arena.dataset.number, 10) <= 5
       for (var i = 0; i < widths.length; i++) {
         fullwidth += widths[i] + 6
         if (get.is.phoneLayout()) {
@@ -309,7 +307,7 @@ export class UI {
       if (fullright) {
         fullwidth += 124
         if (
-          (game.layout === "long2" || game.layout === "nova") &&
+          game.layout === "long2" &&
           ui.arena.dataset.number === "8" &&
           get.mode() !== "boss"
         ) {
@@ -319,28 +317,24 @@ export class UI {
         fullwidth += 154
       }
       for (var stayleft of staylefts) {
-        if (game.layout !== "default") {
-          var current_offset = stayleft._offset
-          if (fullright) {
-            stayleft._offset = Math.ceil(-ui.arena.offsetWidth / 2) + 135
-            if (
-              (game.layout === "long2" || game.layout === "nova") &&
-              ui.arena.dataset.number === "8" &&
-              get.mode() !== "boss"
-            ) {
-              stayleft._offset += game.me.getLeft()
-            }
-          } else {
-            stayleft._offset = Math.ceil(-ui.arena.offsetWidth / 2) + 165
-          }
-          stayleft._offset += stayleft.currentLeft
-
-          if (current_offset !== stayleft._offset) {
-            stayleft.addTempClass("controlpressdownx", 500)
-            stayleft.style.transform = `translateX(${stayleft._offset}px)`
+        var current_offset = stayleft._offset
+        if (fullright) {
+          stayleft._offset = Math.ceil(-ui.arena.offsetWidth / 2) + 135
+          if (
+            game.layout === "long2" &&
+            ui.arena.dataset.number === "8" &&
+            get.mode() !== "boss"
+          ) {
+            stayleft._offset += game.me.getLeft()
           }
         } else {
-          add(stayleft, true)
+          stayleft._offset = Math.ceil(-ui.arena.offsetWidth / 2) + 165
+        }
+        stayleft._offset += stayleft.currentLeft
+
+        if (current_offset !== stayleft._offset) {
+          stayleft.addTempClass("controlpressdownx", 500)
+          stayleft.style.transform = `translateX(${stayleft._offset}px)`
         }
       }
       if (staylefts.length && controls.length) {
@@ -399,11 +393,7 @@ export class UI {
       start = 0
     }
     var str
-    if (
-      get.is.mobileMe(player) ||
-      game.layout === "default" ||
-      player.classList.contains("linked")
-    ) {
+    if (get.is.mobileMe(player) || player.classList.contains("linked")) {
       str = "translateX("
       if (inv) {
         str += "-"
@@ -491,20 +481,15 @@ export class UI {
     }
     var offset1,
       offset12 = 0
-    if (!lib.config.fold_card) {
-      offset1 = 112
+    offset1 = Math.min(
+      112,
+      (ui.handcards1Container.offsetWidth - 128) / (hs1.length - 1),
+    )
+    if (hs1.length > 1 && offset1 < 32) {
+      offset1 = 32
       ui.handcards1Container.classList.add("scrollh")
     } else {
-      offset1 = Math.min(
-        112,
-        (ui.handcards1Container.offsetWidth - 128) / (hs1.length - 1),
-      )
-      if (hs1.length > 1 && offset1 < 32) {
-        offset1 = 32
-        ui.handcards1Container.classList.add("scrollh")
-      } else {
-        ui.handcards1Container.classList.remove("scrollh")
-      }
+      ui.handcards1Container.classList.remove("scrollh")
     }
     if (offset1 < 100) {
       offset12 = 100 - offset1
@@ -545,20 +530,15 @@ export class UI {
 
     var offset2,
       offset22 = 0
-    if (!lib.config.fold_card) {
-      offset2 = 112
+    offset2 = Math.min(
+      112,
+      (ui.handcards2Container.offsetWidth - 128) / (hs2.length - 1),
+    )
+    if (hs2.length > 1 && offset2 < 32) {
+      offset2 = 32
       ui.handcards2Container.classList.add("scrollh")
     } else {
-      offset2 = Math.min(
-        112,
-        (ui.handcards2Container.offsetWidth - 128) / (hs2.length - 1),
-      )
-      if (hs2.length > 1 && offset2 < 32) {
-        offset2 = 32
-        ui.handcards2Container.classList.add("scrollh")
-      } else {
-        ui.handcards2Container.classList.remove("scrollh")
-      }
+      ui.handcards2Container.classList.remove("scrollh")
     }
     if (offset2 < 100) {
       offset22 = 100 - offset2
@@ -743,12 +723,10 @@ export class UI {
         } else {
           ui.dialog.classList.add("scroll1")
           ui.dialog.classList.add("scroll2")
-          if (game.layout !== "default") {
-            ui.dialog.style.height = `${Math.min(height1, (game.layout === "long2" || game.layout === "nova") && ui.arena.classList.contains("choose-character") ? 380 : 350)}px`
-            ui.dialog._scrollset = true
-          }
+          ui.dialog.style.height = `${Math.min(height1, game.layout === "long2" && ui.arena.classList.contains("choose-character") ? 380 : 350)}px`
+          ui.dialog._scrollset = true
         }
-        if (game.layout === "long2" || game.layout === "nova") {
+        if (game.layout === "long2") {
           if (height1 + 240 >= ui.arena.offsetHeight) {
             ui.dialog.classList.add("scroll3")
           } else {

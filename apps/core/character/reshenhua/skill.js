@@ -982,15 +982,11 @@ const skills = {
       game.broadcastAll(
         (card, player) => {
           _status.reguhuoNode = card.copy("thrown")
-          if (lib.config.cardback_style !== "default") {
-            _status.reguhuoNode.style.transitionProperty = "none"
-            ui.refresh(_status.reguhuoNode)
-            _status.reguhuoNode.classList.add("infohidden")
-            ui.refresh(_status.reguhuoNode)
-            _status.reguhuoNode.style.transitionProperty = ""
-          } else {
-            _status.reguhuoNode.classList.add("infohidden")
-          }
+          _status.reguhuoNode.style.transitionProperty = "none"
+          ui.refresh(_status.reguhuoNode)
+          _status.reguhuoNode.classList.add("infohidden")
+          ui.refresh(_status.reguhuoNode)
+          _status.reguhuoNode.style.transitionProperty = ""
           _status.reguhuoNode.style.transform =
             "perspective(600px) rotateY(180deg) translateX(0)"
           player.$throwordered2(_status.reguhuoNode)

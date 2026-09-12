@@ -2288,7 +2288,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.isPlayingAnimation = false
 
         // 动画时长
-        const animationDuration = lib.config.animation_choose_to_move ? 300 : 0
+        const animationDuration = 300
 
         // 初始化触摸点位置和元素偏移量
         let touchStartX = 0
@@ -3808,12 +3808,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     player.phaseNumber++
     game.broadcastAll(
       (player, player2, num, popup) => {
-        if (lib.config.glow_phase) {
-          if (player2) {
-            player2.classList.remove("glow_phase")
-          }
-          player.classList.add("glow_phase")
+        if (player2) {
+          player2.classList.remove("glow_phase")
         }
+        player.classList.add("glow_phase")
         player.phaseNumber = num
         if (popup && lib.config.show_phase_prompt) {
           player.popup("回合开始", null, false)
@@ -5436,9 +5434,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       player.phaseNumber++
       game.broadcastAll(
         (player, num, popup) => {
-          if (lib.config.glow_phase) {
-            player.classList.add("glow_phase")
-          }
+          player.classList.add("glow_phase")
           player.phaseNumber = num
           _status.currentPhase = player
           if (popup && lib.config.show_phase_prompt) {
@@ -9381,31 +9377,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           event.dialog.open()
         } else {
-          if (event.seperate || lib.config.seperate_control) {
-            const controls = event.controls.slice(0)
-            controls.remove("cancel2")
-            if ((event.direct && controls.length === 1) || event.forceDirect) {
-              event.result = {
-                control: event.controls[0],
-                links: get.links([event.controls[0]]),
-              }
-              return
+          const controls = event.controls.slice(0)
+          controls.remove("cancel2")
+          if ((event.direct && controls.length === 1) || event.forceDirect) {
+            event.result = {
+              control: event.controls[0],
+              links: get.links([event.controls[0]]),
             }
-            event.controlbars = []
-            for (const control of event.controls) {
-              event.controlbars.push(ui.create.control([control]))
-            }
-          } else {
-            const controls = event.controls.slice(0)
-            controls.remove("cancel2")
-            if ((event.direct && controls.length === 1) || event.forceDirect) {
-              event.result = {
-                control: event.controls[0],
-                links: get.links([event.controls[0]]),
-              }
-              return
-            }
-            event.controlbar = ui.create.control(event.controls)
+            return
+          }
+          event.controlbars = []
+          for (const control of event.controls) {
+            event.controlbars.push(ui.create.control([control]))
           }
           if (event.dialog) {
             if (Array.isArray(event.dialog)) {
@@ -11099,8 +11082,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (event.animate === false || event.throw === false) {
           return
         }
-        let throw_cards = event.cards
-        let virtualCard_str = false
+        const throw_cards = event.cards
+        const virtualCard_str = false
         for (const id in event.lose_map) {
           if (id === "noowner") {
             continue
@@ -11111,26 +11094,6 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           const originalThrows = event.lose_map[id]
           const throws = originalThrows.slice()
           try {
-            if (owner === player) {
-              if (!throw_cards.length && lib.config.card_animation_info) {
-                const virtualCard = ui.create.card()
-                virtualCard._destroy = true
-                virtualCard.expired = true
-                const number = card.number
-                virtualCard.init([
-                  get.suit(card),
-                  typeof number === "number" ? number : "虚拟",
-                  card.name,
-                  card.nature,
-                ])
-                virtualCard_str = virtualCard.querySelector(".info").innerHTML
-                throw_cards = [virtualCard]
-                throws.add(virtualCard)
-              }
-              if (lib.config.card_animation_info) {
-                throws.addArray(event.lose_map.noowner)
-              }
-            }
             if (throws.length) {
               event.lose_map[id] = throws
               owner.$throw(throws)
@@ -11139,7 +11102,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.lose_map[id] = originalThrows
           }
         }
-        if (event.lose_map.noowner.length && !lib.config.card_animation_info) {
+        if (event.lose_map.noowner.length) {
           for (const card of event.lose_map.noowner) {
             game.broadcastAll(
               (player, card, cardid) => {
@@ -11167,46 +11130,6 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               get.id(),
             )
           }
-        }
-        if (lib.config.card_animation_info) {
-          game.broadcastAll(
-            (cards, card, card_cards, str) => {
-              for (const nodex of cards) {
-                const node = nodex.clone
-                if (nodex._tempName) {
-                  nodex._tempName.delete()
-                  delete nodex._tempName
-                }
-                if (!node) {
-                  continue
-                }
-                if (str) {
-                  node.querySelector(".info").innerHTML = str
-                }
-                if (
-                  cards.length > 1 ||
-                  !card.isCard ||
-                  card.name !== node.name ||
-                  card.nature !== node.nature ||
-                  !card.cards.length
-                ) {
-                  ui.create.cardTempName(card, node)
-                  if (node._tempName && card_cards?.length <= 0) {
-                    node._tempName.innerHTML = node._tempName.innerHTML.slice(
-                      0,
-                      node._tempName.innerHTML.indexOf("<span", -1),
-                    )
-                    node._tempName.innerHTML +=
-                      "<span style='color:black'>虚拟</span></span>"
-                  }
-                }
-              }
-            },
-            throw_cards,
-            event.card,
-            event.cards,
-            virtualCard_str,
-          )
         }
         if (lib.config.sync_speed && throw_cards[0]?.clone) {
           const waitingForTransition = get.id()
@@ -12483,8 +12406,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       player.respondAnimateBefore?.(event, trigger, player)
       if (event.animate !== false && event.throw !== false) {
-        let throw_cards = cards
-        let virtualCard_str = false
+        const throw_cards = cards
+        const virtualCard_str = false
         for (const id in event.lose_map) {
           if (id === "noowner") {
             continue
@@ -12493,32 +12416,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             id
           ]
           const throws = event.lose_map[id]
-          if (owner === player) {
-            if (!throw_cards.length && lib.config.card_animation_info) {
-              const virtualCard = ui.create.card()
-              virtualCard._destroy = true
-              virtualCard.expired = true
-              const info = lib.card[card.name]
-              const number = card.number
-              virtualCard.init([
-                get.suit(card),
-                typeof number === "number" ? number : "虚拟",
-                card.name,
-                card.nature,
-              ])
-              virtualCard_str = virtualCard.querySelector(".info").innerHTML
-              throw_cards = [virtualCard]
-              throws.add(virtualCard)
-            }
-            if (lib.config.card_animation_info) {
-              throws.addArray(event.lose_map.noowner)
-            }
-          }
           if (throws.length) {
             owner.$throw(throws)
           }
         }
-        if (event.lose_map.noowner.length && !lib.config.card_animation_info) {
+        if (event.lose_map.noowner.length) {
           for (const card of event.lose_map.noowner) {
             game.broadcastAll(
               (player, card, cardid) => {
@@ -12546,48 +12448,6 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               get.id(),
             )
           }
-        }
-        if (lib.config.card_animation_info) {
-          game.broadcastAll(
-            (cards, card, card_cards, str, judgeing) => {
-              for (const nodex of cards) {
-                const node = nodex.clone
-                if (nodex._tempName) {
-                  nodex._tempName.delete()
-                  delete nodex._tempName
-                }
-                if (!node) {
-                  continue
-                }
-                if (str) {
-                  node.querySelector(".info").innerHTML = str
-                }
-                if (
-                  (cards.length > 1 ||
-                    !card.isCard ||
-                    card.name !== node.name ||
-                    card.nature !== node.nature ||
-                    !card.cards.length) &&
-                  !judgeing
-                ) {
-                  ui.create.cardTempName(card, node)
-                  if (node._tempName && card_cards?.length <= 0) {
-                    node._tempName.innerHTML = node._tempName.innerHTML.slice(
-                      0,
-                      node._tempName.innerHTML.indexOf("<span", -1),
-                    )
-                    node._tempName.innerHTML +=
-                      "<span style='color:black'>虚拟</span></span>"
-                  }
-                }
-              }
-            },
-            throw_cards,
-            event.card,
-            event.cards,
-            virtualCard_str,
-            event.highlight,
-          )
         }
         if (event.highlight) {
           for (const card of throw_cards) {
@@ -12896,11 +12756,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (player === game.me) {
           card.classList.add("drawinghidden")
         }
-        if (get.is.singleHandcard() || sort > 1) {
-          frag1.appendChild(card)
-        } else {
-          frag2.appendChild(card)
-        }
+        frag1.appendChild(card)
       }
       const addv = () => {
         if (player === game.me) {
@@ -13802,13 +13658,6 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             dnum += stat.damage
           }
         }
-        if (dnum >= 2) {
-          if (lib.config.autoborder_start === "silver") {
-            dnum += 4
-          } else if (lib.config.autoborder_start === "gold") {
-            dnum += 8
-          }
-        }
         if (lib.config.autoborder_count === "damage") {
           source.node.framebg.dataset.decoration = ""
           if (dnum >= 10) {
@@ -14367,8 +14216,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             source.node.framebg.dataset.auto = "silver"
             break
           default:
-            source.node.framebg.dataset.auto =
-              lib.config.autoborder_start || "bronze"
+            source.node.framebg.dataset.auto = "bronze"
         }
         if (lib.config.autoborder_count === "kill") {
           source.node.framebg.dataset.decoration =
@@ -14849,7 +14697,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           game.playAudio("effect", `link${isLinked ? "_clear" : ""}`)
         }
         player.classList.remove("target")
-        player.classList.toggle(get.is.linked2(player) ? "linked2" : "linked")
+        player.classList.toggle("linked2")
         ui.updatej(player)
         ui.updatem(player)
       },
@@ -15012,7 +14860,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     let result: Partial<Result>
     if (event.isMine()) {
       const { promise, resolve } = Promise.withResolvers()
-      const animationDuration = lib.config.animation_choose_to_move ? 300 : 0
+      const animationDuration = 300
       //自动选择
       event.switchToAuto = () => {
         if (!event.filterOk(event.moved)) {
