@@ -371,6 +371,89 @@ const translates = {
   jilei2_bg: "肋",
   jilei_info:
     "当你受到伤害后，你可以声明一种牌的类别，本回合伤害来源不能使用、打出或弃置你声明的此类手牌。",
+
+  sp_yuanshu: "SP袁术",
+  sp_yuanshu_prefix: "SP",
+  spyongsi: "庸肆",
+  spyongsi1: "庸肆",
+  spyongsi2: "庸肆",
+  spyongsi_info:
+    "锁定技，摸牌阶段，你多摸X张牌；弃牌阶段开始时，你弃置X张牌（X为势力数）。",
+  spweidi: "伪帝",
+  spweidi_info: "锁定技，你视为拥有主公的主公技。",
+
+  old_sunshangxiang: "SP孙尚香",
+  old_sunshangxiang_prefix: "SP",
+
+  old_pangde: "SP庞德",
+  old_pangde_prefix: "SP",
+
+  sp_guanyu: "SP关羽",
+  sp_guanyu_prefix: "SP",
+  danji: "单骑",
+  danji_info:
+    "觉醒技，准备阶段，若你的手牌数大于体力值且本局游戏的主公为曹操，你减1点体力上限并获得〖马术〗。",
+
+  old_caiwenji: "SP蔡文姬",
+  old_caiwenji_prefix: "SP",
+
+  old_machao: "SP马超",
+  old_machao_prefix: "SP",
+
+  old_jiaxu: "SP贾诩",
+  old_jiaxu_prefix: "SP",
+
+  caohong: "曹洪",
+  yuanhu: "援护",
+  yuanhu_info:
+    "结束阶段，你可以将一张装备牌置入一名角色的装备区，若此牌为：武器牌，你弃置其距离为1的一名角色区域里的一张牌；防具牌，其摸一张牌；坐骑牌，其回复1点体力。",
+
+  old_guanyinping: "旧关银屏",
+  old_guanyinping_prefix: "旧",
+  oldxueji: "血祭",
+  oldxueji_info:
+    "出牌阶段限一次，你可以弃置一张红色牌并对攻击范围内的至多X名其他角色各造成1点伤害，然后这些角色各摸一张牌（X为你已损失的体力值）。",
+  oldhuxiao: "虎啸",
+  oldhuxiao_info:
+    "锁定技，当你于出牌阶段内使用的【杀】被抵消后，此【杀】不计入次数。",
+  oldwuji: "武继",
+  oldwuji_info:
+    "觉醒技，结束阶段，若你本回合造成过至少3点伤害，你加1点体力上限并回复1点体力，然后失去〖虎啸〗。",
+
+  old_lingju: "旧灵雎",
+  old_lingju_prefix: "旧",
+  oldfenxin: "焚心",
+  oldfenxin_info:
+    "限定技，当被你杀死的角色亮出身份牌前，若你的身份不为主公，你可以与其交换身份牌。",
+
+  xiahouba: "夏侯霸",
+  baobian: "豹变",
+  baobian_info:
+    "锁定技，若你的体力值：不大于3，你视为拥有〖挑衅〗；不大于2，你视为拥有〖咆哮〗；为1，你视为拥有〖神速〗。",
+
+  daxiaoqiao: "大乔小乔",
+  xingwu: "星舞",
+  xingwu_info:
+    "弃牌阶段开始时，你可以将一张颜色与你于此回合内使用过的牌均不同的手牌置于武将牌上（称为“舞”），然后若“舞”数为3，你移去所有“舞”，对一名男性角色造成2点伤害，弃置其装备区里的所有牌。",
+  luoyan: "落雁",
+  luoyan_info: "锁定技，若你有“舞”，你视为拥有〖天香〗和〖流离〗。",
+
+  sp_xiahoushi: "SP夏侯氏",
+  sp_xiahoushi_prefix: "SP",
+  spyanyu: "燕语",
+  spyanyu_info:
+    "一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，此回合限三次，当一张与你弃置牌类别相同的其他牌于出牌阶段内进入弃牌堆后，你可以令一名角色获得之。",
+  spyanyu2: "燕语",
+  xiaode: "孝德",
+  xiaode_info:
+    "当一名其他角色死亡后，你可以声明该武将牌的一项技能。若如此做，你获得此技能并失去技能〖孝德〗直到你的回合结束。（你不能声明觉醒技或主公技）",
+
+  zhangbao: "张宝",
+  zhoufu: "咒缚",
+  zhoufu_info:
+    "出牌阶段限一次，你可以将一张手牌置于一名没有“咒”的其他角色的武将牌旁，称为“咒”。当有“咒”的角色判定时，将“咒”作为判定牌；其回合结束时，你获得其武将牌旁的“咒”。",
+  yingbing: "影兵",
+  yingbing_info: "当一张“咒”成为判定牌后，你可以摸两张牌。",
 }
 
 export default translates

@@ -59,4 +59,18 @@ export default {
   old_jikang: "峻峰孤松",
 
   yangxiu: "恃才放旷",
+  sp_yuanshu: "仲家帝",
+  old_sunshangxiang: "梦醉良缘",
+  old_pangde: "抬榇之悟",
+  sp_guanyu: "汉寿亭侯",
+  old_caiwenji: "金璧之才",
+  old_machao: "西凉的猛狮",
+  old_jiaxu: "算无遗策",
+  caohong: "福将",
+  guanyinping: "武姬",
+  old_lingju: "情随梦逝",
+  xiahouba: "棘途壮志",
+  daxiaoqiao: "江东之花",
+  sp_xiahoushi: "疾冲之恋",
+  zhangbao: "地公将军",
 }

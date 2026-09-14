@@ -22,7 +22,7 @@ window.wtk_package = {
     // shiji: "始计篇",
 
     sp2: "将星归汉",
-    // newjiang: "一将成名",
+    newjiang: "一将成名",
 
     jsrg: "江山如故",
     sxrm: "蚀心入魔",

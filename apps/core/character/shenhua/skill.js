@@ -19,6 +19,7 @@ const skills = {
   // 神速
   shensu: {
     audio: 2,
+    audioname: ["xiahouba"],
     group: ["shensu1", "shensu2"],
     preHidden: ["shensu1", "shensu2"],
   },
@@ -178,6 +179,7 @@ const skills = {
   // 天香
   tianxiang: {
     audio: 2,
+    audioname: ["daxiaoqiao"],
     trigger: { player: "damageBegin3" },
     filter(event, player) {
       return player.countCards("h", { suit: "heart" }) > 0 && event.num > 0
@@ -4879,6 +4881,7 @@ const skills = {
   // 挑衅
   tiaoxin: {
     audio: 2,
+    audioname: ["xiahouba"],
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {

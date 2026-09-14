@@ -5,7 +5,7 @@ export default {
   caoang: "取义成仁",
   simalang: "再世神农",
   guanyinping: "武姬",
-  sp_sunshangxiang: "SP孙尚香",
+  sp_sunshangxiang: "梦醉良缘",
   dongyun: "骨鲠良相",
   sunqian: "折冲樽俎",
   dingfeng: "清侧重臣",

@@ -1121,7 +1121,7 @@ const skills = {
   paoxiao: {
     audio: 2,
     firstDo: true,
-    audioname: ["old_guanzhang"],
+    audioname: ["old_guanzhang", "xiahouba"],
     audioname2: { old_zhangfei: "repaoxiao" },
     trigger: { player: "useCard1" },
     forced: true,
@@ -1682,7 +1682,7 @@ const skills = {
   // 流离
   liuli: {
     audio: 2,
-    audioname: ["re_daqiao"],
+    audioname: ["re_daqiao", "daxiaoqiao"],
     trigger: { target: "useCardToTarget" },
     preHidden: true,
     filter(event, player) {

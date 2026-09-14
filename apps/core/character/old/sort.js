@@ -57,7 +57,23 @@ const characterSort = {
   old_yijiang5: ["old_caorui", "old_caoxiu", "old_quancong"],
   old_yijiang6: ["old_huanghao", "old_liuyu", "old_zhangrang"],
   old_yijiang7: ["old_xinxianying", "old_jikang"],
-  sp_default: ["yangxiu"],
+  sp_default: [
+    "yangxiu",
+    "sp_yuanshu",
+    "old_sunshangxiang",
+    "old_pangde",
+    "sp_guanyu",
+    "old_caiwenji",
+    "old_machao",
+    "old_jiaxu",
+    "caohong",
+    "old_guanyinping",
+    "old_lingju",
+    "xiahouba",
+    "daxiaoqiao",
+    "sp_xiahoushi",
+    "zhangbao",
+  ],
 }
 
 const characterSortTranslate = {

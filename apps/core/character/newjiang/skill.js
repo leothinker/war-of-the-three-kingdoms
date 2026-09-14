@@ -2420,9 +2420,9 @@ const skills = {
     },
     forced: true,
     logTarget: "player",
-    content() {
-      "step 0"
-      player
+    async content(event, trigger, player) {
+      let result
+      result = await player
         .chooseButton(
           [
             "焚心：请选择一项",
@@ -2443,9 +2443,9 @@ const skills = {
             ["fenxin_nei", "fenxin_zhong", "fenxin_fan"].indexOf(button.link) +
             1,
         )
-      ;("step 1")
+        .forResult()
       if (result.bool) {
-        var identity = result.links[0]
+        const identity = result.links[0]
         player.addSkill(identity)
         player.markSkill("fenxin")
       }
