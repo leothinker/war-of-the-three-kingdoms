@@ -485,6 +485,44 @@ const translates = {
   oldmumu: "穆穆",
   oldmumu_info:
     "结束阶段，若你于出牌阶段内未造成过伤害，你可以选择一项：1.弃置场上的一张武器牌，然后摸一张牌；2.将场上的一张防具牌移动至你的装备区里（替换原防具）。",
+
+  old_maliang: "旧马良",
+  old_maliang_prefix: "旧",
+  xiemu: "协穆",
+  xiemu2: "协穆",
+  xiemu_info:
+    "出牌阶段限一次，你可以弃置一张【杀】并选择一个势力，然后直到你的下回合开始，当你成为该势力的其他角色使用黑色牌的目标后，你可以摸两张牌。",
+  naman: "纳蛮",
+  naman_info: "当其他角色打出的【杀】进入弃牌堆后，你可以获得之。",
+
+  zhangliang: "张梁",
+  jijun: "集军",
+  jijun_info: "出牌阶段，你可以将任意张手牌置于武将牌上。",
+  fangtong: "方统",
+  fangtong_info:
+    "锁定技，结束阶段，若你武将牌上的牌数不小于36，你所在阵营获得胜利。",
+
+  old_ganfuren: "旧甘夫人",
+  old_ganfuren_prefix: "旧",
+  oldshushen: "淑慎",
+  oldshushen_info:
+    "当你回复1点体力后，你可以令一名其他角色回复1点体力或摸两张牌。",
+  oldshenzhi: "神智",
+  oldshenzhi_info:
+    "准备阶段，你可以弃置所有手牌，若你以此法弃置的手牌数不小于X（X为你的体力值），你回复1点体力。",
+
+  huangjinleishi: "黄巾雷使",
+  fulu: "符箓",
+  fulu_info: "你可以将【杀】当雷【杀】使用。",
+  zhuji: "助祭",
+  zhuji_info:
+    "当一名角色造成雷电伤害时，你可以令其进行判定，若结果为：黑色，此伤害+1；红色，其获得此牌。",
+
+  wenpin: "文聘",
+  zhenwei: "镇卫",
+  zhenwei2: "镇卫",
+  zhenwei_info:
+    "当其他角色成为【杀】或黑色锦囊牌的唯一目标时，若其体力值小于你且使用者不为你，你可以弃置一张牌并选择一项：1.摸一张牌，然后将此牌转移给你；2.令此牌无效，当前回合结束后，使用者获得此牌。",
 }
 
 export default translates

@@ -77,4 +77,9 @@ export default {
   zumao: "碧血染赤帻",
   old_zhugedan: "薤露蒿里",
   old_sunluyu: "舍身饲虎",
+  old_maliang: "白眉智士",
+  zhangliang: "黄昏的斗蛾",
+  old_ganfuren: "旧甘夫人",
+  huangjinleishi: "雷祭之姝",
+  wenpin: "坚城宿将",
 }

@@ -77,6 +77,11 @@ const characterSort = {
     "zumao",
     "old_zhugedan",
     "old_sunluyu",
+    "old_maliang",
+    "zhangliang",
+    "old_ganfuren",
+    "huangjinleishi",
+    "wenpin",
   ],
 }
 

@@ -480,6 +480,39 @@ const characters = {
     skills: ["oldmeibu", "oldmumu"],
     dieAudios: ["sunluyu"],
   },
+  old_maliang: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["xiemu", "naman"],
+  },
+  zhangliang: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["jijun", "fangtong"],
+  },
+  old_ganfuren: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["oldshushen", "oldshenzhi"],
+    names: "甘|null",
+    dieAudios: ["ganfuren"],
+  },
+  huangjinleishi: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["fulu", "zhuji"],
+    names: "null|null-null|null",
+  },
+  wenpin: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["zhenwei"],
+  },
 }
 
 export default characters
