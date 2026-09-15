@@ -17238,6 +17238,12 @@ const skills = {
     ai: { threaten: 0.8 },
     subSkill: { blocker: { charlotte: true } },
   },
+  // 张星彩
+  // 甚贤
+  reshenxian: {
+    audio: "shenxian",
+    inherit: "shenxian",
+  },
 }
 
 export default skills

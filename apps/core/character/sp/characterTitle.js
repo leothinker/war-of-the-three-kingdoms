@@ -53,5 +53,6 @@ export default {
 
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",
+  re_zhangxingcai: "敬哀皇后",
   wolongfengchu: "一匡天下",
 }

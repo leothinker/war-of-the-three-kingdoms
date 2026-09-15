@@ -5432,12 +5432,7 @@ const skills = {
     async content(event, trigger, player) {
       const target = event.target
       const cards = event.cards
-      const next = target.addToExpansion(cards, player, "give")
-      // 直接赋值比 .add() 稳：框架里 event.gaintag 在 addToExpansion 里默认是数组，
-      // 用 .add() 会运行期炸；之前那个写法依赖隐式 Set-like 行为很脆弱。
-      next.gaintag = ["zhoufu_judge", "eternal_zhoufu_judge"]
-      await next
-      // source 跟牌走，方便 yingbing 在判定牌身上回查施法者
+      target.addToExpansion(cards, player, "give").gaintag.add("zhoufu_judge")
       cards[0].storage.zhoufu_source = player
       target.addTempSkill("zhoufu_judge", { player: "phaseEnd" })
     },
@@ -5450,52 +5445,27 @@ const skills = {
     subSkill: {
       judge: {
         audio: "zhoufu",
-        onremove: async (player) => {
+        onremove: (player) => {
           const cards = player.getExpansions("zhoufu_judge")
-          if (!cards.length) return
-          const source = cards[0].storage?.zhoufu_source
-          if (source?.isIn()) {
-            await source.gain(cards, player, "give", "bySelf")
-          } else {
-            // 施法者已不在场（比如目标还没到回合结束就阵亡），
-            // 干脆扔弃牌堆
-            await player.loseToDiscardpile(cards)
-          }
-          // 主动清理：gain 内部的 lose 阶段只清非 eternal_ 的 tag，
-          // eternal_zhoufu_judge 和 storage.zhoufu_source 必须手动清掉
-          for (const card of cards) {
-            if (card.hasGaintag("eternal_zhoufu_judge")) {
-              card.removeGaintag("eternal_zhoufu_judge")
-            }
-            if (card.storage) {
-              delete card.storage.zhoufu_source
-            }
+          if (cards.length) {
+            const source = cards[0].storage.zhoufu_source
+            source.gain(cards, player, "give", "bySelf")
           }
         },
         intro: {
           content: "expansion",
         },
         trigger: { player: "judgeBefore" },
-        // firstDo：保证 zhoufu_judge 比所有改判技能更早进入 judgeBefore 链，
-        // 这样既能在鬼才/反馈之前把 directresult 设为"咒"，
-        // 也能在他们之前把 trigger.zhoufu_used 这个快照标记塞进事件里。
-        // yingbing 后续读 event.zhoufu_used 就不会被改判影响。
-        firstDo: true,
         forced: true,
         charlotte: true,
         filter(event, player) {
           return (
-            !event.directresult &&
-            player.getExpansions("zhoufu_judge").length > 0
+            !event.directresult && player.getExpansions("zhoufu_judge").length
           )
         },
         async content(event, trigger, player) {
           const card = player.getExpansions("zhoufu_judge")[0]
           trigger.directresult = card
-          // 给事件挂一份"咒"的不可改判快照。
-          // 之后鬼才/反馈/止息 等改判技能可以随便替换 trigger.directresult，
-          // trigger.zhoufu_used 不会被他们触碰，yingbing 仍能正确判断。
-          trigger.zhoufu_used = card
         },
       },
     },
@@ -5503,31 +5473,442 @@ const skills = {
   // 影兵
   yingbing: {
     audio: 2,
-    // 听 judgeBefore。但 - 注意 - 我们不再读 event.directresult，
-    // 因为 directresult 会被鬼才/反馈等改判技能顶掉，改判后这里的 card 就不是"咒"了。
-    //
-    // 我们读 zhoufu_judge 在 content 里塞进事件的 trigger.zhoufu_used：
-    // 那是 zhoufu_judge 把 directresult 设为"咒"那一刻留下的快照，
-    // 之后的改判技能无法覆盖它，所以哪怕鬼才改了判，yingbing 仍能识别出
-    // "这次判定一开始是用'咒'做的"，从而正常摸两张牌。
-    //
-    // 顺序保证：zhoufu_judge 自己配了 firstDo，
-    // 所以 zhoufu_used 一定在所有改判技能（包括 yingbing 自己）触发之前就设好了，
-    // yingbing 不需要再加 lastDo。
     trigger: { global: "judgeBefore" },
     frequent: true,
     filter(event, player) {
-      const card = event.zhoufu_used
-      if (!card?.hasGaintag("eternal_zhoufu_judge")) return false
-      const source = card.storage?.zhoufu_source
-      if (!source || source !== player) return false
-      return player.isIn()
+      return event.directresult?.hasGaintag("zhoufu_judge")
     },
+    logTarget: "player",
     async content(event, trigger, player) {
       await player.draw(2)
     },
     ai: {
       combo: "zhoufu",
+    },
+  },
+  // 狂斧
+  oldkuangfu: {
+    trigger: { source: "damageSource" },
+    audio: "kuangfu",
+    filter(event) {
+      if (event._notrigger.includes(event.player)) {
+        return false
+      }
+      return (
+        event.card && event.card.name === "sha" && event.player.countCards("e")
+      )
+    },
+    logTarget: "player",
+    preHidden: true,
+    check(event, player) {
+      return get.attitude(player, event.player) <= 0
+    },
+    async content(event, trigger, player) {
+      const neg = get.attitude(player, trigger.player) <= 0
+      const result = await player
+        .choosePlayerCard("e", trigger.player)
+        .set("ai", (button) => {
+          if (_status.event.neg) {
+            return get.buttonValue(button)
+          }
+          return 0
+        })
+        .set("neg", neg)
+        .forResult()
+      if (result.bool) {
+        event.card = result.links[0]
+        let boolResult
+        if (player.canEquip(event.card)) {
+          const boolNext = player.chooseBool(
+            `是否将${get.translation(event.card)}置入自己的装备区？`,
+          )
+          boolNext.ai = () => true
+          boolResult = await boolNext.forResult()
+        } else {
+          event._result = { bool: false }
+          boolResult = event._result
+        }
+        if (boolResult.bool) {
+          trigger.player.$give(event.card, player, false)
+          player.equip(event.card)
+        } else {
+          await trigger.player.discard(event.card)
+        }
+      } else {
+        event.finish()
+      }
+    },
+  },
+  // 祖茂
+  // 引兵
+  yinbing: {
+    trigger: { player: "phaseJieshuBegin" },
+    direct: true,
+    audio: 2,
+    preHidden: true,
+    filter(event, player) {
+      return (
+        player.countCards("he", { type: "basic" }) < player.countCards("he")
+      )
+    },
+    marktext: "兵",
+    async content(event, trigger, player) {
+      const result = await player
+        .chooseCard(
+          [
+            1,
+            player.countCards("he") -
+              player.countCards("he", { type: "basic" }),
+          ],
+          "he",
+          get.prompt("yinbing"),
+          (card) => get.type(card) !== "basic",
+          "allowChooseAll",
+        )
+        .set("ai", (card) => 6 - get.value(card))
+        .setHiddenSkill("yinbing")
+        .forResult()
+      if (result.bool) {
+        player.logSkill("yinbing")
+        const addNext = player.addToExpansion(result.cards, player, "give")
+        addNext.gaintag.add("yinbing")
+        await addNext
+      }
+    },
+    onremove(player, skill) {
+      var cards = player.getExpansions(skill)
+      if (cards.length) {
+        player.loseToDiscardpile(cards)
+      }
+    },
+    intro: {
+      content: "expansion",
+      markcount: "expansion",
+    },
+    ai: {
+      effect: {
+        target(card, player, target, current) {
+          if (card.name === "sha" || card.name === "juedou") {
+            if (current < 0) {
+              return 1.2
+            }
+          }
+        },
+      },
+      threaten(player, target) {
+        if (target.getExpansions("yinbing").length) {
+          return 2
+        }
+        return 1
+      },
+      combo: "juedi",
+    },
+    subSkill: {
+      discard: {
+        audio: "yinbing",
+        trigger: { player: "damageEnd" },
+        forced: true,
+        filter(event, player) {
+          return (
+            event.card &&
+            player.getExpansions("yinbing").length > 0 &&
+            (event.card.name === "sha" || event.card.name === "juedou")
+          )
+        },
+        async content(event, trigger, player) {
+          const result = await player
+            .chooseCardButton(
+              "移去一张引兵牌",
+              true,
+              player.getExpansions("yinbing"),
+            )
+            .forResult()
+          if (result.bool) {
+            await player.loseToDiscardpile(result.links)
+          }
+        },
+      },
+    },
+    group: "yinbing_discard",
+  },
+  // 绝地
+  juedi: {
+    trigger: { player: "phaseZhunbeiBegin" },
+    filter(event, player) {
+      return player.getExpansions("yinbing").length > 0
+    },
+    audio: 2,
+    async content(event, trigger, player) {
+      const result = await player
+        .chooseTarget(
+          get.prompt2("juedi"),
+          true,
+          (card, player, target) => player.hp >= target.hp,
+        )
+        .set("ai", (target) => {
+          var player = _status.event.player
+          var att = get.attitude(player, target)
+          if (att < 2) {
+            return att - 10
+          }
+          var num = att / 10
+          if (target === player) {
+            num += player.maxHp - player.countCards("h") + 0.5
+          } else {
+            num += _status.event.n2 * 2
+            if (target.isDamaged()) {
+              if (target.hp === 1) {
+                num += 3
+              } else if (target.hp === 2) {
+                num += 2
+              } else {
+                num += 0.5
+              }
+            }
+          }
+          if (target.hasJudge("lebu")) {
+            num /= 2
+          }
+          return num
+        })
+        .set("n2", player.getExpansions("yinbing").length)
+        .forResult()
+      if (result.bool) {
+        player.line(result.targets[0], "green")
+        const cards = player.getExpansions("yinbing")
+        if (result.targets[0] === player) {
+          await player.loseToDiscardpile(cards)
+          await player.draw(cards.length)
+        } else {
+          const target = result.targets[0]
+          await player.give(cards, target, "give")
+          await target.recover()
+        }
+      }
+    },
+    ai: {
+      combo: "yinbing",
+    },
+  },
+  // 旧诸葛诞
+  // 举义
+  oldjuyi: {
+    audio: "juyi",
+    derivation: ["benghuai", "oldweizhong"],
+    trigger: { player: "phaseZhunbeiBegin" },
+    filter(event, player) {
+      return player.maxHp > game.countPlayer() && player.isDamaged()
+    },
+    forced: true,
+    juexingji: true,
+    skillAnimation: true,
+    animationColor: "thunder",
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.drawTo(player.maxHp)
+      await player.addSkills(["benghuai", "oldweizhong"])
+    },
+  },
+  // 威重
+  oldweizhong: {
+    audio: "weizhong",
+    inherit: "weizhong",
+    async content(event, trigger, player) {
+      await player.draw({
+        num: 1,
+      })
+    },
+  },
+  // 旧孙鲁育
+  // 魅步
+  oldmeibu: {
+    audio: "meibu",
+    trigger: { global: "phaseUseBegin" },
+    filter(event, player) {
+      return (
+        event.player !== player &&
+        get.distance(event.player, player, "attack") > 1
+      )
+    },
+    logTarget: "player",
+    check(event, player) {
+      if (get.attitude(player, event.player) >= 0) {
+        return false
+      }
+      var e2 = player.getEquip(2)
+      if (e2) {
+        if (e2.name === "tengjia" || e2.name === "rewrite_tengjia") {
+          return true
+        }
+        if (e2.name === "bagua" || e2.name === "rewrite_bagua") {
+          return true
+        }
+      }
+      return player.countCards("h", "shan") > 0
+    },
+    content() {
+      var target = trigger.player
+      target.addTempSkill("oldmeibu_viewas")
+      target.addTempSkill("oldmeibu_range")
+      target.storage.oldmeibu = player
+      target.markSkillCharacter(
+        "oldmeibu",
+        player,
+        "魅步",
+        `锦囊牌本回合均视为【杀】且本回合${get.translation(player)}视为在攻击范围内`,
+      )
+    },
+    ai: {
+      expose: 0.2,
+    },
+    subSkill: {
+      range: {
+        mod: {
+          targetInRange(card, player, target) {
+            if (card.name === "sha" && target === player.storage.oldmeibu) {
+              return true
+            }
+          },
+        },
+        onremove(player) {
+          game.broadcast((player) => {
+            if (player.marks.oldmeibu) {
+              player.marks.oldmeibu.delete()
+              delete player.marks.oldmeibu
+            }
+          }, player)
+          if (player.marks.oldmeibu) {
+            player.marks.oldmeibu.delete()
+            delete player.marks.oldmeibu
+            game.addVideo("unmark", player, "oldmeibu")
+          }
+        },
+      },
+      viewas: {
+        mod: {
+          cardEnabled(card, player) {
+            if (card.name !== "sha" && get.type(card, "trick") === "trick") {
+              return false
+            }
+          },
+          cardUsable(card, player) {
+            if (card.name !== "sha" && get.type(card, "trick") === "trick") {
+              return false
+            }
+          },
+          cardRespondable(card, player) {
+            if (card.name !== "sha" && get.type(card, "trick") === "trick") {
+              return false
+            }
+          },
+          cardSavable(card, player) {
+            if (card.name !== "sha" && get.type(card, "trick") === "trick") {
+              return false
+            }
+          },
+        },
+        enable: ["chooseToUse", "chooseToRespond"],
+        filterCard(card) {
+          return get.type(card, "trick") === "trick"
+        },
+        viewAs: { name: "sha" },
+        check() {
+          return 1
+        },
+        ai: {
+          effect: {
+            target(card, player, target, current) {
+              if (get.tag(card, "respondSha") && current < 0) {
+                return 0.8
+              }
+            },
+          },
+          respondSha: true,
+          order: 4,
+          useful: -1,
+          value: -1,
+        },
+      },
+    },
+  },
+  // 穆穆
+  oldmumu: {
+    audio: "mumu",
+    trigger: { player: "phaseJieshuBegin" },
+    filter(event, player) {
+      return (
+        !player.hasHistory("sourceDamage", (evt) => evt.isPhaseUsing(player)) &&
+        game.hasPlayer((current) => {
+          if (current === player) {
+            return current.getEquips(1).length > 0
+          }
+          return (
+            current.getEquips(1).length > 0 || current.getEquips(2).length > 0
+          )
+        })
+      )
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      const result = await player
+        .chooseTarget(
+          get.prompt("mumu"),
+          "弃置场上的一张武器牌，然后摸一张牌，或者将场上的一张防具牌移动至你的装备区里（替换原防具）",
+          (card, player, target) => {
+            if (target === player) {
+              return target.getEquips(1).length > 0
+            }
+            return (
+              target.getEquips(1).length > 0 || target.getEquips(2).length > 0
+            )
+          },
+        )
+        .set("ai", (target) => {
+          var player = _status.event.player
+          var att = get.attitude(player, target)
+          if (target.getEquip(2) && player.hasEmptySlot(2)) {
+            return -2 * att
+          }
+          return -att
+        })
+        .forResult()
+      if (!result.bool || !result.targets?.length) {
+        return
+      }
+      const target = result.targets[0]
+      const e1 = target.getEquips(1)
+      const e2 = target.getEquips(2)
+      event.e1 = e1
+      event.e2 = e2
+      let result2 = result
+      if (e1.length && e2.length) {
+        result2 = await player
+          .chooseControl("武器牌", "防具牌")
+          .set("ai", () => {
+            if (_status.event.player.getEquip(2)) {
+              return "武器牌"
+            }
+            return "防具牌"
+          })
+          .forResult()
+      } else if (e1.length) {
+        event.choice = "武器牌"
+      } else {
+        event.choice = "防具牌"
+      }
+      const choice = event.choice || result2.control
+      if (choice === "武器牌") {
+        if (event.e1) {
+          await target.discard(event.e1)
+        }
+        await player.draw()
+      } else {
+        if (event.e2) {
+          const equipNext = player.equip(event.e2[0])
+          target.$give(event.e2, player)
+          await equipNext
+        }
+      }
     },
   },
 }

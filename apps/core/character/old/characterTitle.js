@@ -73,4 +73,8 @@ export default {
   daxiaoqiao: "江东之花",
   sp_xiahoushi: "疾冲之恋",
   zhangbao: "地公将军",
+  old_panfeng: "联军上将",
+  zumao: "碧血染赤帻",
+  old_zhugedan: "薤露蒿里",
+  old_sunluyu: "舍身饲虎",
 }

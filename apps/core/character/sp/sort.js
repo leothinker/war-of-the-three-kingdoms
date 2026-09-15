@@ -59,13 +59,18 @@ const characterSort = {
     "dongcheng",
     "liangxing",
   ],
-  sp_default: ["ol_zhangchunhua", "ol_xuelingyun", "wolongfengchu"],
+  sp_2026: [
+    "ol_zhangchunhua",
+    "ol_xuelingyun",
+    "re_zhangxingcai",
+    "wolongfengchu",
+  ],
 }
 
 const characterSortTranslate = {
   sp_2020: "珍藏版（2020）",
   sp_2022: "珍藏版（2022）",
-  sp_default: "桌游志SP",
+  sp_2026: "珍藏版（2026）",
 }
 
 export { characterSort, characterSortTranslate }

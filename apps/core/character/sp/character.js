@@ -319,6 +319,13 @@ const characters = {
     hp: 3,
     skills: ["jueqing", "shangshi", "jianmie"],
   },
+  re_zhangxingcai: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["reshenxian", "qiangwu"],
+    dieAudios: ["zhangxingcai"],
+  },
 
   // ol_xuelingyun: {
   //   sex: "female",

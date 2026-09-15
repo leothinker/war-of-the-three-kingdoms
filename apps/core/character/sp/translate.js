@@ -410,6 +410,11 @@ const translates = {
   qiaozhi_info:
     "出牌阶段，你可以弃置一张牌并亮出牌堆顶的两张牌，然后获得其中一张，此技能失效直到你失去以此法获得的牌。",
 
+  re_zhangxingcai: "张星彩",
+  reshenxian: "甚贤",
+  reshenxian_info:
+    "你的回合外，当其他角色因弃置而失去牌后，若其中有基本牌，你可以摸一张牌。",
+
   wolongfengchu: "卧龙凤雏",
   youlong: "游龙",
   youlong_info:

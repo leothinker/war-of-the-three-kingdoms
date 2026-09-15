@@ -141,6 +141,9 @@ export default {
   guozhan_mobile: ["gz_caoying", "gz_guansuo", "gz_sp_duyu", "gz_mb_luxun"],
   guozhan_online: [
     "gz_ol_wangrong",
+    "gz_ol_caozhi",
+    "gz_ol_sunjun",
+    "gz_ol_jianshuo",
     "gz_re_xusheng",
     "gz_re_lvbu",
     "gz_re_taishici",

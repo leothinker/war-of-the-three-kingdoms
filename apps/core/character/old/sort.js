@@ -73,6 +73,10 @@ const characterSort = {
     "daxiaoqiao",
     "sp_xiahoushi",
     "zhangbao",
+    "old_panfeng",
+    "zumao",
+    "old_zhugedan",
+    "old_sunluyu",
   ],
 }
 

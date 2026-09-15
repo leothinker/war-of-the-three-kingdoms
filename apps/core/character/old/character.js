@@ -451,6 +451,35 @@ const characters = {
     hp: 3,
     skills: ["zhoufu", "yingbing"],
   },
+  old_panfeng: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["oldkuangfu"],
+    dieAudios: ["panfeng"],
+  },
+  zumao: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["yinbing", "juedi"],
+  },
+  old_zhugedan: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["gongao", "oldjuyi"],
+    names: "诸葛|诞",
+    clans: ["琅琊诸葛氏"],
+    dieAudios: ["zhugedan"],
+  },
+  old_sunluyu: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["oldmeibu", "oldmumu"],
+    dieAudios: ["sunluyu"],
+  },
 }
 
 export default characters
