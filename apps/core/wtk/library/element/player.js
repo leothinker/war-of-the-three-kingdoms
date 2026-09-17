@@ -1777,13 +1777,7 @@ export class Player extends HTMLDivElement {
    */
   hasDisabledSlot(type) {
     if (type === "horse" || type === "equip3_4") {
-      return (
-        this.hasDisabledSlot(3) &&
-        (get.is.mountCombined() || this.hasDisabledSlot(4))
-      )
-    }
-    if (get.is.mountCombined() && type === "equip4") {
-      return false
+      return this.hasDisabledSlot(3) && this.hasDisabledSlot(4)
     }
     return this.countDisabledSlot(type) > 0
   }
@@ -1806,9 +1800,6 @@ export class Player extends HTMLDivElement {
     if (typeof type === "number") {
       type = `equip${type}`
     }
-    if (get.is.mountCombined() && type === "equip4") {
-      return 0
-    }
     num = map[type]
     if (typeof num === "number" && num > 0) {
       return num
@@ -1822,12 +1813,7 @@ export class Player extends HTMLDivElement {
    */
   hasEmptySlot(type) {
     if (type === "horse" || type === "equip3_4") {
-      return (
-        this.hasEmptySlot(3) && (get.is.mountCombined() || this.hasEmptySlot(4))
-      )
-    }
-    if (get.is.mountCombined() && type === "equip4") {
-      return false
+      return this.hasEmptySlot(3) && this.hasEmptySlot(4)
     }
     return this.countEmptySlot(type) > 0
   }
@@ -1876,8 +1862,6 @@ export class Player extends HTMLDivElement {
       type = `equip${type}`
     } else if (type === "equip3_4") {
       type = "equip3"
-    } else if (get.is.mountCombined() && type === "equip4") {
-      return 0
     }
     return Math.max(
       0,
@@ -1900,17 +1884,11 @@ export class Player extends HTMLDivElement {
    */
   hasEnabledSlot(type) {
     if (type === "horse" || type === "equip3_4") {
-      return (
-        this.hasEnabledSlot(3) &&
-        (get.is.mountCombined() || this.hasEnabledSlot(4))
-      )
+      return this.hasEnabledSlot(3) && this.hasEnabledSlot(4)
     }
     // else if(type=='equip3_4'){
     // 	type='equip3';
     // }
-    if (get.is.mountCombined() && type === "equip4") {
-      return false
-    }
     return this.countEnabledSlot(type) > 0
   }
   /**
@@ -1931,9 +1909,6 @@ export class Player extends HTMLDivElement {
     }
     if (typeof type === "number") {
       type = `equip${type}`
-    }
-    if (get.is.mountCombined() && type === "equip4") {
-      return 0
     }
     let slots = 1
     num = map[type]
@@ -2193,9 +2168,6 @@ export class Player extends HTMLDivElement {
   $syncDisable(map) {
     //TODO:虚拟装备牌的添加暂时没有考虑到废除装备栏的情况，会出现排序错误的问题。需要手动设置排序。
     const suits = { equip3: "+1马栏", equip4: "-1马栏", equip6: "特殊栏" }
-    if (get.is.mountCombined()) {
-      suits.equip3 = "坐骑栏"
-    }
     if (!map) {
       map = this.disabledSlots || {}
     }
@@ -2276,19 +2248,8 @@ export class Player extends HTMLDivElement {
    */
   canEquip(name, replace) {
     const ranges = get.subtypes(name),
-      rangex = [],
-      combined = get.is.mountCombined()
-    if (combined) {
-      ranges.forEach((type) => {
-        if (type === "equip3" || type === "equip4") {
-          rangex.add("equip3_4")
-        } else {
-          rangex.add(type)
-        }
-      })
-    } else {
-      rangex.push(...new Set(ranges))
-    }
+      rangex = []
+    rangex.push(...new Set(ranges))
     if (get.itemtype(name) === "card") {
       const owner = get.owner(name, "judge")
       if (owner && !lib.filter.canBeGained(name, this, owner)) {
@@ -3170,15 +3131,6 @@ export class Player extends HTMLDivElement {
     if (lib.animate.card[card.name]) {
       lib.animate.card[card.name].apply(this, arguments)
     } else {
-      if (!lib.config.show_card_prompt) {
-        return
-      }
-      if (get.type(card) === "equip" && lib.config.hide_card_prompt_equip) {
-        return
-      }
-      if (get.type(card) === "basic" && lib.config.hide_card_prompt_basic) {
-        return
-      }
       if (popname) {
         this.popup({ name: card.name, nature: card.nature }, nature, false)
       } else {
@@ -15696,7 +15648,7 @@ export class Player extends HTMLDivElement {
           ["name", "suit", "number", "nature"].every((key) => {
             const card = curEvent.cards[0]
             if (key === "nature") {
-              if (card.nature == void 0 && curEvent.card.nature === false) {
+              if (card.nature === void 0 && curEvent.card.nature === false) {
                 return true
               }
             }
@@ -15708,11 +15660,11 @@ export class Player extends HTMLDivElement {
       //////////////////////////////////////更改部分结束喵///////////////////////////////////////
     }
     var node
-    if (card == void 0 || card.length === 0) return
+    if (card === void 0 || card.length === 0) return
     var cardx = card.copy("thrown")
     if (id) cardx.node.throw_id = id
     node = this.$throwordered(cardx, nosource, cardsetion)
-    if (time != void 0) {
+    if (time !== void 0) {
       node.fixed = true
       setTimeout(() => {
         node.delete()
@@ -16342,10 +16294,7 @@ export class Player extends HTMLDivElement {
       const num = get.equipNum(card)
       let remove = false
       if (card.name.indexOf("empty_equip") === 0) {
-        if ((num === 4 || num === 3) && get.is.mountCombined()) {
-          remove =
-            !this.hasEmptySlot("equip3_4") || this.getEquips("equip3_4").length
-        } else if (!this.hasEmptySlot(num) || this.getEquips(num).length) {
+        if (!this.hasEmptySlot(num) || this.getEquips(num).length) {
           remove = true
         }
         if (remove) {
@@ -16381,19 +16330,11 @@ export class Player extends HTMLDivElement {
     })
     for (let i = 1; i <= 5; i++) {
       let add = false
-      if ((i === 4 || i === 3) && get.is.mountCombined()) {
-        add =
-          this.hasEmptySlot("equip3_4") && !this.getEquips("equip3_4").length
-      } else {
-        add = this.hasEmptySlot(i) && !this.getEquips(i).length
-      }
+      add = this.hasEmptySlot(i) && !this.getEquips(i).length
       if (
         add &&
         !cardsResume.some((card) => {
           const num = get.equipNum(card)
-          if ((i === 4 || i === 3) && get.is.mountCombined()) {
-            return num === 4 || num === 3
-          }
           return num === i
         })
       ) {

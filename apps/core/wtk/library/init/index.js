@@ -215,43 +215,6 @@ export class LibInit {
       : path
     if (path.startsWith("http")) {
       scriptSource += `?rand=${get.id()}`
-    } else if (
-      lib.config.fuck_sojson &&
-      !_status.connectMode &&
-      scriptSource.includes("extension") !== -1 &&
-      scriptSource.startsWith(lib.assetURL)
-    ) {
-      const pathToRead = scriptSource.slice(lib.assetURL.length)
-      const alertMessage = `检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`
-      if (typeof game.readFileAsText === "function") {
-        game.readFileAsText(
-          pathToRead,
-          (result) => {
-            if (
-              result.includes("sojson") ||
-              result.includes("jsjiami") ||
-              result.includes("var _0x")
-            ) {
-              alert(alertMessage)
-            }
-          },
-          () => void 0,
-        )
-      } else if (location.origin !== "file://") {
-        lib.init.req(
-          pathToRead,
-          (result) => {
-            if (
-              result.includes("sojson") ||
-              result.includes("jsjiami") ||
-              result.includes("var _0x")
-            ) {
-              alert(alertMessage)
-            }
-          },
-          () => void 0,
-        )
-      }
     }
     const script = document.createElement("script")
     //script.type = "module";

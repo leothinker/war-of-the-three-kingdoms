@@ -1055,23 +1055,6 @@ export class Get {
     }
     return str
   }
-  /**
-   * 返回玩家是否处于幸运星状态
-   * @param { Player } player
-   * @returns { boolean }
-   */
-  isLuckyStar(player) {
-    if (player?.hasSkillTag("luckyStar")) {
-      return true
-    }
-    if (_status.connectMode) {
-      return false
-    }
-    return (
-      (!player || player === game.me || player.isUnderControl()) &&
-      lib.config.lucky_star === true
-    )
-  }
   infoHp(hp) {
     if (typeof hp === "number") {
       return hp

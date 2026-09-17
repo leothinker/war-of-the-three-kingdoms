@@ -12,7 +12,7 @@
 
 import { _status, ai, get, lib, ui } from "wtk"
 import { save } from "@/util/config.js"
-import { delay, isClass } from "@/util/index.js"
+import { delay } from "@/util/index.js"
 import { security } from "@/util/sandbox.js"
 import { debounce } from "@/util/utils.js"
 import { Check } from "./check.js"
@@ -1732,11 +1732,6 @@ export class Game {
    * @param { false } [pause]
    */
   showHistory(pause) {
-    if (lib.config.show_history === "left") {
-      ui.window.classList.add("leftbar")
-    } else if (lib.config.show_history === "right") {
-      ui.window.classList.add("rightbar")
-    }
     if (pause !== false && ui.pause) {
       ui.pause.show()
     }
@@ -3117,20 +3112,6 @@ export class Game {
    * @param {*} [url]
    */
   import(type, content, url) {
-    if (type === "extension") {
-      const promise = game.loadExtension(content).then((name) => {
-        if (typeof _status.extensionLoaded === "undefined") {
-          _status.extensionLoaded = []
-        }
-        _status.extensionLoaded.add(name)
-        return name
-      })
-      if (typeof _status.extensionLoading === "undefined") {
-        _status.extensionLoading = []
-      }
-      _status.extensionLoading.add(promise)
-      return promise
-    }
     if (!lib.imported[type]) {
       lib.imported[type] = {}
     }
@@ -3160,202 +3141,6 @@ export class Game {
     _status.importing[type].add(promise)
 
     return promise
-  }
-  async loadExtension(object) {
-    let stopImporting = false
-    if (typeof object === "function") {
-      const extensionFilter = object.filter || (() => true)
-      if (isClass(object)) {
-        object = (await object.init?.()) ?? new object()
-      } else {
-        object = await object(lib, game, ui, get, ai, _status)
-      }
-      if ((await extensionFilter()) !== true) {
-        stopImporting = true
-      }
-    }
-    const name = object.name,
-      extensionName = `extension_${name}`,
-      extensionMenu = {
-        enable: {
-          name: "开启",
-          init: true,
-        },
-      }
-    object.config ??= {}
-    if (object.package) {
-      const author = Object.getOwnPropertyDescriptor(object.package, "author")
-      if (author) {
-        extensionMenu.author = {
-          get name() {
-            return `作者：${this.author}`
-          },
-          clear: true,
-          nopointer: true,
-        }
-        Object.defineProperty(extensionMenu.author, "author", author)
-      }
-      const intro = Object.getOwnPropertyDescriptor(object.package, "intro")
-      if (intro) {
-        extensionMenu.intro = {
-          clear: true,
-          nopointer: true,
-        }
-        Object.defineProperty(extensionMenu.intro, "name", intro)
-      }
-      if (object.package.translation) {
-        lib.translate[extensionName] = object.package.translation
-      }
-    }
-    const addOptions = (target, source) => {
-      if (source) {
-        const descriptors = Object.fromEntries(
-          Object.keys(source).map((key) => [
-            key,
-            Object.getOwnPropertyDescriptor(source, key),
-          ]),
-        )
-        Object.defineProperties(target, descriptors)
-      }
-    }
-    addOptions(extensionMenu, object.config)
-    addOptions(lib.help, object.help)
-
-    if (object.editable !== false && lib.config.show_extensionmaker) {
-      extensionMenu.edit = {
-        name: "编辑此扩展",
-        clear: true,
-        onclick() {
-          if (game.editExtension && lib.extensionPack?.[name]) {
-            game.editExtension(name)
-          } else {
-            alert("无法编辑未启用的扩展，请启用此扩展并重启后重试")
-          }
-        },
-      }
-    }
-    extensionMenu.delete = {
-      name: "删除此扩展",
-      clear: true,
-      onclick() {
-        if (this.innerHTML !== "<span>确认删除</span>") {
-          this.innerHTML = "<span>确认删除</span>"
-          new Promise((resolve) => setTimeout(resolve, 1000)).then(
-            () => (this.innerHTML = "<span>删除此扩展</span>"),
-          )
-          return
-        }
-        const page = this.parentNode,
-          start = page.parentNode.previousSibling
-        page.remove()
-        if (start) {
-          const pageInStart = Array.from(start.childNodes).find(
-            (childNode) => childNode.link === page,
-          )
-          if (pageInStart) {
-            let active = false
-            if (pageInStart.classList.contains("active")) {
-              active = true
-            }
-            pageInStart.remove()
-            if (active) {
-              start.firstChild.classList.add("active")
-              start.nextSibling.appendChild(start.firstChild.link)
-            }
-          }
-        }
-        game.removeExtension(name)
-        if (typeof object.onremove === "function") {
-          object.onremove()
-        }
-      },
-    }
-
-    lib.extensionMenu[extensionName] = extensionMenu
-
-    if (_status.importingExtension) {
-      game.importedPack = object
-      return
-    }
-    if (stopImporting || !object || !lib.config[`${extensionName}_enable`]) {
-      return
-    }
-    Object.keys(object.config)
-      .filter((key) => !(`${extensionName}_${key}` in lib.config))
-      .forEach((key) => {
-        const value = object.config[key]
-        if (value && "init" in value) {
-          game.saveConfig(`${extensionName}_${key}`, value.init)
-        }
-      })
-    const config = {}
-    Object.keys(lib.config)
-      .filter((key) => key !== extensionName && key.startsWith(extensionName))
-      .forEach((key) => {
-        const keyName = key.slice(extensionName.length + 1)
-        config[keyName] = lib.config[key]
-      })
-    try {
-      let extensionPack
-      if (object.package) {
-        extensionPack = object.package
-        object.package.files = object.files ?? {}
-        const extensionPackFiles = {
-          character: [],
-          card: [],
-          skill: [],
-          audio: [],
-          ...object.package.files,
-        }
-      } else {
-        extensionPack = {}
-      }
-      lib.extensionPack[name] = extensionPack
-      const { arenaReady, content, prepare, precontent } = object
-      extensionPack.code = {
-        arenaReady,
-        content,
-        prepare,
-        precontent,
-        help: object.help,
-        config: object.config,
-      }
-      try {
-        if (precontent) {
-          _status.extension = name
-
-          await precontent.call(object, config)
-          delete _status.extension
-        }
-        if (prepare) {
-          lib.onprepare?.push(prepare)
-        }
-      } catch (e) {
-        console.error(`加载《${name}》扩展的precontent时出现错误。`, e)
-        if (!lib.config.ignore_error) {
-          alert(`加载《${name}》扩展的precontent时出现错误。
-该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。
-错误信息: 
-${e instanceof Error ? e.stack : String(e)}`)
-        }
-      }
-
-      if (content) {
-        lib.extensions.push([
-          name,
-          content,
-          config,
-          _status.evaluatingExtension,
-          object.package ?? {},
-          object.connect,
-          arenaReady,
-        ])
-      }
-    } catch (e) {
-      console.error(e)
-    }
-
-    return name
   }
   /**
    * 下载文件
@@ -6856,7 +6641,7 @@ ${e instanceof Error ? e.stack : String(e)}`)
         list.unshift(arguments[i])
       }
     }
-    const num = parseInt(lib.config.recent_character_number, 10)
+    const num = parseInt(12, 10)
     if (list.length > num) {
       list.splice(num)
     }
@@ -9750,53 +9535,18 @@ ${e instanceof Error ? e.stack : String(e)}`)
       }
     })
     const node = ui.create.div()
-    node.innerHTML = lib.config.log_highlight ? str : str2
+    node.innerHTML = str
     ui.sidebar.insertBefore(node, ui.sidebar.firstChild)
-    game.addVideo("log", null, lib.config.log_highlight ? str : str2)
-    game.broadcast(
-      (str, str2) => game.log(lib.config.log_highlight ? str : str2),
-      str,
-      str2,
-    )
+    game.addVideo("log", null, str)
+    game.broadcast((str, str2) => game.log(str), str, str2)
     if (!_status.video && !game.online) {
       if (logvid) {
-        game.logv(
-          logvid,
-          `<div class="text center">${lib.config.log_highlight ? str : str2}</div>`,
-        )
+        game.logv(logvid, `<div class="text center">${str}</div>`)
       } else {
         logvid = _status.event.getLogv()
       }
     }
-    if (lib.config.show_log === "off" || game.chess) {
-      return
-    }
-    const nodeentry = node.cloneNode(true)
-    ui.arenalog.insertBefore(nodeentry, ui.arenalog.firstChild)
-    if (!lib.config.clear_log) {
-      while (
-        ui.arenalog.childNodes.length &&
-        ui.arenalog.scrollHeight > ui.arenalog.offsetHeight
-      ) {
-        ui.arenalog.lastChild.remove()
-      }
-    }
-    if (!lib.config.low_performance) {
-      nodeentry.style.transition = "all 0s"
-      nodeentry.style.marginBottom = `-${nodeentry.offsetHeight}px`
-      ui.refresh(nodeentry)
-      nodeentry.style.transition = ""
-      nodeentry.style.marginBottom = ""
-    }
-    if (!lib.config.clear_log) {
-      return
-    }
-    nodeentry.timeout = setTimeout(() => nodeentry.delete(), 1000)
-    Array.from(ui.arenalog.childNodes).forEach((value) => {
-      if (!value.timeout) {
-        value.remove()
-      }
-    })
+    return
   }
   /**
    * @param { Player } player
@@ -10000,10 +9750,7 @@ ${e instanceof Error ? e.stack : String(e)}`)
     if (lib.config.touchscreen) {
       node.addEventListener("touchstart", ui.click.intro)
     } else {
-      node.addEventListener(
-        lib.config.pop_logv ? "mousemove" : "click",
-        ui.click.logv,
-      )
+      node.addEventListener("click", ui.click.logv)
       node.addEventListener("mouseleave", ui.click.logvleave)
     }
     node.logvid = logvid

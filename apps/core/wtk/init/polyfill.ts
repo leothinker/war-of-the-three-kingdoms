@@ -49,9 +49,6 @@ HTMLDivElement.prototype.hide = function () {
  * @type { typeof HTMLDivElement['prototype']['unfocus'] }
  */
 HTMLDivElement.prototype.unfocus = function () {
-  if (lib.config.transparent_dialog) {
-    this.classList.add("transparent")
-  }
   return this
 }
 /**

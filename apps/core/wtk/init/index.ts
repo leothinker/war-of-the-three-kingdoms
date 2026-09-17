@@ -15,7 +15,6 @@ import {
   loadCard,
   loadCardPile,
   loadCharacter,
-  loadExtension,
   loadMode,
   loadPlay,
 } from "./loading.js"
@@ -60,9 +59,7 @@ export async function boot() {
     lib.translate[name] = get.config("translate")[name]
   }
 
-  if (config.get("compatible") ?? true) {
-    await import("./compatible.js")
-  }
+  await import("./compatible.js")
 
   // 初始化security
   await security.initSecurity({ lib, game, ui, get, ai, _status })
@@ -75,7 +72,6 @@ export async function boot() {
       game.saveConfig("totouched", true)
       if (typeof lib.device !== "undefined") {
         game.saveConfig("low_performance", true)
-        game.saveConfig("confirm_exit", true)
         game.saveConfig("touchscreen", true)
         game.saveConfig("fold_mode", false)
         if (ua.indexOf("ipad") === -1) {
@@ -166,12 +162,6 @@ export async function boot() {
       config.get("all").background_music.push(name)
       music[name] = pack.music[name]
     }
-    if (config.get("customBackgroundMusic")) {
-      for (const name in config.get("customBackgroundMusic")) {
-        config.get("all").background_music.push(name)
-        music[name] = config.get("customBackgroundMusic")[name]
-      }
-    }
     music.music_random = "随机播放"
     music.music_off = "关闭"
   }
@@ -201,12 +191,6 @@ export async function boot() {
       `@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`,
       0,
     )
-  }
-
-  if (config.get("extension_sources")) {
-    for (const name in config.get("extension_sources")) {
-      lib.configMenu.general.config.extension_source.item[name] = name
-    }
   }
 
   // 三国杀更新日志
@@ -614,10 +598,6 @@ export async function boot() {
     if (funcName.startsWith("setMode_")) {
       delete lib.init[funcName]
     }
-  }
-
-  if (Array.isArray(lib.extensions)) {
-    await Promise.allSettled(lib.extensions.map(loadExtension))
   }
 
   if (lib.init.startBefore) {
@@ -1033,7 +1013,7 @@ function setWindowListener() {
   }
 
   window.onbeforeunload = (e) => {
-    if (config.get("confirm_exit") && !_status.reloading) {
+    if (!_status.reloading) {
       e.preventDefault()
       e.returnValue = ""
     }

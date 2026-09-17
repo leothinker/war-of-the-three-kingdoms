@@ -614,13 +614,6 @@ export class Create {
       }
       intro.innerHTML = get.translation(rarity)
     }
-    /*if((button.link=='xushu'||button.link=='xin_xushu'||button.link=='jsrg_guanyu')&&button.node&&button.node.name&&button.node.group){
-			if(button.classList.contains('newstyle')){
-				button.node.name.dataset.nature='watermm';
-				button.node.group.dataset.nature='water';
-			}
-			else button.node.group.style.backgroundColor=get.translation('weiColor');
-		}*/
   }
   div() {
     var str, innerHTML, position, position2, style, divposition, listen
@@ -1958,13 +1951,8 @@ export class Create {
     dialog.classList.add("scroll1")
     dialog.classList.add("scroll2")
     dialog.classList.add("scroll3")
-    dialog.supportsPagination = Boolean(
-      parseInt(lib.config.showMax_character_number, 10),
-    )
-    dialog.paginationMaxCount.set(
-      "character",
-      parseInt(lib.config.showMax_character_number, 10),
-    )
+    dialog.supportsPagination = Boolean(parseInt(10, 10))
+    dialog.paginationMaxCount.set("character", parseInt(10, 10))
     dialog.addEventListener(
       lib.config.touchscreen ? "touchend" : "mouseup",
       () => {
@@ -2722,8 +2710,7 @@ export class Create {
     }
     lib.init.js(`${lib.assetURL}game`, "keyWords", () => {})
 
-    lib.updateURL =
-      lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding
+    lib.updateURL = lib.updateURLS.coding
 
     lib.init.cssstyles()
 
@@ -2757,11 +2744,7 @@ export class Create {
     ui.gameinfo = ui.create.div("#time", ui.window)
 
     ui.arenalog = ui.create.div("#arenalog", ui.arena)
-    if (lib.config.show_log === "off") {
-      ui.arenalog.style.display = "none"
-    } else {
-      ui.arenalog.dataset.position = lib.config.show_log
-    }
+    ui.arenalog.style.display = "none"
     ui.historybar = ui.create.div("#historybar.shadowed", ui.window)
     lib.setScroll(ui.historybar)
 
@@ -3494,38 +3477,6 @@ export class Create {
       lib.arenaReady?.shift()()
     }
     delete lib.arenaReady
-    /*if (lib.config.auto_check_update && !sessionStorage.getItem("auto_check_update")) {
-			setTimeout(() => {
-				sessionStorage.setItem("auto_check_update", "1");
-				game.checkForUpdate(false);
-			}, 3000);
-		}
-		if (!lib.config.asset_version) {
-			lib.onfree.push(function () {
-				setTimeout(function () {
-					if (!game.download) {
-						game.saveConfig("asset_version", "无");
-					} else {
-						var func = function () {
-							if (confirm("是否下载图片和字体素材？")) {
-								if (!ui.arena.classList.contains("menupaused")) {
-									ui.click.configMenu();
-									ui.click.menuTab("其它");
-								}
-								setTimeout(game.checkForAssetUpdate, 500);
-							} else {
-								game.saveConfig("asset_version", "无");
-							}
-						};
-						// if (_status.new_tutorial) {
-						// 	_status.new_tutorial = func;
-						// } else {
-						// 	func();
-						// }
-					}
-				}, 3000);
-			});
-		}*/
     if (localStorage.getItem(`${lib.configprefix}playback`)) {
       setTimeout(lib.init.onfree)
     }

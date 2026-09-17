@@ -1,10 +1,4 @@
 {
-  "extension_sources": {
-    "GitHub Proxy": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/libccy/wtk-extension/master/",
-    "FastGit": "https://raw.fgit.cf/libccy/wtk-extension/master/",
-    "GitHub": "https://raw.githubusercontent.com/libccy/wtk-extension/master/"
-  },
-  "extension_source": "GitHub Proxy",
   "forbidai": ["ns_liuzhang"],
   "forbidai_user": [],
   "forbidall": [],
@@ -84,10 +78,7 @@
   "connect_avatar": "caocao",
   "connect_nickname": "无名玩家",
   "config_menu": true,
-  "auto_popped_config": true,
-  "auto_popped_history": false,
   "auto_skill": true,
-  "auto_confirm": false,
   "enable_drag": true,
   "enable_pressure": false,
   "pressure_taptic": true,
@@ -112,7 +103,6 @@
   "favouriteMode": [],
   "recentIP": [],
   "brokenFile": [],
-  "max_loadtime": "20000",
   "theme": "simple",
   "layout": "long2",
   "card_style": "ol",
@@ -148,7 +138,6 @@
   "animation": true,
   "paused": false,
   "title": false,
-  "log_highlight": true,
   "modeconfig": false,
   "gameconfig": false,
   "appearence": false,

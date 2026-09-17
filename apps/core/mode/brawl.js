@@ -1485,13 +1485,14 @@ export default () => {
           },
         },
       },
-      new_huanhuazhizhan: {
-        name: "幻化三国",
+      huan: {
+        name: "幻",
         mode: "identity",
         intro: [
-          "所有角色受到1点伤害时，随机获得一张未加入游戏的武将牌，称为“副将”",
-          "一名角色至多持有3个“副将”，超过数量上限时须将相应数量的“副将”放回武将牌堆",
-          "玩家持有“副将”的所有技能",
+          "游戏开始时玩家选择的武将称之为“主将”，游戏中任何时候，你的角色势力、性别均与主将相同。",
+          "当任一角色受到1点伤害时，其可以从未加入本局游戏的武将牌库随机获得一张武将牌，正面向上置于自己的主将旁，称之为“副将”，其同时拥有主将和副将的所有技能。",
+          "副将的数量上限默认值为3（即每名角色最多同时拥有4张武将牌的技能）。任何时候，当副将的数量超过数量上限时，须选择相应数量的副将武将牌移除，直到副将数与数量上限相等。被移除的武将牌则返回武将牌库。",
+          "主将技：此武将牌为主将时才能发动的技能。<br>副将技：此武将牌为副将时才能发动的技能。",
         ],
         showcase: function (init) {
           let player
@@ -1506,10 +1507,10 @@ export default () => {
             return player
           }
           if (init) {
-            player = initPlayer("pot_yuji")
+            player = initPlayer("re_yuji")
             player.style.left = "calc(50% - 75px)"
             player.style.top = "20px"
-            player.nowName = "pot_yuji"
+            player.nowName = "re_yuji"
             this.appendChild(player)
             this.playernode = player
           } else {
@@ -1517,12 +1518,7 @@ export default () => {
           }
           let num = 0,
             num2 = 0,
-            nameList = [
-              "pot_yuji",
-              "ol_nanhualaoxian",
-              "pot_yuji_shadow",
-              "re_zuoci",
-            ],
+            nameList = ["re_yuji", "re_zuoci", "ol_yuji", "ol_zuoci"],
             names = game.initCharacterList()
           this.showcaseinterval = setInterval(() => {
             let dx, dy
@@ -2269,7 +2265,7 @@ export default () => {
             for (var i in pack.get) {
               get[i] = pack.get[i]
             }
-            lib.new_huanhuazhizhan = pack
+            lib.huan = pack
           }
           func(pack)
         },

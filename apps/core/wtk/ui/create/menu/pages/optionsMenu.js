@@ -1,13 +1,7 @@
 import JSZip from "jszip"
 import { _status, game, get, lib, ui } from "wtk"
 import { wtkInitialized } from "@/util/index.js"
-import {
-  clickMenuItem,
-  createConfig,
-  menuxpages,
-  openMenu,
-  popupContainer,
-} from "../index.js"
+import { createConfig, menuxpages, openMenu, popupContainer } from "../index.js"
 
 export const optionsMenu = (connectMenu) => {
   if (connectMenu) {
@@ -444,92 +438,6 @@ export const optionsMenu = (connectMenu) => {
               }
               fileReader.readAsText(fileToLoad, "UTF-8")
             }
-          }
-        } else if (j === "import_music") {
-          cfgnode.querySelector("button").onclick = function () {
-            if (_status.music_importing) {
-              return
-            }
-            _status.music_importing = true
-            var fileToLoad = this.previousSibling.files[0]
-            if (fileToLoad) {
-              if (!lib.config.customBackgroundMusic) {
-                lib.config.customBackgroundMusic = {}
-              }
-              var name = fileToLoad.name
-              if (name.includes(".")) {
-                name = name.slice(0, name.indexOf("."))
-              }
-              var link = (game.writeFile ? "cdv_" : "custom_") + name
-              if (lib.config.customBackgroundMusic[link]) {
-                if (
-                  !confirm(
-                    "已经存在文件名称相同的背景音乐，是否仍然要继续导入？",
-                  )
-                ) {
-                  _status.music_importing = false
-                  return
-                }
-                for (var i = 1; i < 1000; i++) {
-                  if (!lib.config.customBackgroundMusic[`${link}_${i}`]) {
-                    link = `${link}_${i}`
-                    break
-                  }
-                }
-              }
-              var callback = () => {
-                var nodexx = ui.background_music_setting
-                var nodeyy = nodexx._link.menu
-                var nodezz = nodexx._link.config
-                var musicname = link.slice(link.indexOf("_") + 1)
-                game.prompt(
-                  `###请输入音乐的名称###${musicname}`,
-                  true,
-                  (str) => {
-                    if (str) {
-                      musicname = str
-                    }
-                    lib.config.customBackgroundMusic[link] = musicname
-                    lib.config.background_music = link
-                    lib.config.all.background_music.add(link)
-                    game.saveConfig("background_music", link)
-                    game.saveConfig(
-                      "customBackgroundMusic",
-                      lib.config.customBackgroundMusic,
-                    )
-                    nodezz.item[link] = lib.config.customBackgroundMusic[link]
-                    var textMenu = ui.create.div(
-                      "",
-                      lib.config.customBackgroundMusic[link],
-                      nodeyy,
-                      clickMenuItem,
-                      nodeyy.childElementCount - 2,
-                    )
-                    textMenu._link = link
-                    nodezz.updatex.call(nodexx, [])
-                    _status.music_importing = false
-                    if (!_status._aozhan) {
-                      game.playBackgroundMusic()
-                    }
-                  },
-                )
-              }
-              if (game.writeFile) {
-                game.writeFile(
-                  fileToLoad,
-                  "audio/background",
-                  `${link}.mp3`,
-                  callback,
-                )
-              } else {
-                game.putDB("audio", link, fileToLoad, callback)
-              }
-            }
-          }
-        } else if (j === "extension_source") {
-          ui.extension_source = cfgnode
-          cfgnode.updateInner = function () {
-            this._link.choosing.innerHTML = lib.config.extension_source
           }
         }
         map[j] = cfgnode

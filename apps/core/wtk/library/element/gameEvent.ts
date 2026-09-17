@@ -297,16 +297,9 @@ export class GameEvent implements PromiseLike<void> {
         } else {
           this.#inContent = true
           const next = this.content(this).catch((error) => {
-            if (
-              lib.config.ignore_error ||
-              (_status.connectMode && !lib.config.debug)
-            ) {
-              game.print(`游戏出错：${this.name}`)
-              game.print(error.toString())
-              console.error(error)
-            } else {
-              throw error
-            }
+            game.print(`游戏出错：${this.name}`)
+            game.print(error.toString())
+            console.error(error)
           })
           await next.finally(() => (this.#inContent = false))
         }

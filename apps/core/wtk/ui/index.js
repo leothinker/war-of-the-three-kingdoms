@@ -681,11 +681,6 @@ export class UI {
               ui.dialog._heightset = ui.dialog.style.height || true
             }
             ui.dialog.style.height = `${ui.dialog.content.offsetHeight}px`
-            if (lib.config.show_log !== "off") {
-              ui.dialog.classList.add("scroll1")
-              ui.dialog.classList.add("scroll2")
-              return
-            }
           } else {
             if (typeof ui.dialog._heightset === "string") {
               ui.dialog.style.height = ui.dialog._heightset

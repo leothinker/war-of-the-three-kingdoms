@@ -1,16 +1,14 @@
 /// <reference types="vite/client" />
-import { _status, game, lib } from "wtk"
+import { game, lib } from "wtk"
 
 export async function importCardPack(name: string) {
   await importFunction("card", `/card/${name}`)
 }
 
 export async function importCharacterPack(name: string) {
-  const alreadyModernCharacterPack = lib.config.moderned_characters || []
-  const path =
-    import.meta.env.DEV || !alreadyModernCharacterPack.includes(name)
-      ? `/character/${name}/index`
-      : `/character/${name}`
+  const path = import.meta.env.DEV
+    ? `/character/${name}/index`
+    : `/character/${name}`
   await importFunction("character", path).catch((e) => {
     console.error(`武将包《${name}》加载失败`, e)
     // 		alert(`武将包《${name}》加载失败
@@ -28,9 +26,6 @@ export async function importExtension(name: string) {
     // @ts-expect-error ignore
     await game.import("extension", await createEmptyExtension(name))
     return
-  }
-  if (lib.config.fuck_sojson && !_status.connectMode) {
-    await checkExtensionSojson(name)
   }
   try {
     await importFunction("extension", `/extension/${name}/extension`)

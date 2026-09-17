@@ -903,21 +903,9 @@ export class Click {
     _status.clicked = true
   }
   pausehistory() {
-    if (!lib.config.auto_popped_history) {
-      return
-    }
-    if (!ui.sidebar.childNodes.length) {
-      return
-    }
-    var uiintro = ui.create.dialog("hidden")
-    uiintro.style.maxHeight = "400px"
-    uiintro.add(ui.sidebar)
-    return uiintro
+    return
   }
   pauseconfig() {
-    if (!lib.config.auto_popped_config) {
-      return
-    }
     if (get.is.phoneLayout()) {
       return
     }
@@ -3825,453 +3813,118 @@ export class Click {
           intro.removeChild(intro.lastChild)
         }
       }
-      // 样式二
-      if (
-        lib.config.show_characternamepinyin === "showPinyin2" ||
-        lib.config.show_skillnamepinyin === "showPinyin2" ||
-        lib.config.show_characternamepinyin === "showCodeIdentifier2" ||
-        lib.config.show_skillnamepinyin === "showCodeIdentifier2"
-      ) {
-        var nameinfo = get.character(name)
-        intro =
-          uiintro.querySelector(".characterintro") ||
-          ui.create.div(".characterintro", get.characterIntro(name), uiintro)
-        if (
-          lib.config.show_characternamepinyin === "showPinyin2" ||
-          lib.config.show_characternamepinyin === "showCodeIdentifier2"
-        ) {
-          var charactername = get.rawName2(name)
-          var characterpinyin =
-            lib.config.show_characternamepinyin === "showCodeIdentifier2"
-              ? name
-              : get.pinyin(charactername)
-          var charactersex = get.translation(nameinfo[0])
-          const charactergroups = get.is.double(name, true)
-          let charactergroup
-          if (charactergroups) {
-            charactergroup = charactergroups
-              .map((i) => get.translation(i))
-              .join("/")
+      // 样式一
+      //TODO: 这里的数据也暂时没有改成新格式，需要后续的修改
+      const nameInfo = get.character(name)
+      intro =
+        uiintro.querySelector(".characterintro") ||
+        ui.create.div(".characterintro", uiintro)
+      // 添加武将称号
+      let characterTitle = get.colorspan(
+          get.characterTitle(name, false, false),
+        ),
+        packName
+      for (const packname in lib.characterPack) {
+        if (name in lib.characterPack[packname]) {
+          let pack = lib.translate[`${packname}_character_config`],
+            sort
+          if (lib.characterSort[packname]) {
+            const sorted = lib.characterSort[packname]
+            for (const sortname in sorted) {
+              if (sorted[sortname].includes(name)) {
+                sort = `<span style = "font-size:small">[${lib.translate[sortname]}]</span>`
+                break
+              }
+            }
+          }
+          packName = `${pack}${sort ? `${sort}` : ""}`
+          if (characterTitle.length) {
+            characterTitle = `${characterTitle}<span style="color: white"> | ${packName}</span>`
           } else {
-            charactergroup = get.translation(nameinfo[1])
+            characterTitle = `<span style="color: white">${packName}</span>`
           }
-          var characterhp = nameinfo[2]
-          var characterintroinfo = get.characterIntro(name)
-          var spacemark = " | "
-          if (charactername.length > 3) {
-            spacemark =
-              '<span style="font-size:7px">' +
-              " " +
-              "</span>" +
-              "|" +
-              '<span style="font-size:7px">' +
-              " " +
-              "</span>"
-          }
-          // 获取武将称号
-          var charactertitle = get.characterTitle(name, false, false)
-          var titleHtml = ""
-          if (charactertitle.length) {
-            titleHtml = `<div class="character-title">${get.colorspan(charactertitle)}</div>`
-          }
-          let packName
-          for (const packname in lib.characterPack) {
-            if (name in lib.characterPack[packname]) {
-              let pack = lib.translate[`${packname}_character_config`],
-                sort
-              if (lib.characterSort[packname]) {
-                const sorted = lib.characterSort[packname]
-                for (const sortname in sorted) {
-                  if (sorted[sortname].includes(name)) {
-                    sort = `<span style = "font-size:small">[${lib.translate[sortname]}]</span>`
-                    break
-                  }
-                }
-              }
-              packName = `${pack}${sort ? `${sort}` : ""}`
-              titleHtml = `${titleHtml}<div class="character-title">${packName}</div>`
-              break
-            }
-          }
-          intro.innerHTML = `${titleHtml}<span style="font-weight:bold;margin-right:5px">${charactername}</span><span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">[${characterpinyin}]</span>${spacemark}${charactersex}${spacemark}${charactergroup}${spacemark}${characterhp}<span style="line-height:2"></span><br>${characterintroinfo}`
-
-          // 添加角色append
-          if (lib.characterAppend[name]) {
-            intro.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>${lib.characterAppend[name]}`
-          }
+          break
         }
-
-        var intro2 =
-          uiintro.querySelector(".intro2") ||
-          ui.create.div(".characterintro.intro2", uiintro)
-        list.addArray(get.character(name, 3) || [])
-        if (lib.config.touchscreen) {
-          lib.setScroll(intro)
-          lib.setScroll(intro2)
-          lib.setScroll(skills)
+      }
+      if (characterTitle.length) {
+        const titleDiv = document.createElement("div")
+        titleDiv.className = "character-title"
+        titleDiv.innerHTML = characterTitle
+        intro.appendChild(titleDiv)
+        // 添加分隔线
+        const hr = document.createElement("hr")
+        hr.style.marginTop = "5px"
+        hr.style.marginBottom = "5px"
+        intro.appendChild(hr)
+      }
+      const characterIntroTable = ui.create.div(
+          ".character-intro-table",
+          intro,
+        ),
+        span = document.createElement("span")
+      span.style.fontWeight = "bold"
+      const exInfo = nameInfo.trashBin,
+        characterName = exInfo?.includes("ruby")
+          ? lib.translate[name]
+          : get.rawName2(name)
+      span.innerHTML = characterName
+      const ruby = document.createElement("ruby")
+      ruby.appendChild(span)
+      const leftParenthesisRP = document.createElement("rp")
+      leftParenthesisRP.textContent = "（"
+      ruby.appendChild(leftParenthesisRP)
+      const rt = document.createElement("rt")
+      rt.innerHTML = name
+      ruby.appendChild(rt)
+      const rightParenthesisRP = document.createElement("rp")
+      rightParenthesisRP.textContent = "）"
+      ruby.appendChild(rightParenthesisRP)
+      characterIntroTable.appendChild(ruby)
+      const characterSexDiv = ui.create.div(
+          ".character-sex",
+          characterIntroTable,
+        ),
+        exInfoSex = exInfo?.find((value) => value.startsWith("sex:")),
+        characterSex = exInfoSex ? exInfoSex.split(":").pop() : nameInfo[0]
+      new Promise((resolve, reject) => {
+        const imageName = `sex_${characterSex}`,
+          information = lib.card[imageName]
+        if (!information) {
+          resolve(`${lib.assetURL}image/card/${imageName}.png`)
+          return
         }
-
-        if (lib.config.mousewheel) {
-          skills.onmousewheel = ui.click.mousewheel
+        const image = information.image
+        if (!image) {
+          resolve(`${lib.assetURL}image/card/${imageName}.png`)
+        } else if (image.startsWith("db:")) {
+          game.getDB("image", image.slice(3)).then(resolve, reject)
+        } else if (image.startsWith("ext:")) {
+          resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`)
+        } else {
+          resolve(`${lib.assetURL}${image}`)
         }
-        clickSkill = function (e) {
-          while (intro2.firstChild) {
-            intro2.removeChild(intro2.lastChild)
-          }
-          var current = this.parentNode.querySelector(".active")
-          if (current) {
-            current.classList.remove("active")
-          }
-          this.classList.add("active")
-          if (this.link !== "dieAudios") {
-            var skillname = get.translation(this.link)
-            var skilltranslationinfo = get.skillInfoTranslation(
-              this.link,
-              null,
-              false,
-            )
-            if (
-              (lib.config.show_skillnamepinyin === "showPinyin2" ||
-                lib.config.show_skillnamepinyin === "showCodeIdentifier2") &&
-              skillname !== "阵亡"
-            ) {
-              var skillpinyin =
-                lib.config.show_skillnamepinyin === "showCodeIdentifier2"
-                  ? this.link
-                  : get.pinyin(skillname)
-              intro2.innerHTML = `<span style="font-weight:bold;margin-right:5px">${skillname}</span><span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">[${skillpinyin}]</span>  ${skilltranslationinfo}`
-            } else {
-              intro2.innerHTML = `<span style="font-weight:bold;margin-right:5px">${skillname}</span>${skilltranslationinfo}`
-            }
-            var info = get.info(this.link)
-            var skill = this.link
-            var playername = this.linkname
-            const audioName = this.linkAudioName
-            const skinName = bg.tempSkin || audioName
-            if (info.derivation) {
-              var derivation = info.derivation
-              if (typeof derivation === "string") {
-                derivation = [derivation]
-              }
-              for (var i = 0; i < derivation.length; i++) {
-                if (
-                  derivation[i].indexOf("_faq") === -1 &&
-                  !get.info(derivation[i]).nopop
-                ) {
-                  continue
-                }
-                var derivationname = get.translation(derivation[i])
-                var derivationtranslationinfo = get.skillInfoTranslation(
-                  derivation[i],
-                  null,
-                  false,
-                )
-                if (
-                  (lib.config.show_skillnamepinyin === "showPinyin2" ||
-                    lib.config.show_skillnamepinyin ===
-                      "showCodeIdentifier2") &&
-                  derivationname.length <= 5 &&
-                  derivation[i].indexOf("_faq") === -1
-                ) {
-                  var derivationpinyin =
-                    lib.config.show_skillnamepinyin === "showCodeIdentifier2"
-                      ? derivation[i]
-                      : get.pinyin(derivationname)
-                  intro2.innerHTML += `<br><br><span style="font-weight:bold;margin-right:5px">${derivationname}</span><span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">[${derivationpinyin}]</span>  ${derivationtranslationinfo}`
-                } else {
-                  intro2.innerHTML += `<br><br><span style="font-weight:bold;margin-right:5px">${derivationname}</span>${derivationtranslationinfo}`
-                }
-              }
-            }
-
-            // 添加技能append
-            if (lib.translate[`${this.link}_append`]) {
-              intro2.innerHTML +=
-                '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>'
-              const appendDiv = document.createElement("div")
-              appendDiv.style.fontSize = "15.2px"
-              appendDiv.innerHTML = lib.translate[`${this.link}_append`]
-              intro2.appendChild(appendDiv)
-            }
-
-            // 添加技能台词
-            const skillVoiceMap = get.Audio.skill({
-              skill: this.link,
-              player: {
-                name: playername,
-                skin: { name: skinName },
-                tempname: [skinName],
-              },
-            }).textList
-            if (skillVoiceMap.length > 0) {
-              intro2.innerHTML +=
-                '<br><br><span style="font-weight:bold;color:#ff6b6b;">技能台词</span>'
-              skillVoiceMap.forEach((text, index) => {
-                const skillTextSpan = document.createElement("span")
-                skillTextSpan.style.fontSize = "15.2px"
-                skillTextSpan.innerHTML = `<br>${skillVoiceMap.length > 1 ? `${index + 1}. ` : ""}${text}`
-                intro2.appendChild(skillTextSpan)
-              })
-            }
-
-            // 添加衍生技能台词
-            if (info.derivation) {
-              var derivation = info.derivation
-              if (typeof derivation === "string") {
-                derivation = [derivation]
-              }
-              for (var i = 0; i < derivation.length; i++) {
-                if (!get.info(derivation[i]).nopop) {
-                  continue
-                }
-                if (derivation[i].indexOf("_faq") !== -1) {
-                  continue
-                }
-                if (nameinfo.skills.includes(derivation[i])) {
-                  continue
-                }
-                const derivationVoiceMap = get.Audio.skill({
-                  skill: derivation[i],
-                  player: {
-                    name: playername,
-                    skin: { name: skinName },
-                    tempname: [skinName],
-                  },
-                }).textList
-                if (derivationVoiceMap.length > 0) {
-                  intro2.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">${get.translation(derivation[i])}台词</span>`
-                  derivationVoiceMap.forEach((text, index) => {
-                    const derivationTextSpan = document.createElement("span")
-                    derivationTextSpan.style.fontSize = "15.2px"
-                    derivationTextSpan.innerHTML = `<br>${derivationVoiceMap.length > 1 ? `${index + 1}. ` : ""}${text}`
-                    intro2.appendChild(derivationTextSpan)
-                  })
-                }
-              }
-            }
-
-            if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name !== this.audioName) {
-                const audioList = get.Audio.skill({
-                  skill: this.link,
-                  player: {
-                    name: playername,
-                    skin: { name: skinName },
-                    tempname: [skinName],
-                  },
-                }).fileList
-                this.playAudio = game.tryAudio({
-                  audioList,
-                  addVideo: false,
-                  random: false,
-                  autoplay: false,
-                })
-                this.audioName = name
-              }
-              this.playAudio()
-            }
-          } else {
-            const skinName2 = bg.tempSkin || this.linkname
-            const dieAudios3 = get.Audio.die({
-              player: {
-                name: this.playername,
-                skin: { name: skinName2 },
-                tempname: [skinName2],
-              },
-            })
-              .audioList.map((i3) => i3.text)
-              .filter(Boolean)
-            intro2.innerHTML =
-              '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>'
-            dieAudios3.forEach((text, index) => {
-              const dieTextSpan = document.createElement("span")
-              dieTextSpan.style.fontSize = "15.2px"
-              dieTextSpan.innerHTML = `<br>${dieAudios3.length > 1 ? `${index + 1}. ` : ""}${text}`
-              intro2.appendChild(dieTextSpan)
-            })
-            if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name !== this.audioName) {
-                const audioList = get.Audio.die({
-                  player: {
-                    name: this.playername,
-                    skin: { name: skinName2 },
-                    tempname: [skinName2],
-                  },
-                }).fileList
-                this.playAudio = game.tryAudio({
-                  audioList,
-                  addVideo: false,
-                  random: false,
-                  autoplay: false,
-                })
-                this.audioName = name
-              }
-              this.playAudio()
-            }
-          }
-        }
-      } else {
-        // 样式一
-        //TODO: 这里的数据也暂时没有改成新格式，需要后续的修改
-        const nameInfo = get.character(name),
-          showCharacterNamePinyin = lib.config.show_characternamepinyin
-        intro =
-          uiintro.querySelector(".characterintro") ||
-          ui.create.div(".characterintro", uiintro)
-        // 添加武将称号
-        let characterTitle = get.colorspan(
-            get.characterTitle(name, false, false),
-          ),
-          packName
-        for (const packname in lib.characterPack) {
-          if (name in lib.characterPack[packname]) {
-            let pack = lib.translate[`${packname}_character_config`],
-              sort
-            if (lib.characterSort[packname]) {
-              const sorted = lib.characterSort[packname]
-              for (const sortname in sorted) {
-                if (sorted[sortname].includes(name)) {
-                  sort = `<span style = "font-size:small">[${lib.translate[sortname]}]</span>`
-                  break
-                }
-              }
-            }
-            packName = `${pack}${sort ? `${sort}` : ""}`
-            if (characterTitle.length) {
-              characterTitle = `${characterTitle}<span style="color: white"> | ${packName}</span>`
-            } else {
-              characterTitle = `<span style="color: white">${packName}</span>`
-            }
-            break
-          }
-        }
-        if (characterTitle.length) {
-          const titleDiv = document.createElement("div")
-          titleDiv.className = "character-title"
-          titleDiv.innerHTML = characterTitle
-          intro.appendChild(titleDiv)
-          // 添加分隔线
-          const hr = document.createElement("hr")
-          hr.style.marginTop = "5px"
-          hr.style.marginBottom = "5px"
-          intro.appendChild(hr)
-        }
-        if (showCharacterNamePinyin !== "doNotShow") {
-          const characterIntroTable = ui.create.div(
-              ".character-intro-table",
-              intro,
-            ),
-            span = document.createElement("span")
-          span.style.fontWeight = "bold"
-          const exInfo = nameInfo.trashBin,
-            characterName = exInfo?.includes("ruby")
-              ? lib.translate[name]
-              : get.rawName2(name)
-          span.innerHTML = characterName
-          const ruby = document.createElement("ruby")
-          ruby.appendChild(span)
-          const leftParenthesisRP = document.createElement("rp")
-          leftParenthesisRP.textContent = "（"
-          ruby.appendChild(leftParenthesisRP)
-          const rt = document.createElement("rt")
-          rt.innerHTML =
-            showCharacterNamePinyin === "showCodeIdentifier"
-              ? name
-              : lib.translate[`${name}_rt`] ||
-                get.pinyin(characterName).join(" ")
-          ruby.appendChild(rt)
-          const rightParenthesisRP = document.createElement("rp")
-          rightParenthesisRP.textContent = "）"
-          ruby.appendChild(rightParenthesisRP)
-          characterIntroTable.appendChild(ruby)
-          const characterSexDiv = ui.create.div(
-              ".character-sex",
-              characterIntroTable,
-            ),
-            exInfoSex = exInfo?.find((value) => value.startsWith("sex:")),
-            characterSex = exInfoSex ? exInfoSex.split(":").pop() : nameInfo[0]
-          new Promise((resolve, reject) => {
-            const imageName = `sex_${characterSex}`,
-              information = lib.card[imageName]
-            if (!information) {
-              resolve(`${lib.assetURL}image/card/${imageName}.png`)
-              return
-            }
-            const image = information.image
-            if (!image) {
-              resolve(`${lib.assetURL}image/card/${imageName}.png`)
-            } else if (image.startsWith("db:")) {
-              game.getDB("image", image.slice(3)).then(resolve, reject)
-            } else if (image.startsWith("ext:")) {
-              resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`)
-            } else {
-              resolve(`${lib.assetURL}${image}`)
-            }
-          })
-            .then(
-              (source) =>
-                new Promise((resolve, reject) => {
-                  const image = new Image()
-                  image.onload = () => resolve(image)
-                  image.onerror = reject
-                  image.src = source
-                }),
-            )
-            .then((image) => characterSexDiv.appendChild(image))
-            .catch(
-              () => (characterSexDiv.innerHTML = get.translation(characterSex)),
-            )
-          const characterGroupDiv = ui.create.div(
-              ".character-group",
-              characterIntroTable,
-            ),
-            characterGroups = get.is.double(name, true)
-          if (characterGroups) {
-            Promise.all(
-              characterGroups.map((characterGroup) =>
-                Promise.resolve()
-                  .then(async () => {
-                    const imageName = `group_${characterGroup}`,
-                      information = lib.card[imageName]
-                    if (!information) {
-                      return `${lib.assetURL}image/card/${imageName}.png`
-                    }
-                    const image = information.image
-                    if (!image) {
-                      return `${lib.assetURL}image/card/${imageName}.png`
-                    }
-                    if (image.startsWith("db:")) {
-                      return await game.getDB("image", image.slice(3))
-                    }
-                    if (image.startsWith("ext:")) {
-                      return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`
-                    }
-                    return `${lib.assetURL}${image}`
-                  })
-                  .then(
-                    (source) =>
-                      new Promise((resolve, reject) => {
-                        const image = new Image()
-                        image.onload = () => resolve(image)
-                        image.onerror = reject
-                        image.src = source
-                      }),
-                  ),
-              ),
-            )
-              .then((images) => {
-                const documentFragment = document.createDocumentFragment()
-                images.forEach(documentFragment.appendChild, documentFragment)
-                characterGroupDiv.appendChild(documentFragment)
-              })
-              .catch(
-                () =>
-                  (characterGroupDiv.innerHTML = characterGroups
-                    .map((characterGroup) => get.translation(characterGroup))
-                    .join("/")),
-              )
-          } else {
-            const characterGroup = nameInfo[1]
+      })
+        .then(
+          (source) =>
+            new Promise((resolve, reject) => {
+              const image = new Image()
+              image.onload = () => resolve(image)
+              image.onerror = reject
+              image.src = source
+            }),
+        )
+        .then((image) => characterSexDiv.appendChild(image))
+        .catch(
+          () => (characterSexDiv.innerHTML = get.translation(characterSex)),
+        )
+      const characterGroupDiv = ui.create.div(
+          ".character-group",
+          characterIntroTable,
+        ),
+        characterGroups = get.is.double(name, true)
+      if (characterGroups) {
+        Promise.all(
+          characterGroups.map((characterGroup) =>
             Promise.resolve()
               .then(async () => {
                 const imageName = `group_${characterGroup}`,
@@ -4299,197 +3952,228 @@ export class Click {
                     image.onerror = reject
                     image.src = source
                   }),
-              )
-              .then((image) => characterGroupDiv.appendChild(image))
-              .catch(
-                () =>
-                  (characterGroupDiv.innerHTML =
-                    get.translation(characterGroup)),
-              )
-          }
-          const hpDiv = ui.create.div(".hp", characterIntroTable),
-            nameInfoHP = nameInfo[2],
-            infoHP = get.infoHp(nameInfoHP)
-          hpDiv.dataset.condition = infoHP < 4 ? "mid" : "high"
-          ui.create.div(hpDiv)
-          const hpTextDiv = ui.create.div(".text", hpDiv),
-            infoMaxHP = get.infoMaxHp(nameInfoHP)
-          hpTextDiv.innerHTML =
-            infoHP === infoMaxHP ? `×${infoHP}` : `×${infoHP}/${infoMaxHP}`
-          const infoShield = get.infoHujia(nameInfoHP)
-          if (infoShield) {
-            ui.create.div(".shield", hpDiv)
-            const shieldTextDiv = ui.create.div(".text", hpDiv)
-            shieldTextDiv.innerHTML = `×${infoShield}`
-          }
-          intro.appendChild(document.createElement("hr"))
-        }
-        const htmlParser = document.createElement("body")
-        htmlParser.innerHTML = get.characterIntro(name)
-        Array.from(htmlParser.childNodes).forEach((value) =>
-          intro.appendChild(value),
+              ),
+          ),
         )
-
-        // 添加角色append
-        if (lib.characterAppend[name]) {
-          intro.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>${lib.characterAppend[name]}`
-        }
-
-        const introduction2 =
-          uiintro.querySelector(".intro2") ||
-          ui.create.div(".characterintro.intro2", uiintro)
-        list.addArray(get.character(name).skills || [])
-        if (lib.config.touchscreen) {
-          lib.setScroll(intro)
-          lib.setScroll(introduction2)
-          lib.setScroll(skills)
-        }
-
-        if (lib.config.mousewheel) {
-          skills.onmousewheel = ui.click.mousewheel
-        }
-        clickSkill = function (e) {
-          while (introduction2.firstChild) {
-            introduction2.removeChild(introduction2.lastChild)
-          }
-          var current2 = this.parentNode.querySelector(".active")
-          if (current2) {
-            current2.classList.remove("active")
-          }
-          this.classList.add("active")
-          if (this.link !== "dieAudios") {
-            const skillNameSpan = document.createElement("span"),
-              skillNameSpanStyle = skillNameSpan.style
-            skillNameSpanStyle.fontWeight = "bold"
-            const link = this.link,
-              skillName = get.translation(link)
-            skillNameSpan.innerHTML = skillName
-            const showSkillNamePinyin = lib.config.show_skillnamepinyin
-            if (showSkillNamePinyin !== "doNotShow" && skillName !== "阵亡") {
-              const ruby = document.createElement("ruby")
-              ruby.appendChild(skillNameSpan)
-              const leftParenthesisRP = document.createElement("rp")
-              leftParenthesisRP.textContent = "（"
-              ruby.appendChild(leftParenthesisRP)
-              const rt = document.createElement("rt")
-              rt.innerHTML =
-                showSkillNamePinyin === "showCodeIdentifier"
-                  ? link
-                  : lib.translate[`${link}_rt`] ||
-                    get.pinyin(skillName).join(" ")
-              ruby.appendChild(rt)
-              const rightParenthesisRP = document.createElement("rp")
-              rightParenthesisRP.textContent = "）"
-              ruby.appendChild(rightParenthesisRP)
-              const div = ui.create.div(introduction2)
-              div.style.marginRight = "5px"
-              div.appendChild(ruby)
-            } else {
-              skillNameSpanStyle.marginRight = "5px"
-              introduction2.appendChild(skillNameSpan)
+          .then((images) => {
+            const documentFragment = document.createDocumentFragment()
+            images.forEach(documentFragment.appendChild, documentFragment)
+            characterGroupDiv.appendChild(documentFragment)
+          })
+          .catch(
+            () =>
+              (characterGroupDiv.innerHTML = characterGroups
+                .map((characterGroup) => get.translation(characterGroup))
+                .join("/")),
+          )
+      } else {
+        const characterGroup = nameInfo[1]
+        Promise.resolve()
+          .then(async () => {
+            const imageName = `group_${characterGroup}`,
+              information = lib.card[imageName]
+            if (!information) {
+              return `${lib.assetURL}image/card/${imageName}.png`
             }
-            htmlParser.innerHTML = get.skillInfoTranslation(
-              this.link,
-              null,
-              false,
-            )
-            Array.from(htmlParser.childNodes).forEach((childNode) =>
-              introduction2.appendChild(childNode),
-            )
-            var info = get.info(this.link)
-            var skill = this.link
-            var playername = this.linkname
-            const audioName2 = this.linkAudioName
-            const skinName2 = bg.tempSkin || audioName2
-            let derivations = info.derivation
-            if (derivations) {
-              if (typeof derivations === "string") {
-                derivations = [derivations]
+            const image = information.image
+            if (!image) {
+              return `${lib.assetURL}image/card/${imageName}.png`
+            }
+            if (image.startsWith("db:")) {
+              return await game.getDB("image", image.slice(3))
+            }
+            if (image.startsWith("ext:")) {
+              return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`
+            }
+            return `${lib.assetURL}${image}`
+          })
+          .then(
+            (source) =>
+              new Promise((resolve, reject) => {
+                const image = new Image()
+                image.onload = () => resolve(image)
+                image.onerror = reject
+                image.src = source
+              }),
+          )
+          .then((image) => characterGroupDiv.appendChild(image))
+          .catch(
+            () =>
+              (characterGroupDiv.innerHTML = get.translation(characterGroup)),
+          )
+      }
+      const hpDiv = ui.create.div(".hp", characterIntroTable),
+        nameInfoHP = nameInfo[2],
+        infoHP = get.infoHp(nameInfoHP)
+      hpDiv.dataset.condition = infoHP < 4 ? "mid" : "high"
+      ui.create.div(hpDiv)
+      const hpTextDiv = ui.create.div(".text", hpDiv),
+        infoMaxHP = get.infoMaxHp(nameInfoHP)
+      hpTextDiv.innerHTML =
+        infoHP === infoMaxHP ? `×${infoHP}` : `×${infoHP}/${infoMaxHP}`
+      const infoShield = get.infoHujia(nameInfoHP)
+      if (infoShield) {
+        ui.create.div(".shield", hpDiv)
+        const shieldTextDiv = ui.create.div(".text", hpDiv)
+        shieldTextDiv.innerHTML = `×${infoShield}`
+      }
+      intro.appendChild(document.createElement("hr"))
+      const htmlParser = document.createElement("body")
+      htmlParser.innerHTML = get.characterIntro(name)
+      Array.from(htmlParser.childNodes).forEach((value) =>
+        intro.appendChild(value),
+      )
+
+      // 添加角色append
+      if (lib.characterAppend[name]) {
+        intro.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>${lib.characterAppend[name]}`
+      }
+
+      const introduction2 =
+        uiintro.querySelector(".intro2") ||
+        ui.create.div(".characterintro.intro2", uiintro)
+      list.addArray(get.character(name).skills || [])
+      if (lib.config.touchscreen) {
+        lib.setScroll(intro)
+        lib.setScroll(introduction2)
+        lib.setScroll(skills)
+      }
+
+      if (lib.config.mousewheel) {
+        skills.onmousewheel = ui.click.mousewheel
+      }
+      clickSkill = function (e) {
+        while (introduction2.firstChild) {
+          introduction2.removeChild(introduction2.lastChild)
+        }
+        var current2 = this.parentNode.querySelector(".active")
+        if (current2) {
+          current2.classList.remove("active")
+        }
+        this.classList.add("active")
+        if (this.link !== "dieAudios") {
+          const skillNameSpan = document.createElement("span"),
+            skillNameSpanStyle = skillNameSpan.style
+          skillNameSpanStyle.fontWeight = "bold"
+          const link = this.link,
+            skillName = get.translation(link)
+          skillNameSpan.innerHTML = skillName
+          if (skillName !== "阵亡") {
+            const ruby = document.createElement("ruby")
+            ruby.appendChild(skillNameSpan)
+            const leftParenthesisRP = document.createElement("rp")
+            leftParenthesisRP.textContent = "（"
+            ruby.appendChild(leftParenthesisRP)
+            const rt = document.createElement("rt")
+            rt.innerHTML = link
+            ruby.appendChild(rt)
+            const rightParenthesisRP = document.createElement("rp")
+            rightParenthesisRP.textContent = "）"
+            ruby.appendChild(rightParenthesisRP)
+            const div = ui.create.div(introduction2)
+            div.style.marginRight = "5px"
+            div.appendChild(ruby)
+          } else {
+            skillNameSpanStyle.marginRight = "5px"
+            introduction2.appendChild(skillNameSpan)
+          }
+          htmlParser.innerHTML = get.skillInfoTranslation(
+            this.link,
+            null,
+            false,
+          )
+          Array.from(htmlParser.childNodes).forEach((childNode) =>
+            introduction2.appendChild(childNode),
+          )
+          var info = get.info(this.link)
+          var skill = this.link
+          var playername = this.linkname
+          const audioName2 = this.linkAudioName
+          const skinName2 = bg.tempSkin || audioName2
+          let derivations = info.derivation
+          if (derivations) {
+            if (typeof derivations === "string") {
+              derivations = [derivations]
+            }
+            derivations.forEach((derivation) => {
+              if (
+                derivation.indexOf("_faq") === -1 &&
+                !get.info(derivation).nopop
+              ) {
+                return false
               }
-              derivations.forEach((derivation) => {
-                if (
-                  derivation.indexOf("_faq") === -1 &&
-                  !get.info(derivation).nopop
-                ) {
-                  return false
-                }
-                introduction2.appendChild(document.createElement("br"))
-                introduction2.appendChild(document.createElement("br"))
-                const derivationNameSpan = document.createElement("span"),
-                  derivationNameSpanStyle = derivationNameSpan.style
-                derivationNameSpanStyle.fontWeight = "bold"
-                const derivationName = get.translation(derivation)
-                derivationNameSpan.innerHTML = derivationName
-                if (
-                  showSkillNamePinyin !== "doNotShow" &&
-                  derivationName.length <= 5 &&
-                  derivation.indexOf("_faq") === -1
-                ) {
-                  const ruby = document.createElement("ruby")
-                  ruby.appendChild(derivationNameSpan)
-                  const leftParenthesisRP = document.createElement("rp")
-                  leftParenthesisRP.textContent = "（"
-                  ruby.appendChild(leftParenthesisRP)
-                  const rt = document.createElement("rt")
-                  rt.innerHTML =
-                    showSkillNamePinyin === "showCodeIdentifier"
-                      ? derivation
-                      : lib.translate[`${derivation}_rt`] ||
-                        get.pinyin(derivationName).join(" ")
-                  ruby.appendChild(rt)
-                  const rightParenthesisRP = document.createElement("rp")
-                  rightParenthesisRP.textContent = "）"
-                  ruby.appendChild(rightParenthesisRP)
-                  const div = ui.create.div(introduction2)
-                  div.style.marginRight = "5px"
-                  div.appendChild(ruby)
-                } else {
-                  derivationNameSpanStyle.marginRight = "5px"
-                  introduction2.appendChild(derivationNameSpan)
-                }
-                htmlParser.innerHTML = get.skillInfoTranslation(
-                  derivation,
-                  null,
-                  false,
-                )
-                Array.from(htmlParser.childNodes).forEach((childNode) =>
-                  introduction2.appendChild(childNode),
-                )
-              })
-            }
+              introduction2.appendChild(document.createElement("br"))
+              introduction2.appendChild(document.createElement("br"))
+              const derivationNameSpan = document.createElement("span"),
+                derivationNameSpanStyle = derivationNameSpan.style
+              derivationNameSpanStyle.fontWeight = "bold"
+              const derivationName = get.translation(derivation)
+              derivationNameSpan.innerHTML = derivationName
+              if (
+                derivationName.length <= 5 &&
+                derivation.indexOf("_faq") === -1
+              ) {
+                const ruby = document.createElement("ruby")
+                ruby.appendChild(derivationNameSpan)
+                const leftParenthesisRP = document.createElement("rp")
+                leftParenthesisRP.textContent = "（"
+                ruby.appendChild(leftParenthesisRP)
+                const rt = document.createElement("rt")
+                rt.innerHTML = derivation
+                ruby.appendChild(rt)
+                const rightParenthesisRP = document.createElement("rp")
+                rightParenthesisRP.textContent = "）"
+                ruby.appendChild(rightParenthesisRP)
+                const div = ui.create.div(introduction2)
+                div.style.marginRight = "5px"
+                div.appendChild(ruby)
+              } else {
+                derivationNameSpanStyle.marginRight = "5px"
+                introduction2.appendChild(derivationNameSpan)
+              }
+              htmlParser.innerHTML = get.skillInfoTranslation(
+                derivation,
+                null,
+                false,
+              )
+              Array.from(htmlParser.childNodes).forEach((childNode) =>
+                introduction2.appendChild(childNode),
+              )
+            })
+          }
 
-            // 添加技能append
-            if (lib.translate[`${this.link}_append`]) {
-              introduction2.innerHTML +=
-                '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>'
-              const appendDiv = document.createElement("div")
-              appendDiv.style.fontSize = "15.2px"
-              appendDiv.innerHTML = lib.translate[`${this.link}_append`]
-              introduction2.appendChild(appendDiv)
-            }
+          // 添加技能append
+          if (lib.translate[`${this.link}_append`]) {
+            introduction2.innerHTML +=
+              '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>'
+            const appendDiv = document.createElement("div")
+            appendDiv.style.fontSize = "15.2px"
+            appendDiv.innerHTML = lib.translate[`${this.link}_append`]
+            introduction2.appendChild(appendDiv)
+          }
 
-            // 添加技能台词
-            const skillVoiceMap = get.Audio.skill({
-              skill: this.link,
-              player: {
-                name: playername,
-                skin: { name: skinName2 },
-                tempname: [skinName2],
-              },
-            }).textList
-            if (skillVoiceMap.length > 0) {
-              introduction2.innerHTML +=
-                '<br><br><span style="font-weight:bold;color:#ff6b6b;">技能台词</span>'
-              skillVoiceMap.forEach((text, index) => {
-                const skillTextSpan = document.createElement("span")
-                skillTextSpan.style.fontSize = "15.2px"
-                skillTextSpan.innerHTML = `<br>${skillVoiceMap.length > 1 ? `${index + 1}. ` : ""}${text}`
-                introduction2.appendChild(skillTextSpan)
-              })
-            }
+          // 添加技能台词
+          const skillVoiceMap = get.Audio.skill({
+            skill: this.link,
+            player: {
+              name: playername,
+              skin: { name: skinName2 },
+              tempname: [skinName2],
+            },
+          }).textList
+          if (skillVoiceMap.length > 0) {
+            introduction2.innerHTML +=
+              '<br><br><span style="font-weight:bold;color:#ff6b6b;">技能台词</span>'
+            skillVoiceMap.forEach((text, index) => {
+              const skillTextSpan = document.createElement("span")
+              skillTextSpan.style.fontSize = "15.2px"
+              skillTextSpan.innerHTML = `<br>${skillVoiceMap.length > 1 ? `${index + 1}. ` : ""}${text}`
+              introduction2.appendChild(skillTextSpan)
+            })
+          }
 
-            // 添加衍生技能台词
-            /*if (info.derivation) {
+          // 添加衍生技能台词
+          /*if (info.derivation) {
 							var derivation = info.derivation;
 							if (typeof derivation == "string") {
 								derivation = [derivation];
@@ -4514,64 +4198,63 @@ export class Click {
 							}
 						}*/
 
-            if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name !== this.audioName) {
-                const audioList = get.Audio.skill({
-                  skill: this.link,
-                  player: {
-                    name: playername,
-                    skin: { name: skinName2 },
-                    tempname: [skinName2],
-                  },
-                }).fileList
-                this.playAudio = game.tryAudio({
-                  audioList,
-                  addVideo: false,
-                  random: false,
-                  autoplay: false,
-                })
-                this.audioName = name
-              }
-              this.playAudio()
+          if (lib.config.background_speak && e !== "init") {
+            if (!this.playAudio || name !== this.audioName) {
+              const audioList = get.Audio.skill({
+                skill: this.link,
+                player: {
+                  name: playername,
+                  skin: { name: skinName2 },
+                  tempname: [skinName2],
+                },
+              }).fileList
+              this.playAudio = game.tryAudio({
+                audioList,
+                addVideo: false,
+                random: false,
+                autoplay: false,
+              })
+              this.audioName = name
             }
-          } else {
-            const skinName2 = bg.tempSkin || this.linkname
-            const dieAudios3 = get.Audio.die({
-              player: {
-                name: this.playername,
-                skin: { name: skinName2 },
-                tempname: [skinName2],
-              },
-            })
-              .audioList.map((i2) => i2.text)
-              .filter(Boolean)
-            introduction2.innerHTML =
-              '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>'
-            dieAudios3.forEach((text, index) => {
-              const dieTextSpan = document.createElement("span")
-              dieTextSpan.style.fontSize = "15.2px"
-              dieTextSpan.innerHTML = `<br>${dieAudios3.length > 1 ? `${index + 1}. ` : ""}${text}`
-              introduction2.appendChild(dieTextSpan)
-            })
-            if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name !== this.audioName) {
-                const audioList = get.Audio.die({
-                  player: {
-                    name: this.playername,
-                    skin: { name: skinName2 },
-                    tempname: [skinName2],
-                  },
-                }).fileList
-                this.playAudio = game.tryAudio({
-                  audioList,
-                  addVideo: false,
-                  random: false,
-                  autoplay: false,
-                })
-                this.audioName = name
-              }
-              this.playAudio()
+            this.playAudio()
+          }
+        } else {
+          const skinName2 = bg.tempSkin || this.linkname
+          const dieAudios3 = get.Audio.die({
+            player: {
+              name: this.playername,
+              skin: { name: skinName2 },
+              tempname: [skinName2],
+            },
+          })
+            .audioList.map((i2) => i2.text)
+            .filter(Boolean)
+          introduction2.innerHTML =
+            '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>'
+          dieAudios3.forEach((text, index) => {
+            const dieTextSpan = document.createElement("span")
+            dieTextSpan.style.fontSize = "15.2px"
+            dieTextSpan.innerHTML = `<br>${dieAudios3.length > 1 ? `${index + 1}. ` : ""}${text}`
+            introduction2.appendChild(dieTextSpan)
+          })
+          if (lib.config.background_speak && e !== "init") {
+            if (!this.playAudio || name !== this.audioName) {
+              const audioList = get.Audio.die({
+                player: {
+                  name: this.playername,
+                  skin: { name: skinName2 },
+                  tempname: [skinName2],
+                },
+              }).fileList
+              this.playAudio = game.tryAudio({
+                audioList,
+                addVideo: false,
+                random: false,
+                autoplay: false,
+              })
+              this.audioName = name
             }
+            this.playAudio()
           }
         }
       }
@@ -4893,11 +4576,7 @@ export class Click {
     }
     lib.placePoppedDialog(uiintro, e)
     if (this.parentNode === ui.historybar) {
-      if (lib.config.show_history === "right") {
-        uiintro.style.left = `${ui.historybar.offsetLeft - 230}px`
-      } else {
-        uiintro.style.left = `${ui.historybar.offsetLeft + 60}px`
-      }
+      uiintro.style.left = `${ui.historybar.offsetLeft + 60}px`
     }
     uiintro.style.zIndex = 21
     var clickintro = function (e) {
@@ -5079,13 +4758,6 @@ export class Click {
     }
     node.addTempClass("start")
     ui.sidebar3.innerHTML = ""
-    if (lib.config.show_discardpile) {
-      for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
-        var div = ui.create.div(ui.sidebar3)
-        div.innerHTML = get.translation(ui.discardPile.childNodes[i])
-        ui.sidebar3.insertBefore(div, ui.sidebar3.firstChild)
-      }
-    }
     node.appendChild(ui.sidebar)
     node.appendChild(ui.sidebar3)
     ui.historybar.classList.add("paused")
