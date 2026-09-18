@@ -1,5 +1,11 @@
 const characters = {
   // 起
+  jsrg_caocao: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["jsrgzhenglve", "jsrghuilie"],
+  },
   jsrg_liuhong: {
     sex: "male",
     group: "qun",
@@ -103,12 +109,6 @@ const characters = {
     group: "qun",
     hp: 4,
     skills: ["jsrgjishan", "jsrgzhenqiao"],
-  },
-  jsrg_caocao: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["jsrgzhenglve", "jsrghuilie"],
   },
   jsrg_sunjian: {
     sex: "male",

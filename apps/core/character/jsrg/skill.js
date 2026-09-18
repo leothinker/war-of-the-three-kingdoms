@@ -2,6 +2,215 @@ import { _status, game, get, lib, ui } from "wtk"
 
 /** @type { importCharacterConfig["skill"] } */
 const skills = {
+  // 江山如故·起
+  // 梦曹操
+  // 政略
+  jsrgzhenglve: {
+    audio: 4,
+    trigger: { global: "phaseEnd" },
+    isFirst(player) {
+      const bool = (target) => {
+        if (game.hasPlayer((current) => current.getSeatNum() > 0)) {
+          return target.getSeatNum() === 1
+        }
+        return target === _status.roundStart
+      }
+      return game
+        .filterPlayer((target) => {
+          switch (get.mode()) {
+            case "identity":
+              return target.isZhu
+            case "guozhan":
+              return get.is.jun(target)
+            case "versus": {
+              if (["three", "four", "guandu"].includes(_status.mode)) {
+                return target.identity === "zhu"
+              }
+              return bool(target)
+            }
+            case "doudizhu":
+            case "boss":
+              return target.identity === "zhu"
+            default:
+              return bool(target)
+          }
+        })
+        .includes(player)
+    },
+    filter(event, player) {
+      return get.info("jsrgzhenglve").isFirst(event.player)
+    },
+    locked: false,
+    group: "jsrgzhenglve_damage",
+    prompt2(event, player) {
+      const num = Math.min(
+        event.player.hasHistory("sourceDamage") ? 1 : 2,
+        game.countPlayer((current) => !current.hasMark("jsrgzhenglve_mark")),
+      )
+      let str = `你可以摸一张牌`
+      if (num) {
+        str += `并令${get.cnNumber(num)}名角色获得“猎”标记`
+      }
+      return str
+    },
+    drawNum: 1,
+    logAudio: () => 2,
+    async content(event, trigger, player) {
+      await player.draw(lib.skill[event.name].drawNum)
+      const damaged = trigger.player.hasHistory("sourceDamage")
+      const num = damaged ? 1 : 2
+      const targets = game.filterPlayer(
+        (current) => !current.hasMark("jsrgzhenglve_mark"),
+      )
+      if (!targets.length) {
+        return
+      }
+      const result =
+        targets.length <= num
+          ? { bool: true, targets: targets }
+          : await player
+              .chooseTarget(
+                `令${num > 1 ? "至多" : ""}${get.cnNumber(num)}名角色获得“猎”标记`,
+                true,
+                [1, num],
+                (card, player, target) => {
+                  return !target.hasMark("jsrgzhenglve_mark")
+                },
+              )
+              .set("ai", (target) => {
+                const att = get.attitude(get.player(), target)
+                return 100 - att
+              })
+              .forResult()
+      if (result.bool) {
+        const { targets } = result
+        player.line(targets)
+        targets.forEach((target) => target.addMark("jsrgzhenglve_mark", 1))
+      }
+    },
+    mod: {
+      cardUsableTarget(card, player, target) {
+        if (target.hasMark("jsrgzhenglve_mark")) {
+          return true
+        }
+      },
+      targetInRange(card, player, target) {
+        if (target.hasMark("jsrgzhenglve_mark")) {
+          return true
+        }
+      },
+    },
+    subSkill: {
+      damage: {
+        audio: ["jsrgzhenglve3.mp3", "jsrgzhenglve4.mp3"],
+        trigger: { source: "damageSource" },
+        usable: 1,
+        filter(event, player) {
+          return event.player.hasMark("jsrgzhenglve_mark")
+        },
+        prompt2(event, player) {
+          const cards = event.cards || []
+          return `摸一张牌${cards.filterInD().length ? `并获得${get.translation(event.cards.filterInD())}` : ""}`
+        },
+        async content(event, trigger, player) {
+          await player.draw()
+          if (trigger.cards?.someInD()) {
+            await player.gain(trigger.cards.filterInD(), "gain2")
+          }
+        },
+      },
+      mark: {
+        marktext: "猎",
+        intro: {
+          name: "猎(政略)",
+          name2: "猎",
+          markcount: () => 0,
+          content: "已拥有“猎”标记",
+        },
+      },
+    },
+  },
+  // 会猎
+  jsrghuilie: {
+    audio: 2,
+    trigger: { player: "phaseZhunbeiBegin" },
+    juexingji: true,
+    forced: true,
+    skillAnimation: true,
+    animationColor: "thunder",
+    derivation: ["jsrgpingrong", "feiying"],
+    filter(event, player) {
+      return (
+        game.countPlayer((current) => current.hasMark("jsrgzhenglve_mark")) > 2
+      )
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      await player.addSkills(["jsrgpingrong", "feiying"])
+    },
+    ai: {
+      combo: ["jsrgzhenglve", "twzhenglve"],
+    },
+  },
+  // 平戎
+  jsrgpingrong: {
+    audio: 3,
+    trigger: { global: "phaseEnd" },
+    filter(event, player) {
+      return (
+        !player.hasSkill("jsrgpingrong_used") &&
+        game.hasPlayer((current) => current.hasMark("jsrgzhenglve_mark"))
+      )
+    },
+    logAudio: () => 2,
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(
+          get.prompt(event.skill),
+          "移去一名角色的“猎”，然后你执行一个额外回合。若你在此额外回合内未造成伤害，则你失去1点体力。",
+          (card, player, target) => {
+            return target.hasMark("jsrgzhenglve_mark")
+          },
+        )
+        .set("ai", (target) => {
+          return get.attitude(_status.event.player, target)
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      player.addTempSkill("jsrgpingrong_used", "roundStart")
+      target.removeMark(
+        "jsrgzhenglve_mark",
+        target.countMark("jsrgzhenglve_mark"),
+      )
+      player.insertPhase()
+      player.addSkill("jsrgpingrong_check")
+    },
+    subSkill: {
+      used: { charlotte: true },
+      check: {
+        charlotte: true,
+        audio: "jsrgpingrong3.mp3",
+        trigger: { player: "phaseAfter" },
+        filter(event, player) {
+          return (
+            event.skill === "jsrgpingrong" &&
+            !player.getHistory("sourceDamage").length
+          )
+        },
+        forced: true,
+        async content(event, trigger, player) {
+          await player.loseHp()
+        },
+      },
+    },
+    ai: {
+      combo: "jsrgzhenglve",
+    },
+  },
+
   //江山如故·衰
   //张举
   jsrgqiluan: {
@@ -13205,210 +13414,6 @@ const skills = {
         mark: true,
         intro: { content: "$已经立牧自居，不可接近" },
       },
-    },
-  },
-  //404曹操
-  jsrgzhenglve: {
-    audio: 4,
-    trigger: { global: "phaseEnd" },
-    isFirst(player) {
-      const bool = (target) => {
-        if (game.hasPlayer((current) => current.getSeatNum() > 0)) {
-          return target.getSeatNum() === 1
-        }
-        return target === _status.roundStart
-      }
-      return game
-        .filterPlayer((target) => {
-          switch (get.mode()) {
-            case "identity":
-              return target.isZhu
-            case "guozhan":
-              return get.is.jun(target)
-            case "versus": {
-              if (["three", "four", "guandu"].includes(_status.mode)) {
-                return target.identity === "zhu"
-              }
-              return bool(target)
-            }
-            case "doudizhu":
-            case "boss":
-              return target.identity === "zhu"
-            default:
-              return bool(target)
-          }
-        })
-        .includes(player)
-    },
-    filter(event, player) {
-      return get.info("jsrgzhenglve").isFirst(event.player)
-    },
-    locked: false,
-    group: "jsrgzhenglve_damage",
-    prompt2(event, player) {
-      const num = Math.min(
-        event.player.hasHistory("sourceDamage") ? 1 : 2,
-        game.countPlayer((current) => !current.hasMark("jsrgzhenglve_mark")),
-      )
-      let str = `你可以摸一张牌`
-      if (num) {
-        str += `并令${get.cnNumber(num)}名角色获得“猎”标记`
-      }
-      return str
-    },
-    drawNum: 1,
-    logAudio: () => 2,
-    async content(event, trigger, player) {
-      await player.draw(lib.skill[event.name].drawNum)
-      const damaged = trigger.player.hasHistory("sourceDamage")
-      const num = damaged ? 1 : 2
-      const targets = game.filterPlayer(
-        (current) => !current.hasMark("jsrgzhenglve_mark"),
-      )
-      if (!targets.length) {
-        return
-      }
-      const result =
-        targets.length <= num
-          ? { bool: true, targets: targets }
-          : await player
-              .chooseTarget(
-                `令${num > 1 ? "至多" : ""}${get.cnNumber(num)}名角色获得“猎”标记`,
-                true,
-                [1, num],
-                (card, player, target) => {
-                  return !target.hasMark("jsrgzhenglve_mark")
-                },
-              )
-              .set("ai", (target) => {
-                const att = get.attitude(get.player(), target)
-                return 100 - att
-              })
-              .forResult()
-      if (result.bool) {
-        const { targets } = result
-        player.line(targets)
-        targets.forEach((target) => target.addMark("jsrgzhenglve_mark", 1))
-      }
-    },
-    mod: {
-      cardUsableTarget(card, player, target) {
-        if (target.hasMark("jsrgzhenglve_mark")) {
-          return true
-        }
-      },
-      targetInRange(card, player, target) {
-        if (target.hasMark("jsrgzhenglve_mark")) {
-          return true
-        }
-      },
-    },
-    subSkill: {
-      damage: {
-        audio: ["jsrgzhenglve3.mp3", "jsrgzhenglve4.mp3"],
-        trigger: { source: "damageSource" },
-        usable: 1,
-        filter(event, player) {
-          return event.player.hasMark("jsrgzhenglve_mark")
-        },
-        prompt2(event, player) {
-          const cards = event.cards || []
-          return `摸一张牌${cards.filterInD().length ? `并获得${get.translation(event.cards.filterInD())}` : ""}`
-        },
-        async content(event, trigger, player) {
-          await player.draw()
-          if (trigger.cards?.someInD()) {
-            await player.gain(trigger.cards.filterInD(), "gain2")
-          }
-        },
-      },
-      mark: {
-        marktext: "猎",
-        intro: {
-          name: "猎(政略)",
-          name2: "猎",
-          markcount: () => 0,
-          content: "已拥有“猎”标记",
-        },
-      },
-    },
-  },
-  jsrghuilie: {
-    audio: 2,
-    trigger: { player: "phaseZhunbeiBegin" },
-    juexingji: true,
-    forced: true,
-    skillAnimation: true,
-    animationColor: "thunder",
-    derivation: ["jsrgpingrong", "feiying"],
-    filter(event, player) {
-      return (
-        game.countPlayer((current) => current.hasMark("jsrgzhenglve_mark")) > 2
-      )
-    },
-    async content(event, trigger, player) {
-      player.awakenSkill(event.name)
-      await player.loseMaxHp()
-      await player.addSkills(["jsrgpingrong", "feiying"])
-    },
-    ai: {
-      combo: ["jsrgzhenglve", "twzhenglve"],
-    },
-  },
-  jsrgpingrong: {
-    audio: 3,
-    trigger: { global: "phaseEnd" },
-    filter(event, player) {
-      return (
-        !player.hasSkill("jsrgpingrong_used") &&
-        game.hasPlayer((current) => current.hasMark("jsrgzhenglve_mark"))
-      )
-    },
-    logAudio: () => 2,
-    async cost(event, trigger, player) {
-      event.result = await player
-        .chooseTarget(
-          get.prompt(event.skill),
-          "移去一名角色的“猎”，然后你执行一个额外回合。若你在此额外回合内未造成伤害，则你失去1点体力。",
-          (card, player, target) => {
-            return target.hasMark("jsrgzhenglve_mark")
-          },
-        )
-        .set("ai", (target) => {
-          return get.attitude(_status.event.player, target)
-        })
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      const target = event.targets[0]
-      player.addTempSkill("jsrgpingrong_used", "roundStart")
-      target.removeMark(
-        "jsrgzhenglve_mark",
-        target.countMark("jsrgzhenglve_mark"),
-      )
-      player.insertPhase()
-      player.addSkill("jsrgpingrong_check")
-    },
-    subSkill: {
-      used: { charlotte: true },
-      check: {
-        charlotte: true,
-        audio: "jsrgpingrong3.mp3",
-        trigger: { player: "phaseAfter" },
-        filter(event, player) {
-          return (
-            event.skill === "jsrgpingrong" &&
-            !player.getHistory("sourceDamage").length
-          )
-        },
-        forced: true,
-        async content(event, trigger, player) {
-          await player.loseHp()
-        },
-      },
-    },
-    ai: {
-      combo: "jsrgzhenglve",
     },
   },
   //南华老仙

@@ -1,5 +1,7 @@
 const characterSort = {
   jiangshanrugu_qi: [
+    "jsrg_caocao",
+
     "jsrg_liuhong",
     "jsrg_wangyun",
     "jsrg_huangfusong",
@@ -15,7 +17,6 @@ const characterSort = {
     "jsrg_zhujun",
     "jsrg_liuyan",
     "jsrg_liubei",
-    "jsrg_caocao",
     "jsrg_sunjian",
   ],
   jiangshanrugu_cheng: [

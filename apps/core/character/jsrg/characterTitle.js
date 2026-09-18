@@ -1,4 +1,5 @@
 export default {
+  jsrg_caocao: "汉征西将军",
   jsrg_liuhong: "轧庭焚礼",
   jsrg_hejin: "独意误国谋",
   jsrg_sunjian: "拨定烈志",
@@ -12,7 +13,6 @@ export default {
   jsrg_liubei: "负戎荷戈",
   jsrg_wangyun: "居功自矜",
   jsrg_liuyan: "裂土之宗",
-  jsrg_caocao: "汉征西将军",
   jsrg_nanhualaoxian: "冯虚御风",
   jsrg_sunce: "问鼎的霸王",
   jsrg_xuyou: "毕方矫翼",
