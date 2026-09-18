@@ -6,6 +6,8 @@ const skills = {
   // 奸雄
   rejianxiong: {
     audio: 2,
+    audioname: ["ol_caocao"],
+    frequent: true,
     trigger: { player: "damageEnd" },
     async content(event, trigger, player) {
       if (

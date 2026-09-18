@@ -1,9 +1,9 @@
 export default {
-  "#rejianxiong1": "燕雀安知鸿鹄之志。",
-  "#rejianxiong2": "夫英雄者，胸怀大志，腹有良谋。",
-  "#rehujia1": "护卫何在！",
-  "#rehujia2": "大胆逆贼！谁可擒之？",
-  "#re_caocao:die": "华佗何在……",
+  "#rejianxiong1": "乱世天下，能者居之！",
+  "#rejianxiong2": "宁人负我，毋人负我！",
+  "#hujia_re_caocao1": "来人，来人！",
+  "#hujia_re_caocao2": "有刺客！",
+  "#re_caocao:die": "神龟虽寿，犹有竟时。",
 
   "#refankui1": "哼！正中下怀！",
   "#refankui2": "哼！自作孽不可活！",

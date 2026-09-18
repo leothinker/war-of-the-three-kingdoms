@@ -2132,22 +2132,7 @@ export default {
       player.recast(event.cards, void 0, (player, cards) => {
         var numberOfCardsToDraw = cards.length
         cards.forEach((value) => {
-          if (
-            lib.config.mode === "stone" &&
-            _status.mode === "deck" &&
-            !player.isMin() &&
-            get.type(value).startsWith("stone")
-          ) {
-            var stonecard = get.stonecard(1, player.career)
-            if (stonecard.length) {
-              numberOfCardsToDraw -= stonecard.length
-              player.gain(game.createCard(stonecard.randomGet()), "draw")
-            } else {
-              player.draw({
-                drawDeck: 1,
-              }).log = false
-            }
-          } else if (get.subtype(value) === "spell_gold") {
+          if (get.subtype(value) === "spell_gold") {
             var libCard = get.libCard((info) => info.subtype === "spell_silver")
             if (!libCard.length) {
               return

@@ -5,7 +5,6 @@ const characters = {
     hp: 4,
     skills: ["rejianxiong", "rehujia"],
     isZhugong: true,
-    dieAudios: ["re_caocao"],
   },
   ol_simayi: {
     sex: "male",

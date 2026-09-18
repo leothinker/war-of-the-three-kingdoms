@@ -670,8 +670,7 @@ export class UI {
         if (
           !ui.dialog.buttons?.length &&
           !ui.dialog.forcebutton &&
-          ui.dialog.classList.contains("fullheight") === false &&
-          get.mode() !== "stone"
+          ui.dialog.classList.contains("fullheight") === false
         ) {
           if (!ui.dialog.classList.contains("addNewRow")) {
             ui.dialog.classList.add("nobutton")

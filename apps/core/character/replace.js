@@ -1,5 +1,12 @@
 window.wtk_character_replace = {
-  caocao: ["caocao", "old_caocao", "re_caocao", "ol_caocao"],
+  caocao: [
+    "caocao",
+    "old_caocao",
+    "re_caocao",
+    "ol_caocao",
+    "sb_caocao",
+    "scl_caocao",
+  ],
   simayi: ["simayi", "re_simayi", "ol_simayi"],
   xiahoudun: ["xiahoudun", "old_xiahoudun", "re_xiahoudun", "ol_xiahoudun"],
   zhangliao: ["zhangliao", "old_zhangliao", "re_zhangliao", "ol_zhangliao"],

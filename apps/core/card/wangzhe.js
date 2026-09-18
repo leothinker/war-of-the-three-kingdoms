@@ -877,16 +877,6 @@ game.import("card", () => ({
                   return 0
                 }
               }
-            } else if (
-              mode === "stone" &&
-              target.isMin() &&
-              player !== target &&
-              tri &&
-              tri.name === "dying" &&
-              player.side === target.side &&
-              tri.source !== target.getEnemy()
-            ) {
-              return 0
             }
             return 2
           },
@@ -4048,12 +4038,7 @@ game.import("card", () => ({
             usable,
             player.mayHaveSha(player, "use", item, "count"),
           )
-          if (
-            shas !== 1 ||
-            (lib.config.mode === "stone" &&
-              !player.isMin() &&
-              player.getActCount() + 1 >= player.actcount)
-          ) {
+          if (shas !== 1) {
             return 0
           }
           return sha + 0.2

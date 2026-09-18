@@ -38,7 +38,10 @@ const skills = {
   // 护驾
   hujia: {
     audio: 2,
-    audioname2: { re_caocao: "rehujia", old_caocao: "rehujia" },
+    audioname: ["re_caocao"],
+    audioname2: {
+      old_caocao: "rehujia",
+    },
     zhuSkill: true,
     trigger: { player: ["chooseToRespondBefore", "chooseToUseBefore"] },
     filter(event, player) {

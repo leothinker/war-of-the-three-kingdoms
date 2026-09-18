@@ -1,9 +1,9 @@
 const characterSort = {
-  sb_zhi: ["sb_caocao"],
+  scl_2026: ["scl_caocao"],
 }
 
 const characterSortTranslate = {
-  sb_zhi: "谋攻篇·知",
+  scl_2026: "王者之战2026",
 }
 
 export { characterSort, characterSortTranslate }

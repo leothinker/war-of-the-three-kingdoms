@@ -11,7 +11,7 @@ window.wtk_package = {
     // reyijiang: "界一将成名",
 
     shenwu: "神武再世",
-    // sb: "谋攻篇",
+    sb: "谋攻篇",
     sbfm: "上兵伐谋",
     // mouding: "谋定天下",
 
@@ -33,6 +33,8 @@ window.wtk_package = {
     old: "往昔龙吟",
 
     // xia: "武侠",
+
+    scl: "王者之战",
   },
   card: {
     standard: "标准版",

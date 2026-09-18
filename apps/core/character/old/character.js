@@ -35,7 +35,7 @@ const characters = {
     skills: ["oldjianxiong", "hujia"],
     isZhugong: true,
     img: "image/character/re_caocao.jpg",
-    dieAudios: ["re_caocao"],
+    dieAudios: ["ol_caocao"],
   },
   old_xiahoudun: {
     sex: "male",

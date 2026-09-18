@@ -901,16 +901,6 @@ export default {
                   return 0
                 }
               }
-            } else if (
-              mode === "stone" &&
-              target.isMin() &&
-              player !== target &&
-              tri &&
-              tri.name === "dying" &&
-              player.side === target.side &&
-              tri.source !== target.getEnemy()
-            ) {
-              return 0
             }
             return 2
           },

@@ -87,6 +87,9 @@ export default {
     },
     async (event, trigger, player) => {
       if (lib.config.new_tutorial) {
+        if (!_status.connectMode) {
+          game.showChangeLog()
+        }
         return
       }
 
@@ -3918,6 +3921,7 @@ export default {
         }
 
         const marknow =
+          !_status.connectMode &&
           this !== game.me &&
           get.config("auto_mark_identity") &&
           this.ai.identity_mark !== "finished"
@@ -4090,6 +4094,7 @@ export default {
 
           game.broadcastAll("closeDialog", event.videoId)
           if (
+            !_status.connectMode &&
             get.config("auto_mark_identity") &&
             !target.node.identity.firstChild.innerHTML.length
           ) {

@@ -3636,10 +3636,6 @@ export class Game {
           game.players[i].init(players[i].name, players[i].name2)
           game.players[i].setIdentity(players[i].identity)
           game.players[i].setNickname(players[i].nickname)
-        } else if (lib.config.mode === "stone") {
-          game.players[i].init(players[i].name, players[i].name2)
-          game.players[i].classList.add("noidentity")
-          game.players[i].updateActCount(null, players[i].count, 0)
         } else if (lib.config.mode === "boss") {
           game.players[i].init(players[i].name, players[i].name2)
           game.players[i].setIdentity(players[i].identity)
@@ -4490,11 +4486,6 @@ export class Game {
       player.next.previous = player.previous
       game.players.remove(player)
       game.dead.push(player)
-      if (lib.config.mode === "stone") {
-        setTimeout(() => {
-          player.delete()
-        }, 500)
-      }
     },
     tafangMe: (player) => {
       if (player) {
@@ -7389,9 +7380,6 @@ export class Game {
             break
           case "chess":
             game.saveConfig("mode", "stone")
-            break
-          case "stone":
-            game.saveConfig("mode", "identity")
             break
         }
       }

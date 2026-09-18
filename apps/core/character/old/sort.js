@@ -57,7 +57,7 @@ const characterSort = {
   old_yijiang5: ["old_caorui", "old_caoxiu", "old_quancong"],
   old_yijiang6: ["old_huanghao", "old_liuyu", "old_zhangrang"],
   old_yijiang7: ["old_xinxianying", "old_jikang"],
-  sp_default: [
+  old_sp: [
     "yangxiu",
     "sp_yuanshu",
     "old_sunshangxiang",
@@ -96,7 +96,7 @@ const characterSortTranslate = {
   old_yijiang5: "一将成名2015",
   old_yijiang6: "原创之魂2016",
   old_yijiang7: "原创之魂2017",
-  sp_default: "桌游志SP",
+  old_sp: "桌游志SP",
 }
 
 export { characterSort, characterSortTranslate }

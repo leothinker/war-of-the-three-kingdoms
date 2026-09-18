@@ -1,9 +1,9 @@
 const characters = {
-  sb_caocao: {
+  scl_caocao: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["sbjianxiong", "qingzheng", "sbhujia"],
+    skills: ["shuzhi", "rejianxiong", "sclqingzheng", "rehujia"],
     isZhugong: true,
   },
 }
