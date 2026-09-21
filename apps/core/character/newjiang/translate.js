@@ -1,4 +1,10 @@
 const translates = {
+  re_caochong: "界曹冲",
+  re_caochong_prefix: "界",
+  rechengxiang: "称象",
+  rechengxiang_info:
+    "当你受到伤害后，你可以亮出牌堆顶的四张牌，然后获得其中任意张点数之和不大于13的牌。若获得的牌点数之和为13，你复原武将牌。",
+
   re_xinxianying: "辛宪英",
   rezhongjian: "忠鉴",
   rezhongjian_info:

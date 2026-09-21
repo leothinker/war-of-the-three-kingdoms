@@ -28,6 +28,14 @@ const characters = {
     skills: ["wangzun", "tongji"],
   },
 
+  old_shen_caocao: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["feiying", "oldguixin"],
+    dieAudios: ["shen_caocao"],
+  },
+
   old_caocao: {
     sex: "male",
     group: "wei",
@@ -351,7 +359,7 @@ const characters = {
     sex: "male",
     group: "wei",
     hp: 3,
-    skills: ["danlao", "jilei"],
+    skills: ["danlao", "oldjilei"],
     clans: ["弘农杨氏"],
   },
   sp_yuanshu: {

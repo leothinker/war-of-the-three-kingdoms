@@ -275,6 +275,18 @@ export default {
   "#zhuixi2": "得势追袭，胜望在握！",
   "#liangxing:die": "夏侯渊，你竟敢！",
 
+  "#tiandu_xizhicai1": "天意不可逆。",
+  "#tiandu_xizhicai2": "既是如此……",
+  "#xianfu1": "辅佐明君，从一而终。",
+  "#xianfu2": "吾于此生，竭尽所能。",
+  "#xianfu3": "春蚕至死，蜡炬成灰。",
+  "#xianfu4": "愿为主公，尽我所能。",
+  "#xianfu5": "赠人玫瑰，手有余香。",
+  "#xianfu6": "主公之幸，我之幸也。",
+  "#chouce1": "一筹一划，一策一略。",
+  "#chouce2": "主公之忧，吾之所思也。",
+  "#xizhicai:die": "为何，不再给我一点点时间……",
+
   "#jueqing_ol_zhangchunhua1": "情丝如雪，难当暖阳。",
   "#jueqing_ol_zhangchunhua2": "有情总被无情负，绝情方无软肋生。",
   "#shangshi_ol_zhangchunhua1": "伤我最深的，竟是你司马懿。",

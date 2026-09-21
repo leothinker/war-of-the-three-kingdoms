@@ -313,6 +313,13 @@ const characters = {
     skills: ["lulve", "zhuixi"],
   },
 
+  xizhicai: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["tiandu", "xianfu", "chouce"],
+  },
+
   ol_zhangchunhua: {
     sex: "female",
     group: "wei",

@@ -5,6 +5,8 @@ export default {
   old_huangyueying: "归隐的杰女",
   old_yuanshu: "野心渐增",
 
+  old_shen_caocao: "挟汉临诸夏",
+
   old_guanyu: "美髯公",
   old_zhangfei: "万夫不当",
   old_zhaoyun: "虎威将军",

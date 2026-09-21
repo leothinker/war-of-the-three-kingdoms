@@ -51,6 +51,8 @@ export default {
   dongcheng: "沥胆卫汉",
   liangxing: "凶豺掠豹",
 
+  xizhicai: "负俗的夭才",
+
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",
   re_zhangxingcai: "敬哀皇后",

@@ -3592,8 +3592,8 @@ const skills = {
     },
   },
   //疑包
-  //曹操 -by.柴油鹿鹿
-  sxrmkuxin: {
+  //曹操
+  kuxin: {
     audio: 2,
     trigger: { player: "damageEnd" },
     filter(event, player) {
@@ -3802,7 +3802,7 @@ const skills = {
                 return 1
               }
               const player = get.player()
-              const cards = get.event().list?.flatMap((i) => i[0])
+              const cards = get.event().list?.flatMap((i) => i[0]) || []
               return (
                 -get.attitude(player, target) *
                 target.countCards("h", (cardx) => !cards?.includes(cardx))
@@ -3904,7 +3904,7 @@ const skills = {
               if (
                 current.hasCard(
                   (cardx) =>
-                    lib.filter.canBeGained(cardx, target, current, "sxrmkuxin"),
+                    lib.filter.canBeGained(cardx, target, current, "kuxin"),
                   "h",
                 )
               ) {
@@ -3924,7 +3924,7 @@ const skills = {
       },
     },
   },
-  sxrmsigu: {
+  sigu: {
     audio: 2,
     enable: "phaseUse",
     filter(event, player) {
@@ -3950,8 +3950,13 @@ const skills = {
       }
       const name = get.info(event.name).pasts[result.number - 1],
         skill = get.info(event.name).derivation[result.number - 1]
-      const mark = `desigu_${player.playerid}`
+      const mark = `sigu_${player.playerid}`
       if (name && skill) {
+        game.broadcastAll(
+          (player, name) => player.tempname.add(name),
+          target,
+          "sxrm_caocao",
+        )
         await target.addAdditionalSkills(mark, [skill], true)
         //写个标记吧
         target.addTip(mark, `似故 ${get.translation(skill)}`)
@@ -3963,6 +3968,13 @@ const skills = {
       await target.damage()
       await target.damage()
       if (name && skill) {
+        if (Array.isArray(target.tempname)) {
+          game.broadcastAll(
+            (player, name) => player.tempname.remove(name),
+            target,
+            "sxrm_caocao",
+          )
+        }
         target.removeAdditionalSkills(mark)
         target.removeTip(mark)
         target.setAvatar(target.name, target.name)
@@ -4011,10 +4023,10 @@ const skills = {
       "re_simayi",
       "re_guojia",
       "ol_xunyu",
-      "sb_caopi",
-      "shenpei",
+      "caopi",
+      "jushou",
       "re_caochong",
-      "re_xunyou",
+      "xunyou",
       "yangxiu",
       "chengyu",
       "xizhicai",
@@ -4022,9 +4034,9 @@ const skills = {
     ],
     derivation: [
       "zhichi",
-      "reganglie",
+      "olganglie",
       "refankui",
-      "new_reyiji",
+      "reyiji",
       "oljieming",
       "fangzhu",
       "shibei",
@@ -4033,8 +4045,126 @@ const skills = {
       "jilei",
       "benyu",
       "chouce",
-      "new_wuhun",
+      "wuhun",
     ],
+  },
+  zhichi_sxrm_caocao: { audio: 1 },
+  olganglie_sxrm_caocao: { audio: 1 },
+  refankui_sxrm_caocao: { audio: 1 },
+  reyiji_sxrm_caocao: { audio: 1 },
+  oljieming_sxrm_caocao: { audio: 1 },
+  fangzhu_sxrm_caocao: { audio: 1 },
+  shibei_sxrm_caocao: { audio: 1 },
+  rechengxiang_sxrm_caocao: { audio: 1 },
+  zhiyu_sxrm_caocao: { audio: 1 },
+  jilei_sxrm_caocao: { audio: 1 },
+  benyu_sxrm_caocao: { audio: 1 },
+  chouce_sxrm_caocao: { audio: 1 },
+  wuhun_sxrm_caocao: { audio: 1 },
+  // 贲育
+  benyu: {
+    audio: 2,
+    audioname2: { sxrm_caocao: "benyu_sxrm_caocao" },
+    trigger: { player: "damageEnd" },
+    filter(event, player) {
+      if (!event.source) {
+        return false
+      }
+      var nh1 = player.countCards("h")
+      var nh2 = event.source.countCards("h")
+      var eh = player.countCards("e")
+      if (nh1 + eh > nh2 && event.source.isIn()) {
+        return true
+      }
+      if (nh1 < Math.min(5, nh2)) {
+        return true
+      }
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      const num1 = player.countCards("h")
+      const num2 = trigger.source.countCards("h")
+      const eh = player.countCards("he", (card) =>
+        lib.filter.cardDiscardable(card, player, "benyu"),
+      )
+      let bool1 = false,
+        bool2 = false
+      if (num1 < Math.min(num2, 5)) {
+        bool1 = true
+      }
+      if (eh > num2 && trigger.source.isIn()) {
+        bool2 = true
+      }
+      if (bool1 && bool2) {
+        event.chosen = true
+        const result = await player
+          .chooseControl("cancel2")
+          .set("prompt", get.prompt("benyu", trigger.source))
+          .set("choiceList", [
+            `将手牌摸至${get.cnNumber(Math.min(num2, 5))}张`,
+            `弃置至少${get.cnNumber(num2 + 1)}张牌，然后对其造成1点伤害`,
+          ])
+          .forResult()
+        if (result.control === "cancel2") {
+          event.finish()
+          return
+        }
+        if (result.index !== 1) {
+          event._result = { bool: true }
+          if (event._result.bool) {
+            player.logSkill("benyu", trigger.source)
+            player.drawTo(Math.min(trigger.source.countCards("h"), 5))
+          }
+          event.finish()
+          return
+        }
+      } else if (!bool2) {
+        const result = await player
+          .chooseBool(
+            get.prompt("benyu", trigger.source),
+            `将手牌摸至${get.cnNumber(Math.min(trigger.source.countCards("h"), 5))}张`,
+          )
+          .forResult()
+        if (result.bool) {
+          player.logSkill("benyu", trigger.source)
+          player.drawTo(Math.min(trigger.source.countCards("h"), 5))
+        }
+        event.finish()
+        return
+      }
+      const num = trigger.source.countCards("h") + 1
+      const args = [[num, player.countCards("he")], "he"]
+      if (event.chosen) {
+        player.logSkill("benyu", trigger.source)
+        args.push(true)
+      } else {
+        args.push(get.prompt("benyu", trigger.source))
+        args.push(`弃置${get.cnNumber(num)}张牌，然后对其造成1点伤害`)
+      }
+      const next = player.chooseToDiscard.apply(player, args)
+      if (!event.chosen) {
+        next.logSkill = ["benyu", trigger.source]
+      }
+      next.set("ai", (card) => {
+        var trigger = _status.event.getTrigger()
+        var player = _status.event.player
+        if (ui.selected.cards.length >= _status.event.num) {
+          return -1
+        }
+        if (
+          get.damageEffect(trigger.source, player, player) > 0 &&
+          (get.value(card, player) < 0 || _status.event.num <= 2)
+        ) {
+          return 8 - get.value(card)
+        }
+        return -1
+      })
+      next.set("num", num)
+      const result2 = await next.forResult()
+      if (result2.bool) {
+        trigger.source.damage()
+      }
+    },
   },
   //刘备
   sxrmchengbian: {

@@ -2,6 +2,28 @@ import { _status, game, get, lib, ui } from "wtk"
 
 /** @type { importCharacterConfig["skill"] } */
 const skills = {
+  // 界曹冲
+  // 称象
+  rechengxiang: {
+    audio: 2,
+    audioname2: { sxrm_caocao: "rechengxiang_sxrm_caocao" },
+    inherit: "chengxiang",
+    async callback(event, trigger, player) {
+      if (
+        event.cards2?.length &&
+        event.cards2
+          .map((card) => {
+            return get.number(card)
+          })
+          .reduce((sum, num) => {
+            return (sum += num)
+          }, 0) === 13
+      ) {
+        await player.link(false)
+        await player.turnOver(false)
+      }
+    },
+  },
   // 辛宪英
   // 忠鉴
   rezhongjian: {

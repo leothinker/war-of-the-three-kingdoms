@@ -1,4 +1,12 @@
 const characters = {
+  // 疑
+  sxrm_caocao: {
+    sex: "male",
+    group: "devil",
+    hp: 3,
+    skills: ["kuxin", "sigu"],
+    groupInGuozhan: "wei",
+  },
   //嗔
   sxrm_zhouyu: {
     sex: "male",
@@ -117,14 +125,7 @@ const characters = {
     skills: ["sxrmhaibian", "sxrmqiewang"],
     names: "颜|良-文|丑",
   },
-  //疑
-  sxrm_caocao: {
-    sex: "male",
-    group: "devil",
-    hp: 3,
-    skills: ["sxrmkuxin", "sxrmsigu"],
-    groupInGuozhan: "wei",
-  },
+
   sxrm_caopi: {
     sex: "male",
     group: "wei",

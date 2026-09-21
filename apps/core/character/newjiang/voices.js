@@ -1,4 +1,10 @@
 export default {
+  "#rechengxiang1": "冲有一法，可得其重。",
+  "#rechengxiang2": "待我细细算来。",
+  "#renxin_re_caochong1": "见死而不救，非仁者所为。",
+  "#renxin_re_caochong2": "遇难而不援，非我之道也。",
+  "#re_caochong:die": "父亲……兄长……",
+
   "#rezhongjian1": "管中可窥豹，一叶而知秋。",
   "#rezhongjian2": "此人肆意放纵，必有异志！",
   "#recaishi1": "小女才疏学浅，将军见笑了。",

@@ -60,6 +60,7 @@ const skills = {
   // 反馈
   refankui: {
     audio: 2,
+    audioname2: { sxrm_caocao: "refankui_sxrm_caocao" },
     trigger: { player: "damageEnd" },
     filter(event, player) {
       return (
@@ -503,6 +504,7 @@ const skills = {
   // 遗计
   reyiji: {
     audio: 2,
+    audioname2: { sxrm_caocao: "reyiji_sxrm_caocao" },
     trigger: {
       player: "damageEnd",
     },

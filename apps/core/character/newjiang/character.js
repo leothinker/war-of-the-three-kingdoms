@@ -1,4 +1,11 @@
 const characters = {
+  re_caochong: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["rechengxiang", "renxin"],
+  },
+
   re_xinxianying: {
     sex: "female",
     group: "wei",

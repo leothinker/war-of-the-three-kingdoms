@@ -1,4 +1,6 @@
 export default {
+  re_caochong: "界曹冲",
+
   re_xinxianying: "忠鉴清识",
   xuelingyun: "霓裳缀红泪",
   duanqiaoxiao: "柔荑点绛唇",

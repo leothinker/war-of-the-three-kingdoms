@@ -213,6 +213,138 @@ const skills = {
       },
     },
   },
+  // 神曹操
+  // 归心
+  oldguixin: {
+    audio: "guixin",
+    forbid: ["guozhan"],
+    init() {
+      if (!_status.oldguixin) {
+        _status.oldguixin = []
+        if (!_status.characterlist) {
+          game.initCharacterList()
+        }
+        for (const name of _status.characterlist) {
+          _status.oldguixin.addArray(
+            get.character(name, 3).filter((skill) => {
+              const info = get.info(skill)
+              return info?.zhuSkill && !info.ai?.combo
+            }),
+          )
+        }
+      }
+    },
+    trigger: { player: "phaseEnd" },
+    filter(event, player) {
+      return (
+        !_status.oldguixin.some(
+          (skill) => !player.hasSkill(skill, null, false, false),
+        ) || game.hasPlayer((current) => current !== player)
+      )
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      const controls = ["获得技能", "修改势力"]
+      if (
+        !_status.oldguixin.some(
+          (skill) => !player.hasSkill(skill, null, false, false),
+        )
+      ) {
+        controls.shift()
+      }
+      if (!game.hasPlayer((current) => current !== player)) {
+        controls.shift()
+      }
+      if (!controls.length) {
+        return
+      }
+      controls.push("cancel2")
+      const result = await player
+        .chooseControl({
+          controls,
+          prompt: get.prompt2(event.name),
+          ai() {
+            return _status.event.controls.length === 3 ? "获得技能" : "cancel2"
+          },
+        })
+        .forResult()
+      if (result?.control === "cancel2") {
+        return
+      }
+      const control = result.control
+      if (control === "获得技能") {
+        const skills = _status.oldguixin.filter(
+          (skill) => !player.hasSkill(skill, null, false, false),
+        )
+        if (skills.length) {
+          const list = skills.map((skill) => [
+            skill,
+            '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">' +
+              (() => {
+                let str = get.translation(skill)
+                if (!lib.skill[skill]?.nobracket) {
+                  str = `【${str}】`
+                }
+                return str
+              })() +
+              "</div><div>" +
+              lib.translate[`${skill}_info`] +
+              "</div></div>",
+          ])
+          const result = await player
+            .chooseButton({
+              createDialog: ["归心：选择获得一个主公技", [list, "textbutton"]],
+              forced: true,
+              ai() {
+                return 1 + Math.random()
+              },
+            })
+            .forResult()
+          if (result?.bool) {
+            player.logSkill(event.name)
+            await player.addSkill(result.links)
+          }
+        }
+      } else if (
+        control === "修改势力" &&
+        game.hasPlayer((current) => current !== player)
+      ) {
+        const result = await player
+          .chooseTarget({
+            prompt: "请选择【归心】的目标",
+            prompt2: "更改一名其他角色的势力",
+            filterTarget: lib.filter.notMe,
+            forced: true,
+            ai() {
+              return 1 + Math.random()
+            },
+          })
+          .forResult()
+        if (result?.bool) {
+          const target = result.targets[0]
+          player.logSkill(event.name, target)
+          const groups = lib.group.filter(
+            (group) => group !== "shen" && group !== target.group,
+          )
+          if (groups.length) {
+            const result = await player
+              .chooseControl({
+                prompt: `请选择${get.translation(target)}要变更的势力`,
+                controls: groups,
+                ai() {
+                  return get.event().controls.randomGet()
+                },
+              })
+              .forResult()
+            if (result?.control) {
+              player.popup(get.translation(`${result.control}2`))
+              await target.changeGroup(result.control)
+            }
+          }
+        }
+      }
+    },
+  },
   // 界关羽
   // 义绝
   oldyijue: {
@@ -4352,6 +4484,7 @@ const skills = {
   jilei: {
     trigger: { player: "damageEnd" },
     audio: 2,
+    audioname2: { sxrm_caocao: "jilei_sxrm_caocao" },
     filter(event) {
       return event.source?.isIn()
     },
@@ -4395,7 +4528,7 @@ const skills = {
     async content(event, trigger, player) {
       const type = event.cost_data[0][2].slice(8)
       player.popup(`${get.translation(type)}牌`)
-      trigger.source.addTempSkill("jilei2")
+      trigger.source.addTempSkill("jilei2", { player: "phaseBegin" })
       trigger.source.markAuto("jilei2", type)
     },
     ai: {
@@ -4465,6 +4598,16 @@ const skills = {
           }
         }
       },
+    },
+  },
+  oldjilei: {
+    audio: "jilei",
+    inherit: "jilei",
+    async content(event, trigger, player) {
+      const type = event.cost_data[0][2].slice(8)
+      player.popup(`${get.translation(type)}牌`)
+      trigger.source.addTempSkill("jilei2")
+      trigger.source.markAuto("jilei2", type)
     },
   },
   // SP袁术

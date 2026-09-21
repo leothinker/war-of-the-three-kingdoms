@@ -1152,6 +1152,7 @@ const skills = {
   // 武魂
   wuhun: {
     audio: 2,
+    audioname2: { sxrm_caocao: "wuhun_sxrm_caocao" },
     trigger: { player: "damageEnd" },
     filter(event, player) {
       return event.source?.isIn()
@@ -3045,6 +3046,7 @@ const skills = {
   // 放逐
   fangzhu: {
     audio: 2,
+    audioname2: { sxrm_caocao: "fangzhu_sxrm_caocao" },
     trigger: { player: "damageEnd" },
     preHidden: true,
     async cost(event, trigger, player) {

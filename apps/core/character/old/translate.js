@@ -24,6 +24,12 @@ const translates = {
   tongji_info:
     "锁定技，若你的手牌数大于体力值，攻击范围含有你的角色使用【杀】只能以你为目标。",
 
+  old_shen_caocao: "神曹操",
+  old_shen_caocao_prefix: "神",
+  oldguixin: "归心",
+  oldguixin_info:
+    "回合结束时，你可以选择一项：1.变更一名其他角色的势力；2.获得一个未登场或已死亡角色的主公技。",
+
   old_guanyu: "界关羽",
   old_guanyu_prefix: "界",
   oldyijue: "义绝",
@@ -370,6 +376,9 @@ const translates = {
   jilei2: "鸡肋",
   jilei2_bg: "肋",
   jilei_info:
+    "当你受到伤害后，你可以声明一种牌的类别，伤害来源不能使用、打出或弃置你声明的此类手牌直到其下回合开始。",
+  oldjilei: "鸡肋",
+  oldjilei_info:
     "当你受到伤害后，你可以声明一种牌的类别，本回合伤害来源不能使用、打出或弃置你声明的此类手牌。",
 
   sp_yuanshu: "SP袁术",

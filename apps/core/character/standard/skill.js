@@ -507,7 +507,7 @@ const skills = {
   // 天妒
   tiandu: {
     audio: 2,
-    audioname: ["re_guojia"],
+    audioname: ["re_guojia", "xizhicai"],
     audioname2: { old_guojia: "tiandu_re_guojia" },
     trigger: { player: "judgeEnd" },
     preHidden: true,

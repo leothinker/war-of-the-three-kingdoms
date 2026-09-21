@@ -1,4 +1,6 @@
 export default {
+  sxrm_caocao: "一目窥九州",
+
   sxrm_zhouyu: "哀弦万耳惊",
   sxrm_sunshangxiang: "生死相随",
   sxrm_zhangzhao: "迂儒",
@@ -19,7 +21,6 @@ export default {
   sxrm_pangde: "狂徒",
   sxrm_yanwen: "土鸡瓦犬",
 
-  sxrm_caocao: "一目窥九州",
   sxrm_liubei: "潜隐波涛",
   sxrm_jianggan: "舌锁千帆",
   sxrm_huatuo: "上医医国",

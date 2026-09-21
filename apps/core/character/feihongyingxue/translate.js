@@ -1,0 +1,144 @@
+const translates = {
+  ol_caocao: "界曹操",
+  ol_caocao_prefix: "界",
+  rehujia: "护驾",
+  rehujia_info:
+    "主公技，当你需要使用或打出【闪】时，你可以令其他魏势力角色选择是否替你使用或打出【闪】（视为由你使用或打出）。当其他魏势力角色于其回合外使用、打出或替你使用或打出【闪】时，其可以令你摸一张牌（每回合限一次）。",
+
+  ol_simayi: "界司马懿",
+  ol_simayi_prefix: "界",
+
+  ol_xiahoudun: "界夏侯惇",
+  ol_xiahoudun_prefix: "界",
+  olganglie: "刚烈",
+  olganglie_info:
+    "当你受到其他角色造成的1点伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
+
+  ol_zhangliao: "界张辽",
+  ol_zhangliao_prefix: "界",
+
+  ol_xuzhu: "界许褚",
+  ol_xuzhu_prefix: "界",
+  olluoyi: "裸衣",
+  olluoyi_info:
+    "摸牌阶段开始前，你可以亮出牌堆顶的三张牌，然后你可以跳过摸牌阶段并获得其中的基本牌、武器牌和【决斗】。若如此做，直到你的下个回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。",
+
+  ol_guojia: "界郭嘉",
+  ol_guojia_prefix: "界",
+
+  ol_zhenji: "界甄姬",
+  ol_zhenji_prefix: "界",
+  reluoshen: "洛神",
+  reluoshen_info:
+    "准备阶段，你可以进行判定，当黑色判定牌生效后，你获得之并可以重复此流程。你的手牌上限+X（X为你本回合因〖洛神〗获得的牌数）。",
+
+  ol_liubei: "界刘备",
+  ol_liubei_prefix: "界",
+  rejijiang: "激将",
+  rejijiang1: "激将",
+  rejijiang2: "激将",
+  rejijiang_info:
+    "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色选择是否替你使用或打出【杀】（视为由你使用或打出）。当其他蜀势力角色于其回合外使用、打出或替你使用或打出【杀】时，其可以令你摸一张牌（每回合限一次）。",
+
+  ol_guanyu: "界关羽",
+  ol_guanyu_prefix: "界",
+
+  ol_zhangfei: "界张飞",
+  ol_zhangfei_prefix: "界",
+  olpaoxiao: "咆哮",
+  olpaoxiao2: "咆哮",
+  olpaoxiao_info:
+    "锁定技，你使用【杀】无次数限制；当你使用的【杀】被抵消后，你本回合下一次造成【杀】的伤害时，此伤害+1。",
+  retishen: "替身",
+  retishen_info:
+    "限定技，准备阶段，你可以将体力回复至上限，然后摸X张牌（X为你本次回复的体力值）。",
+
+  ol_zhugeliang: "界诸葛亮",
+  ol_zhugeliang_prefix: "界",
+
+  ol_zhaoyun: "界赵云",
+  ol_zhaoyun_prefix: "界",
+  relongdan: "龙胆",
+  relongdan_info:
+    "你可以将一张【闪】当【杀】、【杀】当【闪】、【酒】当【桃】、【桃】当【酒】使用或打出。",
+  reyajiao: "涯角",
+  reyajiao_info:
+    "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以弃置攻击范围内包含你的角色区域里的一张牌。",
+
+  ol_machao: "界马超",
+  ol_machao_prefix: "界",
+
+  ol_huangyueying: "界黄月英",
+  ol_huangyueying_prefix: "界",
+  oljizhi: "集智",
+  oljizhi_info:
+    "当你使用非转化的锦囊牌时，你可以摸一张牌。然后你可以弃置一张基本牌，若如此做，本回合你的手牌上限+1。",
+
+  ol_sunquan: "界孙权",
+  ol_sunquan_prefix: "界",
+  oljiuyuan: "救援",
+  oljiuyuan_info:
+    "主公技，当其他吴势力角色于其回合内回复体力时，若其体力值不小于你，其可以改为令你回复1点体力，然后其摸一张牌。",
+
+  ol_ganning: "界甘宁",
+  ol_ganning_prefix: "界",
+
+  ol_lvmeng: "界吕蒙",
+  ol_lvmeng_prefix: "界",
+  reqinxue: "勤学",
+  reqinxue_info:
+    "觉醒技，准备阶段或结束阶段，若你的手牌数减体力值至少为2，你减1点体力上限，回复1点体力或摸两张牌，然后获得技能〖攻心〗。",
+  botu: "博图",
+  botu_info:
+    "每轮限X次（X为存活角色数且至多为3），回合结束后，若本回合置入弃牌堆的牌包含四种花色，你可以获得一个额外回合。",
+
+  ol_huanggai: "界黄盖",
+  ol_huanggai_prefix: "界",
+  rezhaxiang: "诈降",
+  rezhaxiang_info:
+    "锁定技，当你失去1点体力后，你摸三张牌，然后若此时为你的出牌阶段内，则此回合你使用【杀】的次数上限+1、使用红色【杀】无距离限制且不能被【闪】响应。",
+
+  ol_zhouyu: "界周瑜",
+  ol_zhouyu_prefix: "界",
+
+  ol_daqiao: "界大乔",
+  ol_daqiao_prefix: "界",
+
+  ol_luxun: "界陆逊",
+  ol_luxun_prefix: "界",
+
+  ol_sunshangxiang: "界孙尚香",
+  ol_sunshangxiang_prefix: "界",
+
+  ol_huatuo: "界华佗",
+  ol_huatuo_prefix: "界",
+
+  ol_lvbu: "界吕布",
+  ol_lvbu_prefix: "界",
+
+  ol_diaochan: "界貂蝉",
+  ol_diaochan_prefix: "界",
+  relijian: "离间",
+  relijian_info:
+    "出牌阶段限一次，你可以弃置一张牌并选择两名其他男性角色，然后令其中一名角色视为对另一名角色使用一张【决斗】（不能被【无懈可击】响应）。",
+
+  ol_gongsunzan: "界公孙瓒",
+  ol_gongsunzan_prefix: "界",
+  reyicong: "义从",
+  reyicong_info:
+    "锁定技，你计算与其他角色的距离-1；若你已损失的体力值不小于2，其他角色计算与你的距离+1。",
+  reqiaomeng: "趫猛",
+  reqiaomeng_info:
+    "当你使用的黑色牌指定其他角色为目标后，你可以弃置其中一个目标一张牌。若此牌为：装备牌，你获得之；锦囊牌，此黑色牌无法被响应。",
+
+  ol_huaxiong: "界华雄",
+  ol_huaxiong_prefix: "界",
+  olyaowu: "耀武",
+  olyaowu_info:
+    "锁定技，当你受到伤害时，若对你造成伤害的牌：为红色，伤害来源摸一张牌；不为红色，你摸一张牌。",
+  shizhan: "势斩",
+  shizhan_info:
+    "出牌阶段限两次，你可以令一名其他角色视为对你使用一张【决斗】。",
+}
+
+export default translates

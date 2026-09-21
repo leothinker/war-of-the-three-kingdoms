@@ -1280,6 +1280,7 @@ const skills = {
   zhichi: {
     audio: 2,
     trigger: { player: "damageEnd" },
+    audioname2: { sxrm_caocao: "zhichi_sxrm_caocao" },
     forced: true,
     filter(event, player) {
       return _status.currentPhase !== player
@@ -1291,6 +1292,7 @@ const skills = {
   zhichi2: {
     audio: "zhichi",
     trigger: { target: "useCardToBefore" },
+    audioname: ["sxrm_caocao"],
     forced: true,
     charlotte: true,
     priority: 15,
@@ -2071,6 +2073,7 @@ const skills = {
   // 智愚
   zhiyu: {
     audio: 2,
+    audioname2: { sxrm_caocao: "zhiyu_sxrm_caocao" },
     trigger: { player: "damageEnd" },
     preHidden: true,
     async content(event, trigger, player) {
@@ -2979,6 +2982,7 @@ const skills = {
   renxin: {
     trigger: { global: "damageBegin4" },
     audio: 2,
+    audioname: ["re_caochong"],
     //priority:6,
     filter(event, player) {
       return (
@@ -6293,6 +6297,7 @@ const skills = {
     trigger: { player: "damageEnd" },
     forced: true,
     audio: 2,
+    audioname2: { sxrm_caocao: "shibei_sxrm_caocao" },
     check(event, player) {
       return player.getHistory("damage").indexOf(event) === 0
     },

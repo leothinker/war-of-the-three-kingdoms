@@ -41,6 +41,12 @@ window.wtk_character_replace = {
 
   caoren: ["caoren", "re_caoren", "ol_caoren"],
   xiahouyuan: ["xiahouyuan", "re_xiahouyuan", "ol_xiahouyuan"],
+  shen_caocao: [
+    "shen_caocao",
+    "re_shen_caocao",
+    "ol_shen_caocao",
+    "old_shen_caocao",
+  ],
 
   hetaihou: ["hetaihou", "ol_hetaihou"],
 

@@ -1,4 +1,5 @@
 const characterSort = {
+  refresh_yijiang3: ["re_caochong"],
   yijiang_doukou: [
     "re_xinxianying",
     "xuelingyun",
@@ -20,6 +21,7 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
+  refresh_yijiang3: "界限突破·将3",
   yijiang_doukou: "一将成名·豆蔻梢头",
   yijiang_zhengyin: "一将成名·正音雅乐",
   yijiang_jinse: "一将成名·锦瑟良缘",

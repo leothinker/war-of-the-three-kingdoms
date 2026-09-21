@@ -1,0 +1,32 @@
+export default {
+  ol_caocao: "逐鹿天下",
+  ol_simayi: "千军入阵",
+  ol_xiahoudun: "开疆烈血",
+  ol_zhangliao: "踏雪疾驰",
+  ol_xuzhu: "虎啸生风",
+  ol_guojia: "风雅清韵",
+  ol_zhenji: "花好月圆",
+
+  ol_liubei: "龙御天下",
+  ol_guanyu: "武动乾坤",
+  ol_zhangfei: "据水断桥",
+  ol_zhugeliang: "龙年限定",
+  ol_zhaoyun: "曲乐耀武",
+  ol_machao: "星夜袭曹",
+  ol_huangyueying: "木牛流马",
+
+  ol_sunquan: "永开吴祚",
+  ol_ganning: "劈舟斩浪",
+  ol_lvmeng: "剑起惊澜",
+  ol_huanggai: "武动乾坤",
+  ol_zhouyu: "兔年清明",
+  ol_daqiao: "春花恋蝶",
+  ol_luxun: "火烧连营",
+  ol_sunshangxiang: "箭扫荆棘",
+
+  ol_huatuo: "仙山游医",
+  ol_lvbu: "傲睨万物",
+  ol_diaochan: "文和乱武",
+  ol_huaxiong: "刀斩潘凤",
+  ol_gongsunzan: "义从金镞",
+}

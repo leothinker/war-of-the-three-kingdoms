@@ -59,6 +59,7 @@ const characterSort = {
     "dongcheng",
     "liangxing",
   ],
+  sp_2024: ["xizhicai"],
   sp_2026: [
     "ol_zhangchunhua",
     "ol_xuelingyun",
@@ -70,6 +71,7 @@ const characterSort = {
 const characterSortTranslate = {
   sp_2020: "珍藏版（2020）",
   sp_2022: "珍藏版（2022）",
+  sp_2024: "珍藏版（2024）",
   sp_2026: "珍藏版（2026）",
 }
 

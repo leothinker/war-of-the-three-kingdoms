@@ -8,25 +8,26 @@ window.wtk_package = {
     reshenhua: "界神话再临",
     yijiang: "一将之魂",
     sp: "将星",
-    // reyijiang: "界一将成名",
+    offline: "线下专属",
 
+    feihongyingxue: "飞鸿印雪",
     shenwu: "神武再世",
-    sb: "谋攻篇",
-    sbfm: "上兵伐谋",
-    // mouding: "谋定天下",
+    newjiang: "一将成名",
+    shiji: "始计篇",
 
-    // yingbian: "文德武备",
+    sb: "谋攻篇",
+    yingbian: "文德武备",
+
+    jsrg: "江山如故",
+    sp2: "将星归汉",
+
+    sbfm: "上兵伐谋",
+    mouding: "谋定天下",
     clan: "门阀士族",
 
     // bingshi: "兵势篇",
-    // shiji: "始计篇",
 
-    sp2: "将星归汉",
-    newjiang: "一将成名",
-
-    jsrg: "江山如故",
     sxrm: "蚀心入魔",
-    offline: "线下专属",
 
     tianshui: "天水濯名",
     yanling: "雁翎耀光",

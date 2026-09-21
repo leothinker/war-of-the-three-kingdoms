@@ -2,14 +2,20 @@ import { get } from "wtk"
 
 const translates = {
   sxrm: "蚀心入魔",
-  //蚀心入魔·疑
+
+  // 蚀心入魔·疑
   sxrm_caocao: "魔曹操",
   sxrm_caocao_prefix: "魔",
-  sxrmkuxin: "枯心",
-  sxrmkuxin_info:
-    "你受到伤害后，可以令所有其他角色依次选择展示任意张手牌，然后你获得所有角色展示的牌或一名角色未展示的手牌并展示之，若你未以此法获得♥牌，你弃置这些牌并翻面。",
-  sxrmsigu: "似故",
-  sxrmsigu_info: `出牌阶段限一次，你可令一名其他角色进行判定，令其获得${["zhichi", "reganglie", "refankui", "new_reyiji", "oljieming", "fangzhu", "shibei", "rechengxiang", "zhiyu", "jilei", "benyu", "chouce", "new_wuhun"].map((skill) => get.poptip(skill)).join("")}中的第X个技能（X为判定点数）。若如此做，你对其造成两次1点伤害，然后其失去以此法获得的技能。`,
+  kuxin: "枯心",
+  kuxin_info:
+    "当你受到伤害后，你可以令所有其他角色依次展示任意张手牌，你选择获得所有角色展示的牌或一名其他角色未展示的所有手牌并展示之，若你未因此获得红桃牌，你弃置获得的牌并翻面。",
+  sigu: "似故",
+  sigu_info: `出牌阶段限一次，你可以令一名其他角色进行判定并对其造成两次1点伤害，期间其根据判定结果视为拥有对应的“受到伤害后”的技能。<br>判定结果对应的技能——<br>A${get.poptip("zhichi")}、2${get.poptip("olganglie")}、3${get.poptip("refankui")}、4${get.poptip("reyiji")}、5${get.poptip("oljieming")}、6${get.poptip("fangzhu")}、7${get.poptip("shibei")}、8${get.poptip("rechengxiang")}、9${get.poptip("zhiyu")}、10${get.poptip("jilei")}、J${get.poptip("benyu")}、Q${get.poptip("chouce")}、K${get.poptip("wuhun")}`,
+  benyu: "贲育",
+  benyu2: "贲育",
+  benyu_info:
+    "当你受到伤害后，你可以选择一项：1.将手牌摸至与伤害来源手牌数相同（至多摸至五张）；2.弃置大于伤害来源手牌数张牌，然后对其造成1点伤害。",
+
   sxrm_liubei: "疑刘备",
   sxrm_liubei_prefix: "疑",
   sxrmchengbian: "乘变",
