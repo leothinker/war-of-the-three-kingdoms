@@ -1,11 +1,19 @@
 const characters = {
   // 起
+  jsrg_kongrong: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["jsrglirang", "zhengyi"],
+    dieAudios: ["kongrong"],
+  },
   jsrg_caocao: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["jsrgzhenglve", "jsrghuilie"],
   },
+
   jsrg_liuhong: {
     sex: "male",
     group: "qun",
@@ -69,13 +77,6 @@ const characters = {
     img: "image/character/yangbiao.jpg",
     dieAudios: ["yangbiao"],
     clans: ["弘农杨氏"],
-  },
-  jsrg_kongrong: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["jsrg_new_lirang", "jsrg_new_zhengyi"],
-    dieAudios: ["kongrong"],
   },
   ol_wangrong: {
     sex: "female",

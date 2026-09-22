@@ -1,5 +1,7 @@
 export default {
+  jsrg_kongrong: "北海太守",
   jsrg_caocao: "汉征西将军",
+
   jsrg_liuhong: "轧庭焚礼",
   jsrg_hejin: "独意误国谋",
   jsrg_sunjian: "拨定烈志",
@@ -8,7 +10,6 @@ export default {
   jsrg_dongbai: "魔姬",
   jsrg_qiaoxuan: "泛爱博容",
   jsrg_yangbiao: "德彰海内",
-  jsrg_kongrong: "北海太守",
   jsrg_zhujun: "征无遗虑",
   jsrg_liubei: "负戎荷戈",
   jsrg_wangyun: "居功自矜",

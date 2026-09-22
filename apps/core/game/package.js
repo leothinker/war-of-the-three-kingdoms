@@ -16,13 +16,13 @@ window.wtk_package = {
     shiji: "始计篇",
 
     sb: "谋攻篇",
-    yingbian: "文德武备",
+    // yingbian: "文德武备",
 
     jsrg: "江山如故",
     sp2: "将星归汉",
 
     sbfm: "上兵伐谋",
-    mouding: "谋定天下",
+    // mouding: "谋定天下",
     clan: "门阀士族",
 
     // bingshi: "兵势篇",

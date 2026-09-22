@@ -3374,7 +3374,6 @@ const skills = {
   // 曹纯
   // 缮甲
   shanjia: {
-    audio: 2,
     init(player) {
       player.addSkill("shanjia_count")
     },
@@ -3393,6 +3392,7 @@ const skills = {
         }
       },
     },
+    audio: 2,
     trigger: {
       player: "phaseUseBegin",
     },
@@ -3430,7 +3430,8 @@ const skills = {
           .forResult()
       }
       lib.skill.shanjia.sync(player)
-      let bool = true
+      let bool1 = true
+      let bool2 = true
       if (result?.cards?.length) {
         const cards = result.cards
         for (const card of cards) {
@@ -3439,12 +3440,15 @@ const skills = {
             "trick",
             card.original === "h" ? player : false,
           )
-          if (type === "basic" || type === "trick") {
-            bool = false
+          if (type === "basic") {
+            bool1 = false
+          }
+          if (type === "trick") {
+            bool2 = false
           }
         }
       }
-      if (bool) {
+      if (bool1 && bool2) {
         await player.chooseUseTarget({
           card: new lib.element.VCard({ name: "sha", isCard: true }),
           addCount: false,

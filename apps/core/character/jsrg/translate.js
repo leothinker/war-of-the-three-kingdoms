@@ -2,6 +2,15 @@ import { get } from "wtk"
 
 const translates = {
   // 江山如故·起
+  jsrg_kongrong: "起孔融",
+  jsrg_kongrong_prefix: "起",
+  jsrglirang: "礼让",
+  jsrglirang_info:
+    "每轮开始时，你可以选择至多两名其他角色并亮出牌堆顶的四张牌，这些角色依次可以获得其中任意张牌，然后你获得其余牌。",
+  zhengyi: "争义",
+  zhengyi_info:
+    "当本轮获得牌数唯一最少的“礼让”角色每回合首次受到伤害时，本轮获得牌数唯一最多的“礼让”角色可以将此伤害转移给其。",
+
   jsrg_caocao: "梦曹操",
   jsrg_caocao_prefix: "梦",
   jsrgzhenglve: "政略",
@@ -102,20 +111,6 @@ const translates = {
   jsrgyizheng: "义争",
   jsrgyizheng_info:
     "出牌阶段限一次。你可以与一名手牌数大于你的角色拼点。若你：赢，其跳过下一个摸牌阶段；没赢，其可以对你造成至多2点伤害。",
-  jsrg_kongrong: "起孔融",
-  jsrg_kongrong_prefix: "起",
-  jsrglirang: "礼让",
-  jsrglirang_info:
-    "每轮限一次。其他角色的摸牌阶段开始时，你可以交给其两张牌。然后此回合的弃牌阶段结束时，你可以获得所有其于此阶段因弃置进入弃牌堆的牌。",
-  jsrgzhengyi: "争义",
-  jsrgzhengyi_info:
-    "当你每回合首次受到伤害时，本轮因〖礼让〗得到过牌的其他角色可以将此伤害转移给其。",
-  jsrg_new_lirang: "礼让",
-  jsrg_new_lirang_info:
-    "每轮开始时，你可选择至多两名其他角色并亮出牌堆顶四张牌，这些角色可以依次获得其中任意张牌，然后你获得剩余牌。",
-  jsrg_new_zhengyi: "争义",
-  jsrg_new_zhengyi_info:
-    "本轮因〖礼让〗获得牌唯一最少的角色每回合首次受到伤害时，本轮因〖礼让〗获得牌唯一最多的角色可以将此伤害转移给其。",
   jsrg_zhujun: "起朱儁",
   jsrg_zhujun_prefix: "起",
   jsrgfendi: "分敌",
