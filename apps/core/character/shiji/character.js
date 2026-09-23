@@ -26,6 +26,12 @@ const characters = {
     img: "image/character/chenzhen.jpg",
     dieAudios: ["chenzhen"],
   },
+  sp_sunshao: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["dingyi", "zuici"],
+  },
 }
 
 export default characters

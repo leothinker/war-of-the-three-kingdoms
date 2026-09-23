@@ -684,6 +684,171 @@ const skills = {
       },
     },
   },
+  // 孙邵
+  // 定仪（新）：每轮开始时摸一张牌，将一张与所有"仪"花色均不同的牌置于一名没有"仪"的角色的武将牌旁。
+  // 武将牌旁有"仪"的角色按花色获得对应效果：黑桃手牌上限+4；红桃每回合首次脱离濒死回复2；梅花使用牌无距离；方片摸牌阶段+2
+  dingyi: {
+    audio: 2,
+    trigger: { global: "roundStart" },
+    filter(event, player) {
+      if (!player.isIn()) return false
+      return game.hasPlayer(
+        (current) =>
+          current.isIn() && !current.getExpansions("dingyi_yi").length,
+      )
+    },
+    async cost(event, trigger, player) {
+      await player.draw()
+      const result = await player
+        .chooseCard({
+          prompt: '定仪：选择一张手牌，将其置于一名没有"仪"的角色的武将牌旁',
+          position: "h",
+          filterCard(card, player) {
+            const suit = get.suit(card)
+            if (!lib.suit.includes(suit)) return false
+            for (const target of game.players) {
+              if (!target.isIn()) continue
+              for (const yi of target.getExpansions("dingyi_yi")) {
+                if (get.suit(yi) === suit) return false
+              }
+            }
+            return true
+          },
+          ai(card) {
+            return 7 - get.value(card)
+          },
+        })
+        .forResult()
+      if (!result.bool || !result.cards?.length) return
+      event.result = { bool: true, cost_data: result.cards }
+    },
+    async content(event, trigger, player) {
+      const [card] = event.cost_data
+      const result = await player
+        .chooseTarget({
+          prompt: '定仪：选择一名没有"仪"的角色',
+          filterTarget(card, player, target) {
+            return target.isIn() && !target.getExpansions("dingyi_yi").length
+          },
+          ai(target) {
+            return get.attitude(player, target)
+          },
+        })
+        .forResult()
+      if (!result.bool || !result.targets?.length) return
+      const target = result.targets[0]
+      player.line(target, "green")
+      await target.addToExpansion({
+        cards: [card],
+        source: player,
+        animate: "give",
+        gaintag: ["dingyi_yi"],
+      })
+      target.addSkill("dingyi_yi_effect")
+      game.log(player, "将", card, "置于", target, "的武将牌旁")
+    },
+    subSkill: {
+      yi_effect: {
+        charlotte: true,
+        forced: true,
+        trigger: {
+          player: ["phaseDrawBegin2", "dyingAfter", "phaseZhunbeiBegin"],
+        },
+        filter(event, player) {
+          const yi = player.getExpansions("dingyi_yi")[0]
+          if (!yi) return false
+          const suit = get.suit(yi)
+          if (event.name === "phaseDraw") {
+            return suit === "diamond" && !event.numFixed
+          }
+          if (event.name === "phaseZhunbei") {
+            return suit === "heart" && player.storage.dingyi_yi_recover_used
+          }
+          return suit === "heart" && !player.storage.dingyi_yi_recover_used
+        },
+        async content(event, trigger, player) {
+          const yi = player.getExpansions("dingyi_yi")[0]
+          const suit = get.suit(yi)
+          if (suit === "diamond" && event.name === "phaseDraw") {
+            trigger.num += 2
+          } else if (suit === "heart" && event.name === "dyingAfter") {
+            await player.recover(2)
+            player.setStorage("dingyi_yi_recover_used", true)
+          } else if (suit === "heart" && event.name === "phaseZhunbei") {
+            delete player.storage.dingyi_yi_recover_used
+          }
+        },
+        mod: {
+          maxHandcard(player, num) {
+            const yi = player.getExpansions("dingyi_yi")[0]
+            return yi && get.suit(yi) === "spade" ? num + 4 : num
+          },
+          targetInRange(card, player, target) {
+            const yi = player.getExpansions("dingyi_yi")[0]
+            if (yi && get.suit(yi) === "club") return true
+          },
+        },
+      },
+    },
+    ai: { combo: ["zuici"] },
+  },
+  // 罪辞（新）：受到伤害后获得一名角色武将牌旁的"仪"，再从额外牌堆中选择一张智囊令其获得
+  zuici: {
+    audio: 2,
+    trigger: { player: "damageEnd" },
+    filter(event, player) {
+      return game.hasPlayer(
+        (current) =>
+          current.isIn() && current.getExpansions("dingyi_yi").length > 0,
+      )
+    },
+    async cost(event, trigger, player) {
+      const targetResult = await player
+        .chooseTarget({
+          prompt: '罪辞：选择一名武将牌旁有"仪"的角色，获得其"仪"',
+          filterTarget(card, player, target) {
+            return target.isIn() && target.getExpansions("dingyi_yi").length > 0
+          },
+          ai(target) {
+            return -get.attitude(player, target)
+          },
+        })
+        .forResult()
+      if (!targetResult.bool || !targetResult.targets?.length) return
+      event.result = { bool: true, targets: targetResult.targets }
+    },
+    async content(event, trigger, player) {
+      const [target] = event.targets
+      const yiCards = target.getExpansions("dingyi_yi")
+      const yiCard = yiCards[0]
+      await player.gain({ cards: [yiCard], source: target, animate: "give" })
+      target.removeSkill("dingyi_yi_effect")
+      const zhinangList = get.zhinangs().map((name) => ["none", 0, name])
+      if (!zhinangList.length) {
+        game.log("额外牌堆中没有可用的智囊牌")
+        return
+      }
+      const result = await player
+        .chooseButton({
+          createDialog: [
+            `罪辞：从额外牌堆中选择一张智囊令${get.translation(target)}获得`,
+            [zhinangList, "vcard"],
+          ],
+          ai(button) {
+            return get.value({ name: button.link[2] })
+          },
+        })
+        .forResult()
+      if (!result.bool || !result.links?.length) return
+      const [suit, number, name, nature] = result.links[0]
+      const newCard = get.infoCard([suit, number, name, nature])
+      newCard.storage ??= {}
+      newCard.storage.shiji_extraDeck = { type: "trick" }
+      await target.gain({ cards: [newCard], animate: "gain2" })
+      game.log(target, "从额外牌堆获得了", newCard)
+    },
+    ai: { combo: ["dingyi"] },
+  },
 }
 
 export default skills

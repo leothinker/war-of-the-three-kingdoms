@@ -1205,6 +1205,7 @@ export const otherMenu = (/** @type { boolean | undefined } */ connectMenu) => {
             clickMode.call(firstOther)
           }
         }
+        start.firstChild.scrollTop = 0
       },
     )
   }

@@ -1619,13 +1619,13 @@ export class Game {
   /**
    * @overload
    * @param { Card } cards
-   * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
+   * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁区
    * @returns { GameEvent }
    */
   /**
    * @overload
    * @param {Card[]} cards
-   * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
+   * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁区
    * @returns { GameEvent }
    */
   cardsGotoSpecial(cards, bool) {

@@ -1407,7 +1407,7 @@ declare interface CardInfo {
    * ```
    *
    * @param card 卡牌
-   * @param targetPosition 目标位置/区域标识，可能值：`"cardPile"`（牌堆）、`"discardPile"`（弃牌堆）、`"equip"`（装备区）、`"handcard"`（手牌区）、`"judge"`（判定区）、`"ordering"`（处理区/使用牌）、`"renku"`（仁库）、`"special"`（特殊区）、`"expansion"`（扩展区/神势）、或 `event.position.id`（lose 事件动态位置 ID）
+   * @param targetPosition 目标位置/区域标识，可能值：`"cardPile"`（牌堆）、`"discardPile"`（弃牌堆）、`"equip"`（装备区）、`"handcard"`（手牌区）、`"judge"`（判定区）、`"ordering"`（处理区/使用牌）、`"renku"`（仁区）、`"special"`（特殊区）、`"expansion"`（扩展区/神势）、或 `event.position.id`（lose 事件动态位置 ID）
    * @param player 相关玩家，可能为 null
    * @param event 触发事件
    * @returns 返回 truthy 值允许销毁（进入 selfDestroy 流程，触发 onDestroy/destroyLog）；返回 falsy 则走 info.destroy 直接 delete() 的分支

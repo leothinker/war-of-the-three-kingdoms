@@ -30,7 +30,6 @@ const skills = {
       return skill
     },
     async content(event, trigger, player) {
-      player.awakenSkill(event.name)
       player.addSkill(`${event.name}_limit`)
       const list = ["rejianxiong", "sclqingzheng"]
       const result = await player
