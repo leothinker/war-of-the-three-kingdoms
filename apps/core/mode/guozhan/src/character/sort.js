@@ -1,8 +1,10 @@
 import bian, { sort as bianSort } from "./bian.js"
+import jiubian, { sort as jiubianSort } from "./jiubian.js"
 import normal, { sort as normalSort } from "./normal.js"
 import quan, { sort as quanSort } from "./quan.js"
 import shi, { sort as shiSort } from "./shi.js"
 import zhen, { sort as zhenSort } from "./zhen.js"
+import zifeng, { sort as zifengSort } from "./zifeng.js"
 
 export default {
   [normalSort]: Object.keys(normal),
@@ -10,6 +12,8 @@ export default {
   [shiSort]: Object.keys(shi),
   [bianSort]: Object.keys(bian),
   [quanSort]: Object.keys(quan),
+  [jiubianSort]: Object.keys(jiubian),
+  [zifengSort]: Object.keys(zifeng),
   guozhan_jun: [
     "gz_jun_caocao",
     "gz_jun_sunquan",

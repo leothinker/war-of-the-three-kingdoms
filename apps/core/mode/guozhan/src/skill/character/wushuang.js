@@ -359,7 +359,7 @@ export default {
     filter(event, player) {
       return event.card.name === "sha" && get.suit(event.card) === "heart"
     },
-    content() {
+    async content(event, trigger, player) {
       if (trigger.addCount !== false) {
         trigger.addCount = false
         if (player.stat[player.stat.length - 1].card.sha > 0) {

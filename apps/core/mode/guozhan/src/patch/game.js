@@ -5,6 +5,20 @@ import {
   showYexingsContent,
 } from "./content.js"
 
+const withoutGouniResultEffect = (callback) => {
+  const old = _status.gz_gouni_checkingResult
+  _status.gz_gouni_checkingResult = true
+  try {
+    return callback()
+  } finally {
+    if (old) {
+      _status.gz_gouni_checkingResult = old
+    } else {
+      delete _status.gz_gouni_checkingResult
+    }
+  }
+}
+
 export class GameGuozhan extends Game {
   /**
    * 不确定是干啥的，反正恒返回真
@@ -205,7 +219,7 @@ export class GameGuozhan extends Game {
       `<div class="text chat">国战牌堆：${lib.configOL.guozhanpile ? "开启" : "关闭"}`,
     )
     uiintro.add(
-      `<div class="text chat">鏖战模式：${lib.configOL.aozhan ? "开启" : "关闭"}`,
+      `<div class="text chat">鏖战模式：${{ off: "关闭", normal: "原鏖战", jiubian: "九变鏖战" }[lib.configOL.aozhan] || (lib.configOL.aozhan ? "原鏖战" : "关闭")}`,
     )
     last = uiintro.add(
       `<div class="text chat">观看下家副将：${lib.configOL.viewnext ? "开启" : "关闭"}`,
@@ -366,123 +380,127 @@ export class GameGuozhan extends Game {
    * > ?
    */
   tryResult() {
-    var map = {},
-      sides = [],
-      pmap = _status.connectMode ? lib.playerOL : game.playerMap,
-      hiddens = []
-    for (var i of game.players) {
-      if (i.identity === "unknown") {
-        hiddens.push(i)
-        continue
-      }
-      var added = false
-      for (var j of sides) {
-        // @ts-expect-error 祖宗之法就是这么写的
-        if (i.isFriendOf(pmap[j])) {
-          added = true
-          map[j].push(i)
-          break
+    return withoutGouniResultEffect(() => {
+      var map = {},
+        sides = [],
+        pmap = _status.connectMode ? lib.playerOL : game.playerMap,
+        hiddens = []
+      for (var i of game.players) {
+        if (i.identity === "unknown") {
+          hiddens.push(i)
+          continue
+        }
+        var added = false
+        for (var j of sides) {
+          // @ts-expect-error 祖宗之法就是这么写的
+          if (i.isFriendOf(pmap[j])) {
+            added = true
+            map[j].push(i)
+            break
+          }
+        }
+        if (!added) {
+          map[i.playerid] = [i]
+          sides.push(i.playerid)
         }
       }
-      if (!added) {
-        map[i.playerid] = [i]
-        sides.push(i.playerid)
+      if (!game.players.length) {
+        game.checkResult()
+        return
       }
-    }
-    if (!game.players.length) {
-      game.checkResult()
-      return
-    }
-    if (!sides.length) {
-      return
-    }
-    if (sides.length > 1) {
-      if (!hiddens.length && sides.length === 2) {
-        if (
-          map[sides[0]].length === 1 &&
-          !map[sides[1]].filter((i) => i.identity !== "ye" && i.isUnseen(0))
-            .length
-        ) {
-          map[sides[0]][0].showGiveup()
-        }
-        if (
-          map[sides[1]].length === 1 &&
-          !map[sides[0]].filter((i) => i.identity !== "ye" && i.isUnseen(0))
-            .length
-        ) {
-          map[sides[1]][0].showGiveup()
-        }
+      if (!sides.length) {
+        return
       }
-    } else {
-      var isYe = (player) =>
-        player.identity !== "ye" && lib.character[player.name1][1] === "ye"
-      if (!hiddens.length) {
-        if (map[sides[0]].length > 1) {
+      if (sides.length > 1) {
+        if (!hiddens.length && sides.length === 2) {
+          if (
+            map[sides[0]].length === 1 &&
+            !map[sides[1]].filter((i) => i.identity !== "ye" && i.isUnseen(0))
+              .length
+          ) {
+            map[sides[0]][0].showGiveup()
+          }
+          if (
+            map[sides[1]].length === 1 &&
+            !map[sides[0]].filter((i) => i.identity !== "ye" && i.isUnseen(0))
+              .length
+          ) {
+            map[sides[1]][0].showGiveup()
+          }
+        }
+      } else {
+        var isYe = (player) =>
+          player.identity !== "ye" && lib.character[player.name1][1] === "ye"
+        if (!hiddens.length) {
+          if (map[sides[0]].length > 1) {
+            // @ts-expect-error 祖宗之法就是这么写的
+            for (var i of map[sides[0]]) {
+              if (isYe(i)) {
+                // @ts-expect-error 祖宗之法就是这么写的
+                game.showYexings()
+                return
+              }
+            }
+          }
+          broadcastAll((id) => {
+            // @ts-expect-error 祖宗之法就是这么写的
+            game.winner_id = id
+          }, sides[0])
+          // @ts-expect-error 祖宗之法就是这么写的
+          game.checkResult()
+        } else {
+          var identity = map[sides[0]][0].identity
+          if (identity === "ye") {
+            return
+          }
           // @ts-expect-error 祖宗之法就是这么写的
           for (var i of map[sides[0]]) {
             if (isYe(i)) {
-              // @ts-expect-error 祖宗之法就是这么写的
-              game.showYexings()
               return
             }
           }
-        }
-        broadcastAll((id) => {
-          // @ts-expect-error 祖宗之法就是这么写的
-          game.winner_id = id
-        }, sides[0])
-        // @ts-expect-error 祖宗之法就是这么写的
-        game.checkResult()
-      } else {
-        var identity = map[sides[0]][0].identity
-        if (identity === "ye") {
-          return
-        }
-        // @ts-expect-error 祖宗之法就是这么写的
-        for (var i of map[sides[0]]) {
-          if (isYe(i)) {
-            return
+          for (var ind = 0; ind < hiddens.length; ind++) {
+            var current = hiddens[ind]
+            // @ts-expect-error 祖宗之法就是这么写的
+            if (
+              isYe(current) ||
+              current.getGuozhanGroup(2) !== identity ||
+              !current.wontYe(null, ind + 1)
+            ) {
+              return
+            }
           }
-        }
-        for (var ind = 0; ind < hiddens.length; ind++) {
-          var current = hiddens[ind]
+          broadcastAll((id) => {
+            // @ts-expect-error 祖宗之法就是这么写的
+            game.winner_id = id
+          }, sides[0])
           // @ts-expect-error 祖宗之法就是这么写的
-          if (
-            isYe(current) ||
-            current.getGuozhanGroup(2) !== identity ||
-            !current.wontYe(null, ind + 1)
-          ) {
-            return
-          }
+          game.checkResult()
         }
-        broadcastAll((id) => {
-          // @ts-expect-error 祖宗之法就是这么写的
-          game.winner_id = id
-        }, sides[0])
-        // @ts-expect-error 祖宗之法就是这么写的
-        game.checkResult()
       }
-    }
+    })
   }
 
   /**
    * 检查游戏结果
    */
   checkResult() {
-    // @ts-expect-error 祖宗之法就是这么写的
-    _status.overing = true
-    // @ts-expect-error 祖宗之法就是这么写的
-    var me = game.me._trueMe || game.me
-    for (var i = 0; i < game.players.length; i++) {
-      game.players[i].showCharacter(2)
-    }
-    // @ts-expect-error 祖宗之法就是这么写的
-    var winner = (_status.connectMode ? lib.playerOL : game.playerMap)[
-      game.winner_id
-    ]
-    game.over(!!winner?.isFriendOf(me))
-    // @ts-expect-error 祖宗之法就是这么写的
-    game.showIdentity()
+    return withoutGouniResultEffect(() => {
+      // @ts-expect-error 祖宗之法就是这么写的
+      _status.overing = true
+      // @ts-expect-error 祖宗之法就是这么写的
+      var me = game.me._trueMe || game.me
+      for (var i = 0; i < game.players.length; i++) {
+        game.players[i].showCharacter(2)
+      }
+      // @ts-expect-error 祖宗之法就是这么写的
+      var winner = (_status.connectMode ? lib.playerOL : game.playerMap)[
+        game.winner_id
+      ]
+      game.over(!!winner?.isFriendOf(me))
+      // @ts-expect-error 祖宗之法就是这么写的
+      game.showIdentity()
+    })
   }
 
   /**
@@ -491,9 +509,11 @@ export class GameGuozhan extends Game {
    * @returns {boolean}
    */
   checkOnlineResult(player) {
-    // @ts-expect-error 祖宗之法就是这么写的
-    var winner = lib.playerOL[game.winner_id]
-    return winner?.isFriendOf(game.me)
+    return withoutGouniResultEffect(() => {
+      // @ts-expect-error 祖宗之法就是这么写的
+      var winner = lib.playerOL[game.winner_id]
+      return winner?.isFriendOf(game.me)
+    })
   }
 
   chooseCharacter() {

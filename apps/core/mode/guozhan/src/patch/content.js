@@ -12,6 +12,13 @@ const delay = (ms) =>
     }, ms)
   })
 
+const getViceFallback = (player) => {
+  const info = lib.character[player.name2] || lib.character[player.name1]
+  const sex = info?.[0] === "male" ? 1 : 2
+  const group = info?.[1] || player.identity || "ye"
+  return `gz_shibing${sex}${group}`
+}
+
 /**
  * @param {GameEvent} event
  * @param {GameEvent} _trigger
@@ -1259,6 +1266,11 @@ export const showYexingsContent = async (event, _trigger, player) => {
  */
 export const hideCharacter = async (event, _trigger, player) => {
   const { num } = event
+  // 同时保护直接创建的暗置事件，以及事件执行前武将牌发生替换的情况。
+  if (get.is.jun(player[`name${num + 1}`])) {
+    event.cancel()
+    return
+  }
 
   // @ts-expect-error 类型就是这么写的
   game.addVideo("hideCharacter", player, num)
@@ -1354,6 +1366,9 @@ export const chooseJunlingFor = async (event, _trigger, player) => {
   junlingNames = junlingNames.randomGets(event.num).sort()
 
   const junlings = junlingNames.map((name) => ["军令", "", name])
+  const junlingInfos = junlingNames.map(
+    (name) => `${get.translation(name)}：${get.translation(`${name}_info`)}`,
+  )
 
   if (target !== undefined && !prompt) {
     // @ts-expect-error 类型就是这么写的
@@ -1361,8 +1376,15 @@ export const chooseJunlingFor = async (event, _trigger, player) => {
     prompt = `选择一张军令牌，令${get.translation(target)}${selfPrompt}选择是否执行`
   }
 
+  const dialog = [prompt, [junlings, "vcard"]]
+  for (const info of junlingInfos) {
+    dialog.push(
+      `<div class="popup text" style="width:calc(100% - 10px);display:inline-block;text-align:left">${info}</div>`,
+    )
+  }
+
   const { links: chooseResult } = await player
-    .chooseButton([prompt, [junlings, "vcard"]], true)
+    .chooseButton({ createDialog: dialog, forced: true })
     .set("ai", (button) => {
       // @ts-expect-error 祖宗之法就是这么写的
       return get.junlingEffect(
@@ -1418,6 +1440,9 @@ export const chooseJunlingControl = async (event, _trigger, player) => {
   }
   dialog.add(`${get.translation(event.source)}${str1}选择的军令${str2}为`)
   dialog.add([[Reflect.get(event, "junling")], "vcard"])
+  dialog.add(
+    `<div class="popup text" style="width:calc(100% - 10px);display:inline-block;text-align:left">${get.translation(Reflect.get(event, "junling"))}：${get.translation(`${Reflect.get(event, "junling")}_info`)}</div>`,
+  )
 
   let controls = []
 
@@ -1596,14 +1621,22 @@ export const changeViceOnline = async (event, _trigger, player) => {
     }
   }
   if (!name) {
-    return
+    if (_status.mode !== "jiubian") {
+      return
+    }
+    name = getViceFallback(player)
+    event.fallbackVice = true
   }
-  characterlist.remove(name)
+  if (!event.fallbackVice) {
+    characterlist.remove(name)
+  }
 
   let change = false
   if (player.hasViceCharacter()) {
     change = true
-    characterlist.add(player.name2)
+    if (_status.mode !== "jiubian") {
+      characterlist.add(player.name2)
+    }
   }
 
   if (change) {
@@ -1634,7 +1667,10 @@ export const changeViceOnline = async (event, _trigger, player) => {
 export const changeVice = [
   async (event, _trigger, player) => {
     player.showCharacter(2)
-    if (!event.num) {
+    // 九变固定一名候选；其他国战模式保留上游的候选数配置。
+    if (_status.mode === "jiubian") {
+      event.num = 1
+    } else if (!event.num) {
       event.num = 3
     }
     var group = player.identity
@@ -1686,7 +1722,15 @@ export const changeVice = [
       }
     }
     if (!event.tochange.length) {
-      event.finish()
+      if (_status.mode !== "jiubian") {
+        event.finish()
+        return
+      }
+      event.fallbackVice = true
+      event._result = {
+        bool: true,
+        links: [getViceFallback(player)],
+      }
     } else {
       if (event.tochange.length === 1) {
         event._result = {
@@ -1707,11 +1751,15 @@ export const changeVice = [
   async (event, _trigger, player, result) => {
     var name = result.links[0]
     // @ts-expect-error 类型就是这么写的
-    _status.characterlist.remove(name)
+    if (_status.mode !== "jiubian" || (event.repeat && !event.fallbackVice)) {
+      _status.characterlist.remove(name)
+    }
     if (player.hasViceCharacter()) {
       event.change = true
-      // @ts-expect-error 类型就是这么写的
-      _status.characterlist.add(player.name2)
+      if (_status.mode !== "jiubian") {
+        // @ts-expect-error 类型就是这么写的
+        _status.characterlist.add(player.name2)
+      }
     }
     event.toRemove = player.name2
     event.toChange = name
@@ -1732,7 +1780,9 @@ export const changeVice = [
         `#g${get.translation(name)}`,
       )
     }
-    player.viceChanged = true
+    if (_status.mode !== "jiubian" || !event.repeat) {
+      player.viceChanged = true
+    }
     player.reinitCharacter(player.name2, name, false)
     if (event.hidden) {
       if (!player.isUnseen(1)) {
@@ -1757,17 +1807,18 @@ export const mayChangeVice = async (event, _trigger, player) => {
     })
     .forResult()
   if (result.bool) {
-    // @ts-expect-error 祖宗之法就是这么做的
-    if (!event.repeat) {
-      // @ts-expect-error 祖宗之法就是这么做的
-      if (!_status.changedSkills[player.playerid]) {
-        _status.changedSkills[player.playerid] = []
+    if (_status.mode !== "jiubian") {
+      if (!event.repeat) {
+        if (!_status.changedSkills[player.playerid]) {
+          _status.changedSkills[player.playerid] = []
+        }
+        _status.changedSkills[player.playerid].add(event.skill)
       }
-      // @ts-expect-error 祖宗之法就是这么做的
-      _status.changedSkills[player.playerid].add(event.skill)
+      await player.changeVice(event.hidden)
+      return
     }
     // @ts-expect-error 祖宗之法就是这么做的
-    await player.changeVice(event.hidden)
+    await player.changeVice(event.hidden).set("repeat", event.repeat)
   }
 }
 

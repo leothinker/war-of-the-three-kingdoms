@@ -3,6 +3,7 @@ import { lib } from "wtk"
 const Character = lib.element.Character
 
 import bian from "./bian.js"
+import jiubian from "./jiubian.js"
 import normal from "./normal.js"
 import quan from "./quan.js"
 import restCharacter from "./rest.js"
@@ -10,6 +11,7 @@ import shi from "./shi.js"
 import wushuang from "./wushuang.js"
 import yingbian from "./yingbian.js"
 import zhen from "./zhen.js"
+import zifeng from "./zifeng.js"
 
 /** @type {Record<string, Character>} */
 export const pack = {
@@ -132,6 +134,8 @@ export const pack = {
   ...shi,
   ...bian,
   ...quan,
+  ...jiubian,
+  ...zifeng,
   ...yingbian,
   ...wushuang,
 }

@@ -5,6 +5,7 @@ import shi from "./shi.js"
 import wushuang from "./wushuang.js"
 import yingbian from "./yingbian.js"
 import zhen from "./zhen.js"
+import zifeng from "./zifeng.js"
 
 export default {
   ...normal,
@@ -13,5 +14,6 @@ export default {
   ...bian,
   ...quan,
   ...yingbian,
+  ...zifeng,
   ...wushuang,
 }

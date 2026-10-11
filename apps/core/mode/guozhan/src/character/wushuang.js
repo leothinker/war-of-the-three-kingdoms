@@ -1,4 +1,6 @@
-import { Character } from "../../../../wtk/library/element/index.js"
+import { lib } from "wtk"
+
+const Character = lib.element.Character
 
 export default {
   //国战无双
