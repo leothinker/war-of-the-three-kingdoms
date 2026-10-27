@@ -20,6 +20,14 @@
     ].join("\n"),
   }
 
+  // ios端目前不支持jit功能，直接关闭
+  const wkWebView = window as unknown as {
+    webkit?: { messageHandlers?: { bridge?: unknown } }
+  }
+  if (wkWebView.webkit?.messageHandlers?.bridge) {
+    return
+  }
+
   if (!("serviceWorker" in navigator)) {
     alert(globalText.SERVICE_WORKER_NOT_SUPPORT)
     return

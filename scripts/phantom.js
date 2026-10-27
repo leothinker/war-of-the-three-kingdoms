@@ -20,6 +20,7 @@ var load = (id) => {
             if (!lib.node?.clients?.length) {
               return true
             }
+
             return false
           })
         ) {

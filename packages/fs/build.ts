@@ -67,6 +67,7 @@ async function main(platform) {
       console.log("Windows build done")
       return
     }
+
     // macOS (darwin) and Linux share most steps; mac has extra codesign steps & macho segment arg
     if (platform === "macos") {
       copyFileSync(process.execPath, targetExe)
