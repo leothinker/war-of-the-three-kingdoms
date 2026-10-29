@@ -430,7 +430,6 @@ export class Library {
    * @type { { character?: Record<string, importCharacterConfig>, card?: Record<string, importCardConfig>, mode?: Record<string, importModeConfig>, player?: Record<string, importPlayerConfig>, extension?: Record<string, importExtensionConfig>, play?: Record<string, importPlayConfig> } }
    */
   imported = {}
-  layoutfixed = ["chess", "tafang", "stone"]
   pinyins = {
     _metadata: {
       shengmu: [
@@ -1781,19 +1780,11 @@ export class Library {
                 ui.arena.dataset.framedecoration = ""
               }
               ui.css.border_stylesheet.sheet.insertRule(
-                '#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
-                  lib.assetURL +
-                  "theme/style/player/" +
-                  layout +
-                  '1.png")}',
+                `#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("${lib.assetURL}theme/style/player/${layout}1.png")}`,
                 0,
               )
               ui.css.border_stylesheet.sheet.insertRule(
-                '#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-                  lib.assetURL +
-                  "theme/style/player/" +
-                  layout +
-                  '3.png")}',
+                `#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("${lib.assetURL}theme/style/player/${layout}3.png")}`,
                 0,
               )
               ui.css.border_stylesheet.sheet.insertRule(
@@ -1842,12 +1833,7 @@ export class Library {
       name: "显示",
       config: {
         update: (config, map) => {
-          if (
-            lib.config.mode === "versus" ||
-            lib.config.mode === "chess" ||
-            lib.config.mode === "tafang" ||
-            lib.config.mode === "boss"
-          ) {
+          if (lib.config.mode === "versus" || lib.config.mode === "boss") {
             map.show_handcardbutton.show()
           } else {
             map.show_handcardbutton.hide()
@@ -2529,6 +2515,7 @@ export class Library {
               game.saveConfig("hiddenCharacterPack", [])
               game.saveConfig("hiddenCardPack", [])
               game.saveConfig("hiddenPlayPack", [])
+              game.saveConfig("hiddenBackgroundPack", [])
               setTimeout(() => {
                 this.firstChild.innerHTML = "重置隐藏内容"
                 setTimeout(() => {
@@ -3762,13 +3749,14 @@ export class Library {
           item: {
             normal: "势备",
             yingbian: "应变",
+            jiubian: "九变",
             old: "怀旧",
             free: "自由",
           },
           frequent: true,
           restart: true,
           intro:
-            "<li>势备：默认模式，使用线下《君临天下·势备篇》的牌堆进行游戏。<br><li>应变：使用OL的应变国战牌堆进行游戏。<br><li>怀旧：使用传统国战的牌堆进行游戏。<br><li>自由：使用玩家的自定义牌堆进行游戏。",
+            "<li>势备：默认模式，使用线下《君临天下·势备篇》的牌堆进行游戏。<br><li>应变：使用OL的应变国战牌堆进行游戏。<br><li>九变：使用九变篇国战牌堆进行游戏。<br><li>怀旧：使用传统国战的牌堆进行游戏。<br><li>自由：使用玩家的自定义牌堆进行游戏。",
         },
         player_number: {
           name: "游戏人数",
@@ -3794,11 +3782,24 @@ export class Library {
         },
         aozhan: {
           name: "鏖战模式",
-          init: true,
+          init: "normal",
+          item: {
+            off: "关闭",
+            normal: "原鏖战",
+            jiubian: "九变鏖战",
+          },
           frequent: true,
           restart: true,
           intro:
-            "若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。",
+            "◇原鏖战：进入鏖战后，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>◇九变鏖战：进入鏖战后，【桃】只能当做【酒】使用或打出，并且每轮开始时翻开一张场景牌并执行对应效果。<br>◇场景牌包括：不进则退、胜者为王、激励、祸起、落石、贱礼。",
+        },
+        qunlangCharacters: {
+          name: "使用群狼环鼎武将",
+          init: false,
+          frequent: true,
+          restart: true,
+          intro:
+            "开启后，部分旧国战武将将替换为群狼环鼎修订版本，并隐藏对应的九变篇独立武将。",
         },
         separatism: {
           name: "群雄割据",
@@ -5466,248 +5467,6 @@ export class Library {
         },
       },
     },
-    chess: {
-      name: "战棋",
-      config: {
-        chess_mode: {
-          name: "游戏模式",
-          init: "combat",
-          item: {
-            combat: "自由",
-            three: "统率",
-            leader: "君主",
-          },
-          restart: true,
-          frequent: true,
-        },
-        update: (config, map) => {
-          if (config.chess_mode === "leader") {
-            map.chess_leader_save.show()
-            map.chess_leader_clear.show()
-            map.chess_leader_allcharacter.show()
-            map.chess_character.hide()
-          } else {
-            map.chess_leader_save.hide()
-            map.chess_leader_clear.hide()
-            map.chess_leader_allcharacter.hide()
-            map.chess_character.show()
-          }
-          if (config.chess_mode === "combat") {
-            // map.battle_number.show();
-            // map.chess_ordered.show();
-            map.free_choose.show()
-            map.change_choice.show()
-          } else {
-            // map.battle_number.hide();
-            // map.chess_ordered.hide();
-            map.free_choose.hide()
-            map.change_choice.hide()
-          }
-        },
-        chess_leader_save: {
-          name: "选择历程",
-          init: "save1",
-          item: {
-            save1: "一",
-            save2: "二",
-            save3: "三",
-            save4: "四",
-            save5: "五",
-          },
-          restart: true,
-          frequent: true,
-        },
-        chess_leader_allcharacter: {
-          name: "启用全部角色",
-          init: true,
-          onclick(bool) {
-            if (confirm("调整该设置将清除所有进度，是否继续？")) {
-              for (var i = 1; i < 6; i++) {
-                game.save(`save${i}`, null, "chess")
-              }
-              game.saveConfig("chess_leader_allcharacter", bool, "chess")
-              if (get.mode() === "chess") {
-                game.reload()
-              }
-              return
-            }
-            this.classList.toggle("on")
-          },
-        },
-        chess_leader_clear: {
-          name: "清除进度",
-          onclick() {
-            if (this._clearing) {
-              for (var i = 1; i < 6; i++) {
-                game.save(`save${i}`, null, "chess")
-              }
-              game.reload()
-              return
-            }
-            this._clearing = true
-            this.firstChild.innerHTML = "单击以确认 (3)"
-            setTimeout(() => {
-              this.firstChild.innerHTML = "单击以确认 (2)"
-              setTimeout(() => {
-                this.firstChild.innerHTML = "单击以确认 (1)"
-                setTimeout(() => {
-                  this.firstChild.innerHTML = "清除进度"
-                  delete this._clearing
-                }, 1000)
-              }, 1000)
-            }, 1000)
-          },
-          clear: true,
-          frequent: true,
-        },
-        // chess_treasure:{
-        // 	name:'战场机关',
-        // 	init:'0',
-        // 	frequent:true,
-        // 	item:{
-        // 		'0':'关闭',
-        // 		'0.1':'较少出现',
-        // 		'0.2':'偶尔出现',
-        // 		'0.333':'时常出现',
-        // 		'0.5':'频繁出现',
-        // 	}
-        // },
-        chess_obstacle: {
-          name: "随机路障",
-          init: "0.2",
-          item: {
-            0: "关闭",
-            0.2: "少量",
-            0.333: "中量",
-            0.5: "大量",
-          },
-          frequent: true,
-        },
-        show_range: {
-          name: "显示卡牌范围",
-          init: true,
-        },
-        show_distance: {
-          name: "显示距离",
-          init: true,
-        },
-        chess_character: {
-          name: "战棋武将",
-          init: true,
-          frequent: true,
-        },
-        chess_card: {
-          name: "战棋卡牌",
-          init: true,
-          frequent: true,
-        },
-        free_choose: {
-          name: "自由选将",
-          init: true,
-          onclick(bool) {
-            game.saveConfig("free_choose", bool, this._link.config.mode)
-            if (
-              get.mode() !== this._link.config.mode ||
-              (!_status.event.getParent().showConfig &&
-                !_status.event.showConfig)
-            ) {
-              return
-            }
-            if (!ui.cheat2 && get.config("free_choose")) {
-              ui.create.cheat2()
-            } else if (ui.cheat2 && !get.config("free_choose")) {
-              ui.cheat2.close()
-              delete ui.cheat2
-            }
-          },
-        },
-        change_choice: {
-          name: "开启换将卡",
-          init: true,
-          onclick(bool) {
-            game.saveConfig("change_choice", bool, this._link.config.mode)
-            if (
-              !_status.event.getParent().showConfig &&
-              !_status.event.showConfig
-            ) {
-              return
-            }
-            if (!ui.cheat && get.config("change_choice")) {
-              ui.create.cheat()
-            } else if (ui.cheat && !get.config("change_choice")) {
-              ui.cheat.close()
-              delete ui.cheat
-            }
-          },
-        },
-        chessscroll_speed: {
-          name: "边缘滚动速度",
-          init: "20",
-          intro: "鼠标移至屏幕边缘时自动滚屏",
-          item: {
-            0: "不滚动",
-            10: "10格/秒",
-            20: "20格/秒",
-            30: "30格/秒",
-          },
-        },
-      },
-    },
-    tafang: {
-      name: "塔防",
-      config: {
-        tafang_turn: {
-          name: "游戏胜利",
-          init: "10",
-          frequent: true,
-          item: {
-            10: "十回合",
-            20: "二十回合",
-            30: "三十回合",
-            1000: "无限",
-          },
-        },
-        // tafang_size:{
-        // 	name:'战场大小',
-        // 	init:'9',
-        // 	frequent:true,
-        // 	item:{
-        // 		'6':'小',
-        // 		'9':'中',
-        // 		'12':'大',
-        // 	}
-        // },
-        tafang_difficulty: {
-          name: "战斗难度",
-          init: "2",
-          frequent: true,
-          item: {
-            1: "简单",
-            2: "普通",
-            3: "困难",
-          },
-        },
-        show_range: {
-          name: "显示卡牌范围",
-          init: true,
-        },
-        show_distance: {
-          name: "显示距离",
-          init: true,
-        },
-        chessscroll_speed: {
-          name: "边缘滚动速度",
-          intro: "鼠标移至屏幕边缘时自动滚屏",
-          init: "20",
-          item: {
-            0: "不滚动",
-            10: "10格/秒",
-            20: "20格/秒",
-            30: "30格/秒",
-          },
-        },
-      },
-    },
     brawl: {
       name: "乱斗",
       config: {
@@ -6535,7 +6294,6 @@ export class Library {
       game.saveConfig("favouriteCharacter", favs)
       game.saveConfig("favouriteMode", favmodes)
       game.saveConfig("theme", "simple")
-      game.saveConfig("player_border", "slim")
       game.saveConfig("cards", lib.config.all.cards)
       game.saveConfig("characters", characters)
       game.saveConfig("show_splash", "off")
@@ -6549,7 +6307,6 @@ export class Library {
       game.saveConfig("skip_shan", false)
       game.saveConfig("tao_enemy", true)
       game.saveConfig("layout", "long2")
-      game.saveConfig("hp_style", "glass")
       game.saveConfig("background_music", "music_off")
       game.saveConfig("background_audio", false)
       game.saveConfig("background_speak", false)
@@ -6580,6 +6337,40 @@ export class Library {
           ui.cardPile.insertBefore(card, ui.cardPile.firstChild)
         }
       }
+    },
+    /**
+     * 将卡牌的样式在simple和default之间切换
+     *
+     * 有参数时改为获得指定的牌
+     *
+     * @param { ...string } args
+     */
+    q(...args) {
+      // if(lib.config.layout!='mobile') lib.init.layout('mobile');
+      if (args.length === 0) {
+        if (ui.css.card_style) {
+          ui.css.card_style.remove()
+        }
+        if (lib.config.card_style !== "simple") {
+          lib.config.card_style = "simple"
+          ui.css.card_style = lib.init.css(
+            `${lib.assetURL}theme/style/card`,
+            "simple",
+          )
+        } else {
+          lib.config.card_style = "default"
+          ui.css.card_style = lib.init.css(
+            `${lib.assetURL}theme/style/card`,
+            "default",
+          )
+        }
+      } else {
+        for (let i = 0; i < args.length; i++) {
+          lib.cheat.g(args[i])
+        }
+      }
+      ui.arena.classList.remove("selecting")
+      ui.arena.classList.remove("tempnoe")
     },
     /**
      * 替换皮肤
@@ -6859,27 +6650,7 @@ export class Library {
         log(str)
         str = `红桃牌${sa}； 方片牌${sb}； 梅花牌${sc}； 黑桃牌${sd}`
         log(str)
-        str =
-          "杀" +
-          sha +
-          "； " +
-          "黑杀" +
-          heisha +
-          "； " +
-          "红杀" +
-          hongsha +
-          "； " +
-          "闪" +
-          shan +
-          "； " +
-          "桃" +
-          tao +
-          "； " +
-          "酒" +
-          jiu +
-          "； " +
-          "无懈" +
-          wuxie
+        str = `杀${sha}； 黑杀${heisha}； 红杀${hongsha}； 闪${shan}； 桃${tao}； 酒${jiu}； 无懈${wuxie}`
         log(str)
         if (arguments[1]) {
           for (let i = 1; i <= 13; i++) {
@@ -7112,7 +6883,6 @@ export class Library {
         if (
           !lib.config.forbidai.includes(key) &&
           !key.startsWith("boss_") &&
-          !key.startsWith("tafang_") &&
           !list2.includes(key)
         ) {
           log(get.translation(key), key)
@@ -7664,11 +7434,6 @@ export class Library {
       stratagem_fury: "怒气",
       _stratagem_add_buff: "强化",
       danqi_hufu: "虎符",
-      zhanfa: "战法",
-      zf_common: "普通",
-      zf_rare: "稀有",
-      zf_epic: "史诗",
-      zf_legend: "传说",
       assigned_tag: "已分配",
 
       phaseZhunbei: "准备阶段",
@@ -10004,7 +9769,7 @@ export class Library {
         game
           .createEvent("giveup", false)
           .set("includeOut", true)
-          .setContent(() => {
+          .setContent(async (event, trigger, player) => {
             game.log(player, "投降")
             player.popup("投降")
             player.die("nosource").includeOut = true

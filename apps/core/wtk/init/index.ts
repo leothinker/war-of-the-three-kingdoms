@@ -110,11 +110,7 @@ export async function boot() {
     game.saveConfig("mousewheel", false)
   }
 
-  let layout = config.get("layout")
-  if (lib.layoutfixed.indexOf(config.get("mode")) !== -1) {
-    layout = "mobile"
-  }
-  game.layout = layout
+  game.layout = "long2"
 
   await loadCss()
   initSheet()
@@ -491,12 +487,7 @@ export async function boot() {
     window.inSplash = true
     clearTimeout(window.resetGameTimeout)
 
-    if (typeof lib.config.splash_style === "undefined") {
-      game.saveConfig("splash_style", lib.onloadSplashes[0].id)
-    }
-    let splash = lib.onloadSplashes.find(
-      (item) => item.id === lib.config.splash_style,
-    )
+    let splash = lib.onloadSplashes.find((item) => item.id === "style1")
     if (!splash) {
       splash = lib.onloadSplashes[0]
     }

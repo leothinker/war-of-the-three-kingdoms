@@ -1,17 +1,10 @@
 <template>
-  <div
-    class="hidden"
-    v-for="(mode, index) in lib.config.all.mode"
-    :key="mode"
-    :link="mode"
-    :index="index"
-    ref="nodeList"
-  >
-    <div class="splashtext">
-      {{ get.verticalStr(get.translation(mode)) }}
-    </div>
-    <div class="avatar"></div>
-  </div>
+	<div class="hidden" v-for="(mode, index) in lib.config.all.mode" :key="mode" :link="mode" :index="index" ref="nodeList">
+		<div class="splashtext">
+			{{ get.verticalStr(get.translation(mode)) }}
+		</div>
+		<div class="avatar"></div>
+	</div>
 </template>
 
 <script setup lang="ts">

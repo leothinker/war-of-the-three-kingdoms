@@ -214,8 +214,6 @@ export const cardPackMenu = (connectMenu) => {
         switch (type) {
           case "basic":
             return 0
-          case "chess":
-            return 1.5
           case "trick":
             return 2
           case "delay":
@@ -236,8 +234,6 @@ export const cardPackMenu = (connectMenu) => {
                 return 4
             }
           }
-          case "zhenfa":
-            return 5
           default:
             return 6
         }

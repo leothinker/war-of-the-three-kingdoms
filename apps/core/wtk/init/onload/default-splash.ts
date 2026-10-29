@@ -25,8 +25,8 @@ export class DefaultSplash implements IOnloadSplash {
     }
     node.classList.add("slim")
 
-    node.dataset.radius_size = lib.config.radius_size
-    node.dataset.splash_style = lib.config.splash_style
+    node.dataset.radius_size = "reduce"
+    node.dataset.splash_style = "style1"
 
     this.app = createApp(OnloadSplash, {
       handle: this.handle.bind(this),
@@ -68,22 +68,10 @@ export class DefaultSplash implements IOnloadSplash {
   click(mode: string, node: HTMLDivElement): void {
     node.classList.add("clicked")
 
-    if (game.layout !== "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
-      game.layout = "mobile"
+    if (game.layout === "mobile") {
+      game.layout = "long2"
       // @ts-expect-error ignore
       ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
-    } else if (
-      game.layout === "mobile" &&
-      lib.layoutfixed.indexOf(mode) === -1
-    ) {
-      game.layout = lib.config.layout
-      if (game.layout === "default") {
-        // @ts-expect-error ignore
-        ui.css.layout.href = ""
-      } else {
-        // @ts-expect-error ignore
-        ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
-      }
     }
 
     this.clicked = node

@@ -31,18 +31,6 @@ export class Client {
 
     if (!temp) {
       this.sandbox = null
-      if (this.sandbox) {
-        Reflect.defineProperty(this, "sandbox", {
-          value: this.sandbox,
-          writable: false,
-          configurable: false,
-        })
-        Reflect.defineProperty(this.sandbox, "client", {
-          value: this,
-          writable: false,
-          configurable: false,
-        })
-      }
     }
   }
   /**

@@ -172,16 +172,7 @@ export function loadCharacter(character: importCharacterConfig) {
           !lib.config.characters.includes(name) &&
           lib.config.mode !== "connect"
         ) {
-          if (
-            lib.config.mode === "chess" &&
-            get.config("chess_mode") === "leader" &&
-            get.config("chess_leader_allcharacter")
-          ) {
-            for (const charaName in value) {
-              // @ts-expect-error ignore
-              lib.hiddenCharacters.push(charaName)
-            }
-          } else if (lib.config.mode !== "boss" || name !== "boss") {
+          if (lib.config.mode !== "boss" || name !== "boss") {
             break
           }
         }

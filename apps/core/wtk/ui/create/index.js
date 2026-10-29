@@ -363,206 +363,151 @@ export class Create {
     let cardName = get.name(card)
     const cardNature = get.nature(card)
     let tempname = get.translation(cardName)
-    const cardTempNameConfig = "image"
     const node =
       getApplyNode._tempName || ui.create.div(".tempname", getApplyNode)
     let datasetNature = ""
     const cardPosition = get.position(card)
     getApplyNode._tempName = node
-    if (cardTempNameConfig !== "image") {
-      //清空，避免和下面的image部分有冲突
-      node.innerHTML = ""
-      datasetNature = "fire"
-      if (
-        (cardPosition === "e" || cardPosition === "j") &&
-        card.viewAs &&
-        card.viewAs !== card.name
-      ) {
-        datasetNature = "wood"
-        tempname = get.translation(card.viewAs)
-      } else {
-        if (cardName === "sha") {
-          if (cardNature) {
-            tempname = get.translation(cardNature) + tempname
-          }
-          if (cardNature === "thunder") {
-            datasetNature = "thunder"
-          }
-          if (cardNature === "kami") {
-            datasetNature = "kami"
-          }
-          if (cardNature === "ice") {
-            datasetNature = "ice"
-          }
-        }
+    if (
+      (cardPosition === "e" || cardPosition === "j") &&
+      card.viewAs &&
+      card.viewAs !== card.name
+    ) {
+      cardName = card.viewAs
+      tempname = get.translation(card.viewAs)
+    }
+    if (cardName === "sha") {
+      if (cardNature) {
+        tempname = get.translation(cardNature) + tempname
       }
-      if (cardTempNameConfig === "default") {
-        getApplyNode._tempName.classList.add("vertical")
+      if (cardNature === "fire") {
+        datasetNature = "fire"
       }
-      if (datasetNature.length > 0) {
-        node.dataset.nature = datasetNature
-      } else {
-        delete node.dataset.nature
-        node.classList.add(datasetNature)
+      if (cardNature === "thunder") {
+        datasetNature = "thunder"
       }
+      if (cardNature === "kami") {
+        datasetNature = "kami"
+      }
+      if (cardNature === "ice") {
+        datasetNature = "ice"
+      }
+    }
+    let bg = node.querySelector("div")
+    if (bg) {
+      Array.from(node.childNodes)
+        .filter((v) => v !== bg)
+        .forEach((v) => node.removeChild(v))
     } else {
-      if (
-        (cardPosition === "e" || cardPosition === "j") &&
-        card.viewAs &&
-        card.viewAs !== card.name
-      ) {
-        cardName = card.viewAs
-        tempname = get.translation(card.viewAs)
-      }
-      if (cardName === "sha") {
-        if (cardNature) {
-          tempname = get.translation(cardNature) + tempname
-        }
-        if (cardNature === "fire") {
-          datasetNature = "fire"
-        }
-        if (cardNature === "thunder") {
-          datasetNature = "thunder"
-        }
-        if (cardNature === "kami") {
-          datasetNature = "kami"
-        }
-        if (cardNature === "ice") {
-          datasetNature = "ice"
-        }
-      }
-      let bg = node.querySelector("div")
-      if (bg) {
-        Array.from(node.childNodes)
-          .filter((v) => v !== bg)
-          .forEach((v) => node.removeChild(v))
+      bg = ui.create.div(node)
+    }
+    node.classList.add("tempimage")
+    let img = get.dynamicVariable(lib.card[cardName].image, card)
+    if (img) {
+      if (typeof img !== "string") {
+        img = null
       } else {
-        bg = ui.create.div(node)
-      }
-      node.classList.add("tempimage")
-      let img = get.dynamicVariable(lib.card[cardName].image, card)
-      if (img) {
-        if (typeof img !== "string") {
+        if (img.startsWith("ext:")) {
+          img = img.replace(/^ext:/, "extension/")
+        } else if (
+          ["character:"].some((prefix) => img.startsWith(prefix)) ||
+          ["background", "card"].includes(img)
+        ) {
           img = null
+        }
+      }
+    }
+    if (lib.card[cardName].fullskin) {
+      if (img) {
+        if (img.startsWith("db:")) {
+          bg.setBackgroundDB(img.slice(3))
+        } else if (typeof img === "string") {
+          bg.setBackgroundImage(img)
+        }
+      } else {
+        if (lib.card[cardName].modeimage) {
+          bg.setBackgroundImage(
+            `image/mode/${lib.card[cardName].modeimage}/card/${cardName}.png`,
+          )
         } else {
-          if (img.startsWith("ext:")) {
-            img = img.replace(/^ext:/, "extension/")
-          } else if (
-            ["character:"].some((prefix) => img.startsWith(prefix)) ||
-            ["background", "card"].includes(img)
-          ) {
-            img = null
+          if (cardName === "sha" && lib.natureBg.has(cardNature)) {
+            bg.setBackgroundImage(lib.natureBg.get(cardNature))
+          } else {
+            bg.setBackgroundImage(`image/card/${cardName}.png`)
           }
         }
       }
-      if (lib.card[cardName].fullskin) {
-        if (img) {
-          if (img.startsWith("db:")) {
-            bg.setBackgroundDB(img.slice(3))
-          } else if (typeof img === "string") {
-            bg.setBackgroundImage(img)
-          }
-          /*if (img.startsWith("ext:")) {
-						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-					} else {
-						bg.setBackgroundDB(img);
-					}*/
-        } else {
-          if (lib.card[cardName].modeimage) {
-            bg.setBackgroundImage(
-              `image/mode/${lib.card[cardName].modeimage}/card/${cardName}.png`,
-            )
-          } else {
-            if (cardName === "sha" && lib.natureBg.has(cardNature)) {
-              bg.setBackgroundImage(lib.natureBg.get(cardNature))
-            } else {
-              bg.setBackgroundImage(`image/card/${cardName}.png`)
-            }
-          }
+    } else if (
+      get.dynamicVariable(lib.card[cardName].image, card) === "background"
+    ) {
+      if (cardNature) {
+        bg.setBackground(`${cardName}_${cardNature}`, "card")
+      } else {
+        bg.setBackground(cardName, "card")
+      }
+    } else if (lib.card[cardName].fullimage) {
+      if (img) {
+        if (img.startsWith("db:")) {
+          bg.setBackgroundDB(img.slice(3))
+        } else if (typeof img === "string") {
+          bg.setBackgroundImage(img)
+          bg.style.backgroundSize = "cover"
         }
-      } else if (
-        get.dynamicVariable(lib.card[cardName].image, card) === "background"
-      ) {
-        if (cardNature) {
-          bg.setBackground(`${cardName}_${cardNature}`, "card")
-        } else {
-          bg.setBackground(cardName, "card")
-        }
-      } else if (lib.card[cardName].fullimage) {
-        if (img) {
-          if (img.startsWith("db:")) {
-            bg.setBackgroundDB(img.slice(3))
-          } else if (typeof img === "string") {
-            bg.setBackgroundImage(img)
-            bg.style.backgroundSize = "cover"
-          }
-          /*if (img.startsWith("ext:")) {
-						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-						bg.style.backgroundSize = "cover";
-					} else {
-						bg.setBackgroundDB(img);
-					}*/
-        } else if (get.dynamicVariable(lib.card[cardName].image, card)) {
-          if (
-            get
-              .dynamicVariable(lib.card[cardName].image, card)
-              .startsWith("character:")
-          ) {
-            bg.setBackground(
-              get.dynamicVariable(lib.card[cardName].image, card).slice(10),
-              "character",
-            )
-          } else {
-            bg.setBackground(
-              get.dynamicVariable(lib.card[cardName].image, card),
-            )
-          }
-        } else {
-          const cardPack = lib.cardPack[`mode_${get.mode()}`]
-          if (Array.isArray(cardPack) && cardPack.includes(cardName)) {
-            bg.setBackground(`mode/${get.mode()}/card/${cardName}`)
-          } else {
-            bg.setBackground(`card/${cardName}`)
-          }
-        }
-      } else if (
-        get.dynamicVariable(lib.card[cardName].image, card) === "card"
-      ) {
-        if (cardNature) {
-          bg.setBackground(`${cardName}_${cardNature}`, "card")
-        } else {
-          bg.setBackground(cardName, "card")
-        }
-      } else if (
-        typeof get.dynamicVariable(lib.card[cardName].image, card) ===
-          "string" &&
-        !lib.card[cardName].fullskin
-      ) {
-        if (img) {
-          if (img.startsWith("db:")) {
-            bg.setBackgroundDB(img.slice(3))
-          } else if (typeof img === "string") {
-            bg.setBackgroundImage(img)
-            bg.style.backgroundSize = "cover"
-          }
-          /*if (img.startsWith("ext:")) {
-						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-						bg.style.backgroundSize = "cover";
-					} else {
-						bg.setBackgroundDB(img);
-					}*/
+      } else if (get.dynamicVariable(lib.card[cardName].image, card)) {
+        if (
+          get
+            .dynamicVariable(lib.card[cardName].image, card)
+            .startsWith("character:")
+        ) {
+          bg.setBackground(
+            get.dynamicVariable(lib.card[cardName].image, card).slice(10),
+            "character",
+          )
         } else {
           bg.setBackground(get.dynamicVariable(lib.card[cardName].image, card))
         }
       } else {
-        console.warn("卡牌图片解析失败")
+        const cardPack = lib.cardPack[`mode_${get.mode()}`]
+        if (Array.isArray(cardPack) && cardPack.includes(cardName)) {
+          bg.setBackground(`mode/${get.mode()}/card/${cardName}`)
+        } else {
+          bg.setBackground(`card/${cardName}`)
+        }
       }
-      if (datasetNature.length > 0) {
-        node.classList.add(datasetNature)
+    } else if (get.dynamicVariable(lib.card[cardName].image, card) === "card") {
+      if (cardNature) {
+        bg.setBackground(`${cardName}_${cardNature}`, "card")
+      } else {
+        bg.setBackground(cardName, "card")
       }
-      delete node.dataset.nature
+    } else if (
+      typeof get.dynamicVariable(lib.card[cardName].image, card) === "string" &&
+      !lib.card[cardName].fullskin
+    ) {
+      if (img) {
+        if (img.startsWith("db:")) {
+          bg.setBackgroundDB(img.slice(3))
+        } else if (typeof img === "string") {
+          bg.setBackgroundImage(img)
+          bg.style.backgroundSize = "cover"
+        }
+        /*if (img.startsWith("ext:")) {
+						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
+						bg.style.backgroundSize = "cover";
+					} else {
+						bg.setBackgroundDB(img);
+					}*/
+      } else {
+        bg.setBackground(get.dynamicVariable(lib.card[cardName].image, card))
+      }
+    } else {
+      console.warn("卡牌图片解析失败")
     }
-    node.innerHTML += `<span>${cardTempNameConfig === "default" ? get.verticalStr(tempname) : tempname}</span>`
+    if (datasetNature.length > 0) {
+      node.classList.add(datasetNature)
+    }
+    delete node.dataset.nature
+    node.innerHTML += `<span>${tempname}</span>`
     node.tempname = tempname
     return node
   }
@@ -1040,7 +985,7 @@ export class Create {
           game
             .createEvent("giveup", false)
             .set("includeOut", true)
-            .setContent(() => {
+            .setContent(async (event, trigger, player) => {
               game.log(player, "投降")
               player.popup("投降")
               player.die("nosource").set("_triggered", null).includeOut = true
@@ -1910,16 +1855,12 @@ export class Create {
         switch (type) {
           case "basic":
             return 0
-          case "chess":
-            return 1.5
           case "trick":
             return 2
           case "delay":
             return 3
           case "equip":
             return 4
-          case "zhenfa":
-            return 5
           default:
             return 6
         }
@@ -2672,10 +2613,12 @@ export class Create {
     if (game.layout === "long2") {
       ui.arena.classList.add("long")
     }
-    ui.arena.classList.add("slim_player")
+    if (game.layout === "long2") {
+      ui.arena.classList.add("slim_player")
+    }
     ui.arena.classList.add("uslim_player")
     ui.window.dataset.player_border = lib.config.player_border
-    ui.window.dataset.radius_size = lib.config.radius_size || "reduce"
+    ui.window.dataset.radius_size = "reduce"
     if (game.layout === "mobile") {
       //if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
       ui.arena.classList.add("textequip")
@@ -2714,7 +2657,8 @@ export class Create {
 
     lib.init.cssstyles()
 
-    ui.arena.dataset.player_height = lib.config.player_height || "default"
+    ui.arena.dataset.player_height = "default"
+    ui.arena.dataset.player_height_nova = "short"
     ui.backgroundMusic = document.createElement("audio")
     ui.backgroundMusic.volume = lib.config.volumn_background / 8
     game.playBackgroundMusic()
@@ -2971,6 +2915,9 @@ export class Create {
       }
     }
     ui.volumn = ui.create.system("♫")
+    if (lib.device === "ios") {
+      ui.volumn.style.display = "none"
+    }
     lib.setPopped(ui.volumn, ui.click.volumn, 200)
     // if(lib.config.show_pause) ui.auto.style.marginLeft='10px';
     if (!lib.config.show_volumn) {

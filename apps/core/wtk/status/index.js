@@ -1,3 +1,4 @@
+import { lib } from "wtk"
 import PauseManager from "@/game/PauseManager.ts"
 import { GameEventManager } from "@/library/element/gameEvent.js"
 
@@ -172,4 +173,14 @@ export class status {
   countDialogs = {}
 }
 
-export const _status = new status()
+export let _status = new status()
+
+/**
+ * @param { InstanceType<typeof status> } [instance]
+ */
+export const setStatus = (instance) => {
+  _status = instance || new status()
+  if (lib.config.dev) {
+    window._status = _status
+  }
+}

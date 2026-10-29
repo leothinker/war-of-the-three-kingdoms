@@ -742,9 +742,7 @@ game.import("card", () => ({
                   (nd > 1 || (nd && player.hp < 1 + taos.length))) ||
                 (target.identity === "zhu" &&
                   (nd || target.hp < 3) &&
-                  (mode === "identity" ||
-                    mode === "versus" ||
-                    mode === "chess")) ||
+                  (mode === "identity" || mode === "versus")) ||
                 !player.hasFriend()
               ) {
                 return 2
@@ -755,9 +753,7 @@ game.import("card", () => ({
                     player !== current &&
                     current.identity === "zhu" &&
                     current.hp < 3 &&
-                    (mode === "identity" ||
-                      mode === "versus" ||
-                      mode === "chess") &&
+                    (mode === "identity" || mode === "versus") &&
                     get.attitude(player, current) > 0
                   )
                 })

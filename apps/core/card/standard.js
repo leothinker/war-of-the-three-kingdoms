@@ -273,7 +273,9 @@ export default {
             target.countCards("h") > 0
           ) {
             const discardResult = await target
-							.chooseToDiscard("刺杀：请弃置一张手牌，否则此刺【杀】依然造成伤害")
+              .chooseToDiscard(
+                "刺杀：请弃置一张手牌，否则此刺【杀】依然造成伤害",
+              )
               .set("ai", (card) => {
                 const target = _status.event.player
                 const evt = _status.event.getParent()
@@ -766,9 +768,7 @@ export default {
                   (nd > 1 || (nd && player.hp < 1 + taos.length))) ||
                 (target.identity === "zhu" &&
                   (nd || target.hp < 3) &&
-                  (mode === "identity" ||
-                    mode === "versus" ||
-                    mode === "chess")) ||
+                  (mode === "identity" || mode === "versus")) ||
                 !player.hasFriend()
               ) {
                 return 2
@@ -779,9 +779,7 @@ export default {
                     player !== current &&
                     current.identity === "zhu" &&
                     current.hp < 3 &&
-                    (mode === "identity" ||
-                      mode === "versus" ||
-                      mode === "chess") &&
+                    (mode === "identity" || mode === "versus") &&
                     get.attitude(player, current) > 0
                   )
                 })

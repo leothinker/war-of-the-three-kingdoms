@@ -1068,7 +1068,7 @@ export class Game {
     config.updatex.call(backgroundMusicSetting, [])
   }
   updateBackground() {
-    const background = _status.tempBackground || lib.config.image_background
+    const background = _status.tempBackground || "default"
     ui.background.delete()
     const uiBackground = (ui.background = ui.create.div(".background")),
       style = uiBackground.style
@@ -1308,7 +1308,7 @@ export class Game {
     if (rank.rare.includes(name)) {
       return "rare"
     }
-    if (get.mode() !== "chess" && rank.junk.includes(name)) {
+    if (rank.junk.includes(name)) {
       return "junk"
     }
     return "common"
@@ -3726,7 +3726,6 @@ export class Game {
           glowing.classList.remove("glow_phase")
         }
         player.classList.add("glow_phase")
-        // player.dataset.glow_phase=lib.config.glow_phase;
       } else {
         console.log(player)
       }
@@ -7376,10 +7375,7 @@ export class Game {
             game.saveConfig("mode", "boss")
             break
           case "boss":
-            game.saveConfig("mode", "chess")
-            break
-          case "chess":
-            game.saveConfig("mode", "stone")
+            game.saveConfig("mode", "identity")
             break
         }
       }
@@ -8091,10 +8087,8 @@ export class Game {
    * @param {*} configx
    */
   switchMode(name, configx) {
-    if (!lib.layoutfixed.includes(name)) {
-      if (lib.config.layout !== game.layout) {
-        lib.init.layout(lib.config.layout)
-      }
+    if (lib.config.layout !== game.layout) {
+      lib.init.layout(lib.config.layout)
     }
     game.loadModeAsync(name, async (exports) => {
       const mode = exports
@@ -8934,6 +8928,7 @@ export class Game {
         }
       },
     ])
+    return next
   }
   updateRoundNumber() {
     game.broadcastAll(
@@ -10383,7 +10378,7 @@ export class Game {
   triggerEnter(player) {
     const next = game.createEvent("enterGame", false)
     next.player = player
-    next.setContent(() => {
+    next.setContent(async (event, trigger, player) => {
       event.trigger("enterGame")
     })
     return next

@@ -11098,7 +11098,7 @@ export default () => {
         priority: 100,
         fixed: true,
         audio: 2,
-        mode: ["identity", "guozhan", "boss", "stone"],
+        mode: ["identity", "guozhan", "boss"],
         init(player) {
           if (get.mode() === "boss" && player === game.boss) {
             lib.onwash.push(() => {

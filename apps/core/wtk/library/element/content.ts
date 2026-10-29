@@ -9391,18 +9391,31 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           event.dialog.open()
         } else {
-          const controls = event.controls.slice(0)
-          controls.remove("cancel2")
-          if ((event.direct && controls.length === 1) || event.forceDirect) {
-            event.result = {
-              control: event.controls[0],
-              links: get.links([event.controls[0]]),
+          if (event.seperate) {
+            const controls = event.controls.slice(0)
+            controls.remove("cancel2")
+            if ((event.direct && controls.length === 1) || event.forceDirect) {
+              event.result = {
+                control: event.controls[0],
+                links: get.links([event.controls[0]]),
+              }
+              return
             }
-            return
-          }
-          event.controlbars = []
-          for (const control of event.controls) {
-            event.controlbars.push(ui.create.control([control]))
+            event.controlbars = []
+            for (const control of event.controls) {
+              event.controlbars.push(ui.create.control([control]))
+            }
+          } else {
+            const controls = event.controls.slice(0)
+            controls.remove("cancel2")
+            if ((event.direct && controls.length === 1) || event.forceDirect) {
+              event.result = {
+                control: event.controls[0],
+                links: get.links([event.controls[0]]),
+              }
+              return
+            }
+            event.controlbar = ui.create.control(event.controls)
           }
           if (event.dialog) {
             if (Array.isArray(event.dialog)) {
@@ -10361,7 +10374,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     const cards = player.getCards("h")
     const next = player.showCards(cards)
-    next.setContent(() => {})
+    next.setContent(async (event, trigger, player) => {})
 
     let str = `${get.translation(player.name)}的手牌`
     if (typeof event.prompt === "string") {

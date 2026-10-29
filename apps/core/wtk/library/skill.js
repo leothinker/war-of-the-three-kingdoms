@@ -1503,13 +1503,13 @@ export default {
       markcount: () => _status.renku.length,
       mark: (dialog, content, player) => {
         if (!_status.renku.length) {
-          return "仁库中没有牌"
+          return "仁区中没有牌"
         }
         dialog.addAuto(_status.renku)
       },
       content: () => {
         if (!_status.renku.length) {
-          return "仁库中没有牌"
+          return "仁区中没有牌"
         }
         return get.translation(_status.renku)
       },

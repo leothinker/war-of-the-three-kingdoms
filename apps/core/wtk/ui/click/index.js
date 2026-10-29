@@ -483,9 +483,6 @@ export class Click {
       }
     }
   }
-  autoskin() {
-    return
-  }
   skin(avatar, name, callback) {
     let nowSkin = "defaultSkin"
     if (name.startsWith("gz_")) {
@@ -814,9 +811,7 @@ export class Click {
         } else {
           uiintro.touchclose = true
         }
-        // if(lib.config.theme!='woodden'){
         uiintro.classList.add("woodbg")
-        // }
         if (get.is.phoneLayout()) {
           uiintro.style.width = "100px"
         } else {

@@ -1,7 +1,6 @@
 import dedent from "dedent"
 import { _status, ai, game, get, lib, ui } from "wtk"
 import { AsyncFunction } from "@/util/index.js"
-import { security } from "@/util/sandbox.js"
 import { CacheContext } from "../cache/cacheContext.js"
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js"
 import { ContentCompiler } from "./gameEvent.js"
@@ -482,10 +481,11 @@ export class Player extends HTMLDivElement {
   /**
    * 整理手牌，要联机的不要单独用，主机不会同步状态的
    * @param {(a: Card, b: Card) => number|Card[]} [sort] 排序方法，如果传的牌数组，就按数组顺序排
+   * @param {boolean} forced 是否无视noSortCard标签强制整理手牌
    * @returns {boolean|undefined}
    */
-  sortHandcard(sort) {
-    if (this.hasSkillTag("noSortCard")) {
+  sortHandcard(sort, forced) {
+    if (!forced && this.hasSkillTag("noSortCard")) {
       return false
     }
 
@@ -540,9 +540,10 @@ export class Player extends HTMLDivElement {
   /**
    * 整理手牌然后如果是联机模式顺便同步
    * @param {(a: Card, b: Card) => number|Card[]} [sort] 排序方法，如果传的牌数组，就按数组顺序排
+   * @param {boolean} forced 是否无视noSortCard标签强制整理手牌
    */
-  sortHandcardOL(sort) {
-    const bool = this.sortHandcard(sort)
+  sortHandcardOL(sort, forced) {
+    const bool = this.sortHandcard(sort, forced)
     //联机要同步手牌状态
     if (_status.connectMode && bool !== false) {
       if (game.online) {
@@ -1015,13 +1016,7 @@ export class Player extends HTMLDivElement {
           if (!get.isFunctionBody(str2)) {
             throw new Error("无效的content函数代码")
           }
-          let recompiledScope
-          if (security.isSandboxRequired()) {
-            recompiledScope = (code) =>
-              security.eval(`return (${code.toString()})`)
-          } else {
-            recompiledScope = eval
-          }
+          const recompiledScope = eval
           compileStep(str2, recompiledScope)
         }
       }
@@ -14175,11 +14170,6 @@ export class Player extends HTMLDivElement {
       return this.side === me.side && get.config("single_control")
     }
     if (game.chess) {
-      if (lib.config.mode === "chess") {
-        if (_status.mode === "combat" && !get.config("single_control")) {
-          return false
-        }
-      }
       return this.side === me.side
     }
     return false
@@ -16332,8 +16322,7 @@ export class Player extends HTMLDivElement {
       }
     })
     for (let i = 1; i <= 5; i++) {
-      let add = false
-      add = this.hasEmptySlot(i) && !this.getEquips(i).length
+      const add = this.hasEmptySlot(i) && !this.getEquips(i).length
       if (
         add &&
         !cardsResume.some((card) => {

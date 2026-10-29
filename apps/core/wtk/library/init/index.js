@@ -349,9 +349,6 @@ export class LibInit {
     loadingScreenStyle.animationDuration = "1s"
     loadingScreenStyle.animationFillMode = "forwards"
     loadingScreenStyle.animationName = "opacity-0-1"
-    if (layout === "default") {
-      layout = "mobile"
-    }
     if (!nosave) {
       game.saveConfig("layout", layout)
     }
@@ -399,7 +396,11 @@ export class LibInit {
         } else {
           ui.arena.classList.remove("long")
         }
-        ui.arena.classList.add("slim_player")
+        if (game.layout === "long2") {
+          ui.arena.classList.add("slim_player")
+        } else {
+          ui.arena.classList.remove("slim_player")
+        }
         ui.arena.classList.remove("lslim_player")
         ui.arena.classList.add("uslim_player")
         ui.arena.classList.remove("mslim_player")
