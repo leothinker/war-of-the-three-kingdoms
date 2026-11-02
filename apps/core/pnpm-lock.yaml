@@ -77,6 +77,9 @@ importers:
       error-stack-parser:
         specifier: ^2.1.4
         version: 2.1.4
+      eslint-linter-browserify:
+        specifier: ^9.39.2
+        version: 9.39.2
       jszip:
         specifier: ^2.7.0
         version: 2.7.0
@@ -693,6 +696,9 @@ packages:
   escalade@3.2.0:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
+
+  eslint-linter-browserify@9.39.2:
+    resolution: {integrity: sha512-X4oD9ymZLMaNcSRZkNyDEcwObLPTg9QsQM/YHnfWJbnqUJpmmgicXtgi9UGgk+ntC9Aydnp3RW7+uWrkoUbWbg==}
 
   estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
@@ -1548,6 +1554,8 @@ snapshots:
       '@esbuild/win32-x64': 0.27.3
 
   escalade@3.2.0: {}
+
+  eslint-linter-browserify@9.39.2: {}
 
   estree-walker@2.0.2: {}
 

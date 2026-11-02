@@ -4697,7 +4697,7 @@ export default {
       "huangjinleishi",
       "re_panfeng",
       "guosi",
-      "sp_liuqi",
+      "liuqi",
       "mangyachang",
       "gaolan",
       "lvkuanglvxiang",
@@ -4780,7 +4780,7 @@ export default {
     ["spade", 12, "tiesuo"],
     ["spade", 12, "zhangba"],
     ["spade", 13, "wuxie"],
-    ["spade", 13, "dawanma"],
+    ["spade", 13, "dayuanma"],
 
     ["club", 1, "baiyin"],
     ["club", 1, "zhuge"],
