@@ -22,31 +22,31 @@ damage        → EventDamageParams
 
 ```javascript
 // 迁移前：顺序不表达含义
-player.gain(cards, source, "give", "bySelf");
+player.gain(cards, source, "give", "bySelf")
 
 // 迁移后
 player.gain({
-	cards,
-	source,
-	animate: "give",
-	bySelf: true,
-});
+  cards,
+  source,
+  animate: "give",
+  bySelf: true,
+})
 ```
 
 旧式调用允许交换部分参数的顺序：
 
 ```javascript
-player.gain(cards, "gain2");
-player.gain("gain2", cards);
+player.gain(cards, "gain2")
+player.gain("gain2", cards)
 ```
 
 二者都迁移为：
 
 ```javascript
 player.gain({
-	cards,
-	animate: "gain2",
-});
+  cards,
+  animate: "gain2",
+})
 ```
 
 ### 3. 把标志字符串改成布尔字段
@@ -55,16 +55,16 @@ player.gain({
 
 ```javascript
 // 迁移前
-player.damage(source, 2, "fire", "nocard", "nohujia");
+player.damage(source, 2, "fire", "nocard", "nohujia")
 
 // 迁移后
 player.damage({
-	source,
-	num: 2,
-	nature: "fire",
-	nocard: true,
-	nohujia: true,
-});
+  source,
+  num: 2,
+  nature: "fire",
+  nocard: true,
+  nohujia: true,
+})
 ```
 
 不能把标志字符串原样放进对象，也不要写成不属于接口的字段：
@@ -72,9 +72,9 @@ player.damage({
 ```javascript
 // 错误
 player.damage({
-	source,
-	flags: ["nocard", "nohujia"],
-});
+  source,
+  flags: ["nocard", "nohujia"],
+})
 ```
 
 ### 4. 把单数值包装为复数字段
@@ -83,19 +83,19 @@ player.damage({
 
 ```javascript
 // 迁移前
-player.gain(card, "gain2");
-player.useCard({ name: "sha" }, target);
+player.gain(card, "gain2")
+player.useCard({ name: "sha" }, target)
 
 // 迁移后
 player.gain({
-	cards: [card],
-	animate: "gain2",
-});
+  cards: [card],
+  animate: "gain2",
+})
 
 player.useCard({
-	card: { name: "sha" },
-	targets: [target],
-});
+  card: { name: "sha" },
+  targets: [target],
+})
 ```
 
 不要把真实的 `Card`、`Player` 或 `Dialog` 当成参数对象；它们是字段值。
@@ -104,15 +104,17 @@ player.useCard({
 
 ```javascript
 // 迁移前
-const next = player.chooseTarget("选择一名其他角色", true, lib.filter.notMe).set("ai", target => -get.attitude(player, target));
+const next = player
+  .chooseTarget("选择一名其他角色", true, lib.filter.notMe)
+  .set("ai", (target) => -get.attitude(player, target))
 
 // 迁移后
 const next = player.chooseTarget({
-	prompt: "选择一名其他角色",
-	forced: true,
-	filterTarget: lib.filter.notMe,
-	ai: target => -get.attitude(player, target),
-});
+  prompt: "选择一名其他角色",
+  forced: true,
+  filterTarget: lib.filter.notMe,
+  ai: (target) => -get.attitude(player, target),
+})
 ```
 
 以下情况可以继续使用 `.set()`：
@@ -126,21 +128,21 @@ const next = player.chooseTarget({
 以下调用已被明确纳入方法类型，不必为了迁移而改写：
 
 ```javascript
-player.draw(2);
-player.damage(2);
-player.recover(1);
-player.loseMaxHp(1);
-player.gainMaxHp(1);
+player.draw(2)
+player.damage(2)
+player.recover(1)
+player.loseMaxHp(1)
+player.gainMaxHp(1)
 ```
 
 当调用只有一个数字参数时，其含义是明确的。需要加入其他选项时，再改为对象：
 
 ```javascript
 await target.damage({
-	num: 2,
-	source: player,
-	nature: "fire",
-});
+  num: 2,
+  source: player,
+  nature: "fire",
+})
 ```
 
 ## 二、常见迁移对照
@@ -149,16 +151,16 @@ await target.damage({
 
 ```javascript
 // 迁移前
-await target.gain(cards, player, "giveAuto", "bySelf", "log");
+await target.gain(cards, player, "giveAuto", "bySelf", "log")
 
 // 迁移后
 await target.gain({
-	cards,
-	source: player,
-	animate: "giveAuto",
-	bySelf: true,
-	log: true,
-});
+  cards,
+  source: player,
+  animate: "giveAuto",
+  bySelf: true,
+  log: true,
+})
 ```
 
 | 旧参数                                 | 对象字段                |
@@ -180,20 +182,25 @@ await target.gain({
 ```javascript
 // 迁移前
 const result = await player
-	.chooseTarget([1, 2], "选择至多两名其他角色", true, (_card, player, target) => target !== player)
-	.set("ai", target => -get.attitude(player, target))
-	.forResult();
+  .chooseTarget(
+    [1, 2],
+    "选择至多两名其他角色",
+    true,
+    (_card, player, target) => target !== player,
+  )
+  .set("ai", (target) => -get.attitude(player, target))
+  .forResult()
 
 // 迁移后
 const result = await player
-	.chooseTarget({
-		selectTarget: [1, 2],
-		prompt: "选择至多两名其他角色",
-		forced: true,
-		filterTarget: (_card, player, target) => target !== player,
-		ai: target => -get.attitude(player, target),
-	})
-	.forResult();
+  .chooseTarget({
+    selectTarget: [1, 2],
+    prompt: "选择至多两名其他角色",
+    forced: true,
+    filterTarget: (_card, player, target) => target !== player,
+    ai: (target) => -get.attitude(player, target),
+  })
+  .forResult()
 ```
 
 旧式调用中的第一个函数会被当作 `filterTarget`，第二个函数会被当作 `ai`。迁移后应直接使用字段名，不再依赖函数出现的先后顺序。
@@ -203,21 +210,23 @@ const result = await player
 ```javascript
 // 迁移前
 const result = await player
-	.chooseCard(2, true, "he", "选择两张可重铸的牌", (card, player) => player.canRecast(card))
-	.set("ai", card => 6 - get.value(card))
-	.forResult();
+  .chooseCard(2, true, "he", "选择两张可重铸的牌", (card, player) =>
+    player.canRecast(card),
+  )
+  .set("ai", (card) => 6 - get.value(card))
+  .forResult()
 
 // 迁移后
 const result = await player
-	.chooseCard({
-		selectCard: 2,
-		forced: true,
-		position: "he",
-		prompt: "选择两张可重铸的牌",
-		filterCard: (card, player) => player.canRecast(card),
-		ai: card => 6 - get.value(card),
-	})
-	.forResult();
+  .chooseCard({
+    selectCard: 2,
+    forced: true,
+    position: "he",
+    prompt: "选择两张可重铸的牌",
+    filterCard: (card, player) => player.canRecast(card),
+    ai: (card) => 6 - get.value(card),
+  })
+  .forResult()
 ```
 
 `chooseToDiscard`、`chooseToGive`、`chooseToRespond` 等选牌方法使用相同的公共字段，但仍应检查各自的 `EventXxxParams`，因为它们还有不同的专用字段。
@@ -226,15 +235,15 @@ const result = await player
 
 ```javascript
 const result = await player
-	.chooseCard({
-		position: "he",
-		prompt: "选择一张红色基本牌",
-		filterCard: {
-			type: "basic",
-			color: "red",
-		},
-	})
-	.forResult();
+  .chooseCard({
+    position: "he",
+    prompt: "选择一张红色基本牌",
+    filterCard: {
+      type: "basic",
+      color: "red",
+    },
+  })
+  .forResult()
 ```
 
 旧式调用中作为筛选条件传入的普通对象，可以迁移到 `filterCard` 字段；方法会通过 `get.filter` 将它转换为函数。动态条件仍使用函数形式。
@@ -245,17 +254,17 @@ const result = await player
 
 ```javascript
 const result = await player
-	.chooseCardTarget({
-		prompt: "弃置一张牌并选择一名其他角色",
-		position: "he",
-		filterCard: lib.filter.cardDiscardable,
-		selectCard: 1,
-		filterTarget: (_card, player, target) => target !== player,
-		selectTarget: 1,
-		ai1: card => 6 - get.value(card),
-		ai2: target => -get.attitude(player, target),
-	})
-	.forResult();
+  .chooseCardTarget({
+    prompt: "弃置一张牌并选择一名其他角色",
+    position: "he",
+    filterCard: lib.filter.cardDiscardable,
+    selectCard: 1,
+    filterTarget: (_card, player, target) => target !== player,
+    selectTarget: 1,
+    ai1: (card) => 6 - get.value(card),
+    ai2: (target) => -get.attitude(player, target),
+  })
+  .forResult()
 ```
 
 同时存在牌和目标评分时使用 `ai1`、`ai2`，不要写单独的 `ai`。
@@ -264,45 +273,51 @@ const result = await player
 
 ```javascript
 // 迁移前
-await player.draw(2, source, "bottom", "visible", "nodelay");
+await player.draw(2, source, "bottom", "visible", "nodelay")
 
 // 迁移后
 await player.draw({
-	num: 2,
-	source,
-	bottom: true,
-	visible: true,
-	nodelay: true,
-});
+  num: 2,
+  source,
+  bottom: true,
+  visible: true,
+  nodelay: true,
+})
 ```
 
 `drawTo` 的目标手牌数仍是第一个位置参数：
 
 ```javascript
 // 迁移前
-await player.drawTo(5, ["bottom", "visible"]);
+await player.drawTo(5, ["bottom", "visible"])
 
 // 迁移后
 await player.drawTo(5, {
-	bottom: true,
-	visible: true,
-});
+  bottom: true,
+  visible: true,
+})
 ```
 
 ### `useCard`
 
 ```javascript
 // 迁移前
-await player.useCard({ name: "sha", isCard: true }, cards, target, "example_skill", false);
+await player.useCard(
+  { name: "sha", isCard: true },
+  cards,
+  target,
+  "example_skill",
+  false,
+)
 
 // 迁移后
 await player.useCard({
-	card: { name: "sha", isCard: true },
-	cards,
-	targets: [target],
-	skill: "example_skill",
-	addCount: false,
-});
+  card: { name: "sha", isCard: true },
+  cards,
+  targets: [target],
+  skill: "example_skill",
+  addCount: false,
+})
 ```
 
 | 旧参数                          | 对象字段            |
@@ -320,43 +335,43 @@ await player.useCard({
 
 ```javascript
 // 仍是旧式调用，因为还有第二个实参
-player.useCard({ name: "sha" }, target);
+player.useCard({ name: "sha" }, target)
 
 // 明确的对象参数
 player.useCard({
-	card: { name: "sha" },
-	targets: [target],
-});
+  card: { name: "sha" },
+  targets: [target],
+})
 ```
 
 ### `damage` 与 `recover`
 
 ```javascript
 // 迁移前
-await target.damage(cards, card, 2, source, "fire", "notrigger", "nohujia");
+await target.damage(cards, card, 2, source, "fire", "notrigger", "nohujia")
 
 // 迁移后
 await target.damage({
-	cards,
-	card,
-	num: 2,
-	source,
-	nature: "fire",
-	notrigger: true,
-	nohujia: true,
-});
+  cards,
+  card,
+  num: 2,
+  source,
+  nature: "fire",
+  notrigger: true,
+  nohujia: true,
+})
 
 // 迁移前
-await target.recover(card, cards, source, 1, "nocard");
+await target.recover(card, cards, source, 1, "nocard")
 
 // 迁移后
 await target.recover({
-	card,
-	cards,
-	source,
-	num: 1,
-	nocard: true,
-});
+  card,
+  cards,
+  source,
+  num: 1,
+  nocard: true,
+})
 ```
 
 注意：`nocard` 和 `nosource` 会阻止方法从当前事件继承牌或来源。即使调用时没有显式的 `card` 或 `source`，迁移时也要保留这些字段，才能保持旧行为。
@@ -365,46 +380,46 @@ await target.recover({
 
 ```javascript
 await target.recoverTo(3, {
-	source,
-	nocard: true,
-});
+  source,
+  nocard: true,
+})
 ```
 
 ### `discard`、`loseToDiscardpile` 与 `lose`
 
 ```javascript
 // 迁移前
-await player.discard(cards, source);
+await player.discard(cards, source)
 
 // 迁移后
 await player.discard({
-	cards,
-	discarder: source,
-});
+  cards,
+  discarder: source,
+})
 
 // 迁移前
-await player.loseToDiscardpile(cards, source, "insert", "blank", false);
+await player.loseToDiscardpile(cards, source, "insert", "blank", false)
 
 // 迁移后
 await player.loseToDiscardpile({
-	cards,
-	source,
-	insert_card: true,
-	blank: true,
-	animate: false,
-});
+  cards,
+  source,
+  insert_card: true,
+  blank: true,
+  animate: false,
+})
 
 // 迁移前
-await player.lose(cards, source, ui.discardPile, "visible", "insert");
+await player.lose(cards, source, ui.discardPile, "visible", "insert")
 
 // 迁移后
 await player.lose({
-	cards,
-	source,
-	position: ui.discardPile,
-	visible: true,
-	insert_card: true,
-});
+  cards,
+  source,
+  position: ui.discardPile,
+  visible: true,
+  insert_card: true,
+})
 ```
 
 `discard` 的行为发起者字段名是 `discarder`；`lose` 与 `loseToDiscardpile` 使用 `source`。不要机械地把所有 `Player` 参数都命名为同一个字段。
@@ -464,14 +479,14 @@ await player.lose({
 ```javascript
 // 错误
 player.drawTo({
-	num: 5,
-	bottom: true,
-});
+  num: 5,
+  bottom: true,
+})
 
 // 正确
 player.drawTo(5, {
-	bottom: true,
-});
+  bottom: true,
+})
 ```
 
 ## 五、兼容策略

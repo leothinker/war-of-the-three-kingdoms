@@ -2381,7 +2381,7 @@ class Marshal {
 
     // 如果可能，应该尽量避免陷入相同运行域
     if (prevDomain === domain) {
-      return console.warn("trapDomain 处于相同 domain"), action()
+      return (console.warn("trapDomain 处于相同 domain"), action())
     }
 
     Domain[SandboxExposer2](SandboxSignal_EnterDomain, domain)

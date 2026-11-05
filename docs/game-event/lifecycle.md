@@ -30,15 +30,15 @@ checkSkipped(): Promise<bool>  // 检查是否被跳过
 
 `_triggered` 是事件流程的核心状态字段，驱动 `loop()` 的分支走向：
 
-| 值 | 含义 | 触发阶段 |
-|----|------|----------|
-| `null` | 非 trigger 事件（构造时 `trigger = false`） | 无 |
-| `0` | 初始状态 | → `XXXBefore` |
-| `1` | Before 已触发 | → `XXXBegin`（未 finish）/ `XXXOmitted`（已 finish） |
-| `2` | Begin 已触发 | → 执行 content |
-| `3` | Content 已执行 | → `XXXAfter` |
-| `4` | 全部触发完成 | → 处理 after 链，退出 loop |
-| `5` | 被 `untrigger` 取消 | 跳过当前 arrangeTrigger |
+| 值     | 含义                                        | 触发阶段                                             |
+| ------ | ------------------------------------------- | ---------------------------------------------------- |
+| `null` | 非 trigger 事件（构造时 `trigger = false`） | 无                                                   |
+| `0`    | 初始状态                                    | → `XXXBefore`                                        |
+| `1`    | Before 已触发                               | → `XXXBegin`（未 finish）/ `XXXOmitted`（已 finish） |
+| `2`    | Begin 已触发                                | → 执行 content                                       |
+| `3`    | Content 已执行                              | → `XXXAfter`                                         |
+| `4`    | 全部触发完成                                | → 处理 after 链，退出 loop                           |
+| `5`    | 被 `untrigger` 取消                         | 跳过当前 arrangeTrigger                              |
 
 ## 构造
 

@@ -136,7 +136,7 @@ export class Pagination {
             for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
               const value = String(i + 1)
               // @ts-expect-error ignore
-              evaNumberLi[i].innerText =
+              evaNumberLi[i].textContent =
                 state.pageNumberForCN?.[parseInt(value, 10) - 1] ?? value
               evaNumberLi[i].setAttribute(state.dataNumberAttr, value)
             }
@@ -156,7 +156,7 @@ export class Pagination {
           for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
             const value = String(pageNumber + (i - state.activePosition))
             // @ts-expect-error ignore
-            evaNumberLi[i].innerText =
+            evaNumberLi[i].textContent =
               state.pageNumberForCN?.[parseInt(value, 10) - 1] ?? value
             evaNumberLi[i].setAttribute(state.dataNumberAttr, value)
           }
@@ -175,7 +175,7 @@ export class Pagination {
                 state.totalPageCount - (state.maxShowBtnCount - i) - 1,
               )
               // @ts-expect-error ignore
-              evaNumberLi[i].innerText =
+              evaNumberLi[i].textContent =
                 state.pageNumberForCN?.[parseInt(value, 10) - 1] ?? value
               evaNumberLi[i].setAttribute(state.dataNumberAttr, value)
             }

@@ -59,19 +59,19 @@ phaseLoop 无限推进玩家回合
 `apps/core/wtk/entry.ts` 导入核心单例：
 
 ```js
-import { lib, game, get, _status, ui, ai } from "wtk";
-import { boot } from "@/init/index.js";
+import { lib, game, get, _status, ui, ai } from "wtk"
+import { boot } from "@/init/index.js"
 ```
 
 `"wtk"` 对应 `apps/core/wtk.js`，该文件统一导出：
 
 ```js
-export { AI, ai, setAI } from "./wtk/ai/index.js";
-export { Game, game, setGame } from "./wtk/game/index.js";
-export { Get, get, setGet } from "./wtk/get/index.js";
-export { Library, lib, setLibrary } from "./wtk/library/index.js";
-export { status, _status, setStatus } from "./wtk/status/index.js";
-export { UI, ui, setUI } from "./wtk/ui/index.js";
+export { AI, ai, setAI } from "./wtk/ai/index.js"
+export { Game, game, setGame } from "./wtk/game/index.js"
+export { Get, get, setGet } from "./wtk/get/index.js"
+export { Library, lib, setLibrary } from "./wtk/library/index.js"
+export { status, _status, setStatus } from "./wtk/status/index.js"
+export { UI, ui, setUI } from "./wtk/ui/index.js"
 ```
 
 这些对象的职责大致是：
@@ -95,7 +95,7 @@ Electron -> init/node.js
 preload 完成后，处理 GPL 确认，然后调用：
 
 ```js
-await boot();
+await boot()
 ```
 
 ## boot 基础初始化
@@ -122,7 +122,7 @@ await boot();
 关键点：
 
 ```js
-_status.event = lib.element.GameEvent.initialGameEvent();
+_status.event = lib.element.GameEvent.initialGameEvent()
 ```
 
 这给事件系统一个初始状态。后续根事件 `game` 会接管真正的游戏流程。
@@ -171,9 +171,9 @@ importExtension(name)
 ```js
 const path = alreadyModernMode.includes(name)
   ? `/mode/${name}/index`
-  : `/mode/${name}`;
+  : `/mode/${name}`
 
-await importFunction("mode", path);
+await importFunction("mode", path)
 ```
 
 `importFunction()` 会：
@@ -188,7 +188,7 @@ await importFunction("mode", path);
 `game.import(type, content)` 负责把导入结果暂存到：
 
 ```js
-lib.imported[type][result.name] = result;
+lib.imported[type][result.name] = result
 ```
 
 例如：
@@ -221,8 +221,8 @@ importMode(result)
 模式加载到 `lib.imported.mode` 后，boot 会取出当前模式：
 
 ```js
-const currentMode = lib.imported.mode[lib.config.mode];
-loadMode(currentMode);
+const currentMode = lib.imported.mode[lib.config.mode]
+loadMode(currentMode)
 ```
 
 `loadMode()` 位于 `apps/core/wtk/init/loading.ts`。
@@ -230,11 +230,11 @@ loadMode(currentMode);
 它会把模式配置混入全局对象：
 
 ```js
-mixinLibrary(mode, lib);
-mixinGeneral(mode, "game", game);
-mixinGeneral(mode, "ui", ui);
-mixinGeneral(mode, "get", get);
-mixinGeneral(mode, "ai", ai);
+mixinLibrary(mode, lib)
+mixinGeneral(mode, "game", game)
+mixinGeneral(mode, "ui", ui)
+mixinGeneral(mode, "get", get)
+mixinGeneral(mode, "ai", ai)
 ```
 
 也就是说，模式可以提供：
@@ -251,8 +251,8 @@ mixinGeneral(mode, "ai", ai);
 随后 boot 保存：
 
 ```js
-lib.init.start = currentMode.start;
-lib.init.startBefore = currentMode.startBefore;
+lib.init.start = currentMode.start
+lib.init.startBefore = currentMode.startBefore
 ```
 
 ## 加载武将包、卡包、play、扩展
@@ -289,11 +289,11 @@ lib.skill
 
 ```js
 if (lib.init.startBefore) {
-  lib.init.startBefore();
-  delete lib.init.startBefore;
+  lib.init.startBefore()
+  delete lib.init.startBefore
 }
 
-ui.create.arena();
+ui.create.arena()
 ```
 
 `startBefore` 给模式一个在根事件创建前调整环境的机会。
@@ -305,7 +305,7 @@ ui.create.arena();
 启动流程真正进入事件系统的关键语句：
 
 ```js
-game.createEvent("game", false).setContent(lib.init.start);
+game.createEvent("game", false).setContent(lib.init.start)
 ```
 
 含义：
@@ -317,9 +317,9 @@ game.createEvent("game", false).setContent(lib.init.start);
 随后：
 
 ```js
-delete lib.init.start;
-await _status.onprepare;
-game.loop();
+delete lib.init.start
+await _status.onprepare
+game.loop()
 ```
 
 ## game.loop
@@ -424,7 +424,7 @@ game.finishCards()
 模式调用：
 
 ```js
-event.trigger("gameStart");
+event.trigger("gameStart")
 ```
 
 `GameEvent.trigger("gameStart")` 有额外逻辑：
@@ -443,7 +443,9 @@ game.showHistory()
 很多技能会监听：
 
 ```js
-trigger: { global: "gameStart" }
+trigger: {
+  global: "gameStart"
+}
 ```
 
 ## gameDraw
@@ -451,11 +453,11 @@ trigger: { global: "gameStart" }
 `game.gameDraw(player, num, targets)` 会创建 `gameDraw` 事件：
 
 ```js
-let next = game.createEvent("gameDraw");
-next.player = player;
-next.num = num;
-next.targets = targets;
-next.setContent("gameDraw");
+let next = game.createEvent("gameDraw")
+next.player = player
+next.num = num
+next.targets = targets
+next.setContent("gameDraw")
 ```
 
 `gameDraw` content 负责初始发牌：
@@ -522,7 +524,7 @@ return next;
 `phase` content 默认阶段列表：
 
 ```js
-[
+;[
   "phaseZhunbei",
   "phaseJudge",
   "phaseDraw",

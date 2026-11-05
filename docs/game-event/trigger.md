@@ -63,11 +63,11 @@ untrigger(all, player?)       // 取消触发（_triggered = 5 或 加入 _notri
 
 每项字段：
 
-| 字段 | 说明 |
-|------|------|
-| `player` | 角色实例，或 `"firstDo"` / `"lastDo"` 特殊标识 |
-| `todoList` | 待触发的技能条目，按 priority 降序 |
-| `doneList` | 已触发过的技能条目（防止重复） |
+| 字段       | 说明                                           |
+| ---------- | ---------------------------------------------- |
+| `player`   | 角色实例，或 `"firstDo"` / `"lastDo"` 特殊标识 |
+| `todoList` | 待触发的技能条目，按 priority 降序             |
+| `doneList` | 已触发过的技能条目（防止重复）                 |
 
 每个技能条目：`{ skill, player, priority, indexedData? }`
 

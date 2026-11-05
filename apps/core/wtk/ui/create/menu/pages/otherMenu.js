@@ -848,7 +848,7 @@ export const otherMenu = (/** @type { boolean | undefined } */ connectMenu) => {
 
       const button = document.createElement("button")
       button.classList.add("changeWebviewProvider")
-      button.innerText = "点击切换WebView实现"
+      button.textContent = "点击切换WebView实现"
       button.addEventListener("click", () => {
         if (
           typeof window.WTKAndroidBridge?.changeWebviewProvider === "function"

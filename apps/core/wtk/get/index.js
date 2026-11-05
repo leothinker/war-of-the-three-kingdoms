@@ -1896,7 +1896,7 @@ export class Get {
         poptip.createdCallback()
       })
 
-      const text = doc.body.textContent || doc.body.innerText
+      const text = doc.body.textContent || doc.body.textContent
       this.plainTextMap.set(htmlContent, text)
       return text
     }

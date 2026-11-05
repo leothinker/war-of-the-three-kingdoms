@@ -64,12 +64,12 @@ export default {
         node.classList?.remove("active")
       })
       target.classList.add("active")
-      this.tabName = target.innerText
+      this.tabName = target.textContent
       /**
        * @type { menuData }
        */
       // @ts-expect-error type transfer
-      const data = this.tabDataMap.get(target.innerText)
+      const data = this.tabDataMap.get(target.textContent)
       const leftPaneData = data?.initLeftPaneData?.(this.connectMenu)
       // @ts-expect-error type transfer
       this.leftPaneData = Array.isArray(leftPaneData) ? leftPaneData : []

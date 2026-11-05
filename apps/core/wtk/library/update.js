@@ -543,9 +543,9 @@ export function createProgress(title, max, fileName, value) {
   progress.setAttribute("value", value || "0")
   progress.setAttribute("max", max)
 
-  parent.getTitle = () => caption.innerText
+  parent.getTitle = () => caption.textContent
   parent.setTitle = (title) => (caption.innerHTML = title)
-  parent.getFileName = () => file.innerText
+  parent.getFileName = () => file.textContent
   parent.setFileName = (name) => (file.innerHTML = name)
   parent.getProgressValue = () => progress.value
   parent.setProgressValue = (value) =>

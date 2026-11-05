@@ -68,11 +68,11 @@ export const defaultTemplate = {
         node.classList?.remove("active")
       })
       target.classList.add("active")
-      this.tabName = target.innerText
+      this.tabName = target.textContent
       /**
        * @type { menuData }
        */
-      const data = this.tabDataMap.get(target.innerText)
+      const data = this.tabDataMap.get(target.textContent)
       const leftPaneData = data?.initLeftPaneData?.(this.connectMenu)
       this.leftPaneData = Array.isArray(leftPaneData) ? leftPaneData : []
       // 高亮默认元素

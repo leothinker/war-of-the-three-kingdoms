@@ -170,7 +170,7 @@ export class Card extends HTMLDivElement {
     this.nature = get.nature(natures)
     this.classList.add(nature)
     const str = `${get.translation(this.nature)}杀`
-    this.node.name.innerText = str
+    this.node.name.textContent = str
     const name = get.name(this, false)
     do {
       if (name === "sha") {
@@ -202,7 +202,7 @@ export class Card extends HTMLDivElement {
     }
     this.classList.remove(nature)
     const str = `${get.translation(this.nature)}杀`
-    this.node.name.innerText = str
+    this.node.name.textContent = str
     const name = get.name(this, false)
     do {
       if (name === "sha") {

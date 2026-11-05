@@ -1625,18 +1625,18 @@ export class Library {
           restart: true,
           onblur(e) {
             const text = e.target
-            const zoom = Number.parseInt(text.innerText, 10)
+            const zoom = Number.parseInt(text.textContent, 10)
             const originalValue = lib.config.ui_zoom
             const originalZoom = Number.parseInt(originalValue, 10)
 
             if (Number.isNaN(zoom)) {
               alert("请填写数值！")
-              text.innerText = originalValue
+              text.textContent = originalValue
               return
             }
             if (zoom < 50 || zoom > 300) {
               alert("请填入50~300以内的整数！")
-              text.innerText = originalValue
+              text.textContent = originalValue
               return
             }
 
@@ -1646,7 +1646,7 @@ export class Library {
               `确定要将界面缩放比例修改为 ${zoomText} 吗？`,
             )
             if (!confirmed) {
-              text.innerText = originalValue
+              text.textContent = originalValue
               return
             }
 
@@ -1662,7 +1662,7 @@ export class Library {
               }
             }
 
-            text.innerText = zoomText
+            text.textContent = zoomText
             applyZoom(zoom)
 
             const popupContainer = ui.create.div(".popup-container", ui.window)
@@ -1691,7 +1691,7 @@ export class Library {
               if (keep) {
                 game.saveConfig("ui_zoom", zoomText)
               } else {
-                text.innerText = originalValue
+                text.textContent = originalValue
                 applyZoom(originalZoom)
               }
             }
@@ -2772,13 +2772,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_zhu", num, "identity")
           },
         },
@@ -2830,13 +2830,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_zhong", num, "identity")
           },
         },
@@ -2853,13 +2853,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_fan", num, "identity")
           },
         },
@@ -2870,13 +2870,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_nei", num, "identity")
           },
         },
@@ -2905,13 +2905,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_commoner", num, "identity")
           },
         },
@@ -3496,13 +3496,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_zhu", num, "identity")
           },
         },
@@ -3550,13 +3550,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_zhong", num, "identity")
           },
         },
@@ -3567,13 +3567,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_nei", num, "identity")
           },
         },
@@ -3584,13 +3584,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_fan", num, "identity")
           },
         },
@@ -3609,13 +3609,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_commoner", num, "identity")
           },
         },
@@ -4872,13 +4872,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_zhu", num, "doudizhu")
           },
         },
@@ -4889,13 +4889,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("connect_choice_fan", num, "doudizhu")
           },
         },
@@ -5029,13 +5029,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_zhu", num, "doudizhu")
           },
         },
@@ -5046,13 +5046,13 @@ export class Library {
           restart: true,
           onblur(e) {
             let text = e.target,
-              num = Number(text.innerText)
+              num = Number(text.textContent)
             if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
-            text.innerText = num
+            text.textContent = num
             game.saveConfig("choice_fan", num, "doudizhu")
           },
         },

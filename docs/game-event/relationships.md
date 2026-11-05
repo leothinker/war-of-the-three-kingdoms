@@ -80,16 +80,16 @@ popStatusEvent()            // 事件出栈
 
 `next` 和 `after` 的区别：
 
-|  | next | after |
-|--|------|-------|
-| 执行时机 | 下一轮 loop 迭代 | 所有 trigger 完成后 |
+|          | next                        | after                         |
+| -------- | --------------------------- | ----------------------------- |
+| 执行时机 | 下一轮 loop 迭代            | 所有 trigger 完成后           |
 | 使用场景 | `game.createEvent` 默认挂载 | `event.insertAfter`、延迟回调 |
 
 ### insert / insertAfter
 
 ```js
-event.insert(content, { player: target });
-event.insertAfter(cleanupContent, { player: target });
+event.insert(content, { player: target })
+event.insertAfter(cleanupContent, { player: target })
 ```
 
 - `insert(content, map)`：创建非 trigger 事件 push 到 `next`

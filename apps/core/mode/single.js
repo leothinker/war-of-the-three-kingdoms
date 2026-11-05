@@ -2870,7 +2870,7 @@ export default {
             const evt = get.event()
             evt.result = { refresh: true }
             event.control.classList.add("disabled")
-            event.control.firstChild.innerText = "刷新(1/1)"
+            event.control.firstChild.textContent = "刷新(1/1)"
             game.resume()
           },
         ]
@@ -2879,7 +2879,7 @@ export default {
         )
         if (!event.refreshable) {
           event.control.classList.add("disabled")
-          event.control.firstChild.innerText = "刷新(1/1)"
+          event.control.firstChild.textContent = "刷新(1/1)"
         }
         let refreshed = false,
           result
