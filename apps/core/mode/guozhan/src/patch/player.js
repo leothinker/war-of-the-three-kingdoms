@@ -18,6 +18,23 @@ const hasGouniRelation = (player, target) => {
 }
 
 export class PlayerGuozhan extends lib.element.Player {
+  getName(forDialog = false) {
+    const seat = this.getSeatNum()
+    const slots = [this.name1, this.name2].map((name, index) => {
+      const hidden = _status.video
+        ? this.classList.contains(index ? "unseen2_v" : "unseen_v")
+        : this.isUnseen(index)
+      return hidden || !name ? "暗将" : get.translation(name)
+    })
+    const playername =
+      this._tempTranslate ||
+      `${seat > 0 ? get.seatTranslation(seat - 1) : "未知座位"}(${slots.join("/")})`
+    if (!forDialog) {
+      return playername
+    }
+    return `<span style="font-weight:560"><span data-nature=unknown><span style="letter-spacing:0.1em">${playername}</span></span><br/><span style="color:#FFD700">`
+  }
+
   /**
    * @type {string}
    */
@@ -306,6 +323,7 @@ export class PlayerGuozhan extends lib.element.Player {
    * @param { object } info
    */
   setModeState(info) {
+    this.seatNum = info.seatNum
     if (info.mode.unseen) {
       this.classList.add("unseen")
     }
@@ -323,9 +341,10 @@ export class PlayerGuozhan extends lib.element.Player {
     this.init(info.name1, info.name2, false)
     this.name1 = info.name1
     this.name = info.name
+    const seat = this.getSeatNum()
     this.node.name_seat = ui.create.div(
       ".name.name_seat",
-      get.verticalStr(lib.translate[this.name].slice(0, 3)),
+      seat > 0 ? get.seatTranslation(seat - 1) : "未知座位",
       this,
     )
     if (info.identityShown) {
