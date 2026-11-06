@@ -4,68 +4,60 @@ const characters = {
     sex: "male",
     group: "devil",
     hp: 3,
-    skills: ["kuxin", "sigu"],
+    skills: ["sxrmkuxin", "sxrmsigu"],
     groupInGuozhan: "wei",
   },
-  //嗔
-  sxrm_zhouyu: {
+  sxrm_xunyu: {
     sex: "male",
-    group: "devil",
-    hp: 4,
-    skills: ["sxrmjiehuo", "sxrmxianger", "sxrmmieguo"],
-    groupInGuozhan: "wu",
+    group: "wei",
+    hp: 3,
+    skills: ["sxrmhuice", "sxrmyihe", "sxrmjizhi"],
+    clans: ["颍川荀氏"],
   },
-  sxrm_sunshangxiang: {
+  sxrm_caopi: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["sxrmzhengsi", "sxrmchengming"],
+  },
+  sxrm_wanghou: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["sxrmjugu"],
+  },
+  sxrm_jianggan: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["sxrmzongheng", "sxrmduibian"],
+  },
+  sxrm_liubei: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["sxrmchengbian"],
+  },
+  sxrm_fuhuanghou: {
     sex: "female",
-    group: "wu",
+    group: "qun",
     hp: 3,
-    skills: ["sxrmjiaozong", "sxrmfusui"],
+    maxHp: 4,
+    skills: ["sxrmmitu", "sxrmqianliu"],
   },
-  sxrm_zhangzhao: {
+  sxrm_huatuo: {
     sex: "male",
-    group: "wu",
-    hp: 3,
-    skills: ["sxrmxiezhong", "sxrmqishi"],
-  },
-  sxrm_lusu: {
-    sex: "male",
-    group: "wu",
-    hp: 3,
-    skills: ["sxrmwanli", "sxrmlishui"],
-  },
-  sxrm_chen_caocao: {
-    sex: "male",
-    group: "wei",
+    group: "qun",
     hp: 4,
-    skills: ["sxrmlanjiao"],
+    skills: ["sxrmmiehai"],
   },
-  sxrm_zhugeliang: {
+  sxrm_lvboshe: {
     sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["sxrmbingqu", "sxrmfanxin"],
-    groupBorder: "shen",
-    names: "诸葛|亮",
-  },
-  sxrm_jiahua: {
-    sex: "male",
-    group: "wu",
-    hp: 5,
-    skills: ["sxrmfubei", "sxrmdancui"],
-  },
-  sxrm_zhaoyun: {
-    sex: "male",
-    group: "shu",
+    group: "qun",
     hp: 4,
-    skills: ["sxrmzhaduo"],
+    skills: ["sxrmqingjun"],
   },
-  sxrm_caoren: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["sxrmyangbei", "sxrmyinfeng"],
-  },
-  //慢
+  // 慢
   sxrm_guanyu: {
     sex: "male",
     group: "devil",
@@ -73,23 +65,29 @@ const characters = {
     skills: ["sxrmhanguo", "sxrmweiwo"],
     groupInGuozhan: "shu",
   },
+  sxrm_pangde: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["sxrmnuozhan"],
+  },
   sxrm_guanyinping: {
     sex: "female",
     group: "shu",
     hp: 4,
     skills: ["sxrmyinmou", "sxrmquchi"],
   },
-  sxrm_yujin: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["sxrmsuwu", "sxrmrenwang"],
-  },
   sxrm_mifang: {
     sex: "male",
     group: "shu",
     hp: 3,
     skills: ["sxrmhuoe", "sxrmtanduo"],
+  },
+  sxrm_yujin: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["sxrmsuwu", "sxrmrenwang"],
   },
   sxrm_liufeng: {
     sex: "male",
@@ -112,12 +110,6 @@ const characters = {
     maxHp: 4,
     skills: ["sxrmkongzhi", "sxrmbizha"],
   },
-  sxrm_pangde: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["sxrmnuozhan"],
-  },
   sxrm_yanwen: {
     sex: "male",
     group: "qun",
@@ -125,56 +117,64 @@ const characters = {
     skills: ["sxrmhaibian", "sxrmqiewang"],
     names: "颜|良-文|丑",
   },
-
-  sxrm_caopi: {
+  // 嗔
+  sxrm_zhouyu: {
     sex: "male",
-    group: "wei",
+    group: "devil",
+    hp: 4,
+    skills: ["sxrmjiehuo", "sxrmxianger", "sxrmmieguo"],
+    groupInGuozhan: "wu",
+  },
+  sxrm_zhugeliang: {
+    sex: "male",
+    group: "shu",
     hp: 3,
-    skills: ["sxrmzhengsi", "sxrmchengming"],
+    skills: ["sxrmbingqu", "sxrmfanxin"],
+    groupBorder: "shen",
+    names: "诸葛|亮",
+    clans: ["琅琊诸葛氏"],
   },
-  sxrm_wanghou: {
+  sxrm_chen_caocao: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["sxrmjugu"],
+    skills: ["sxrmlanjiao"],
   },
-  sxrm_liubei: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["sxrmchengbian"],
-  },
-  sxrm_jianggan: {
+  sxrm_caoren: {
     sex: "male",
     group: "wei",
+    hp: 4,
+    skills: ["sxrmyangbei", "sxrmyinfeng"],
+  },
+  sxrm_zhaoyun: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["sxrmzhaduo"],
+  },
+  sxrm_jiahua: {
+    sex: "male",
+    group: "wu",
+    hp: 5,
+    skills: ["sxrmfubei", "sxrmdancui"],
+  },
+  sxrm_lusu: {
+    sex: "male",
+    group: "wu",
     hp: 3,
-    skills: ["sxrmzongheng", "sxrmduibian"],
+    skills: ["sxrmwanli", "sxrmlishui"],
   },
-  sxrm_huatuo: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["sxrmmiehai"],
-  },
-  sxrm_lvboshe: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["sxrmqingjun"],
-  },
-  sxrm_fuhuanghou: {
+  sxrm_sunshangxiang: {
     sex: "female",
-    group: "qun",
+    group: "wu",
     hp: 3,
-    maxHp: 4,
-    skills: ["sxrmmitu", "sxrmqianliu"],
+    skills: ["sxrmjiaozong", "sxrmfusui"],
   },
-  sxrm_xunyu: {
+  sxrm_zhangzhao: {
     sex: "male",
-    group: "wei",
+    group: "wu",
     hp: 3,
-    skills: ["sxrmhuice", "sxrmyihe", "sxrmjizhi"],
-    clans: ["颍川荀氏"],
+    skills: ["sxrmxiezhong", "sxrmqishi"],
   },
 }
 

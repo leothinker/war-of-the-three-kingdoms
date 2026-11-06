@@ -1,8 +1,8 @@
 const voices = {
-  "#kuxin1": "万山终尽，万水终竭，万世青史，终付北邙！",
-  "#kuxin2": "念孤少时亦以壮心入世，而今空余此枯心。",
-  "#sigu1": "往昔逝者如斯，梦里纷至沓来！",
-  "#sigu2": "叹诸君先孤而死，然孤先诸君而凋。",
+  "#sxrmkuxin1": "万山终尽，万水终竭，万世青史，终付北邙！",
+  "#sxrmkuxin2": "念孤少时亦以壮心入世，而今空余此枯心。",
+  "#sxrmsigu1": "往昔逝者如斯，梦里纷至沓来！",
+  "#sxrmsigu2": "叹诸君先孤而死，然孤先诸君而凋。",
   "#zhichi_sxrm_caocao1": "昔孤以不疑待公台，故招无妄之祸。",
   "#olganglie_sxrm_caocao1": "元让若终无愧于孤，何需窃汉官之嫌？",
   "#refankui_sxrm_caocao1": "孤尝梦三马同槽而食之，仲达可解何意？",
@@ -18,20 +18,23 @@ const voices = {
   "#wuhun_sxrm_caocao1": "孤独不疑云长之忠义，只恨公忠不在孤！",
   "#sxrm_caocao:die": "孤尝疑有生之荣，未尝疑有死之哀……",
 
-  "#sxrmqingjun1": "小阿瞒，叔父今天定要好好招待你。",
-  "#sxrmqingjun2": "厨刀利、镬釜沸，烹猪宰羊，待老夫打酒而归！嘿嘿嘿！",
-  "#sxrm_lvboshe:die": "我未尽地主之谊，小阿瞒何故急行？啊！",
   "#sxrmchengbian1": "待吾腾于九天，必与公一争天下。",
   "#sxrmchengbian2": "备有不挠之志，岂甘为公所讥。",
   "#sxrm_liubei:die": "公早已知备，今又何故再疑。",
+
   "#sxrmmitu1": "宫闱密密谋，暗室窃窃语。",
   "#sxrmmitu2": "此贼如若不死，父亲如何执掌朝堂。",
   "#sxrmqianliu1": "汝可匿于朝堂，待时而起之。",
   "#sxrmqianliu2": "朝野暗流渐起，曹贼如何得脱？",
   "#sxrm_fuhuanghou:die": "曹贼疑心甚重…甚重……",
+
   "#sxrmmiehai1": "吾欲知天下之疾，当从权臣始。",
   "#sxrmmiehai2": "吾有一法，可绝丞相百般疾痛。",
   "#sxrm_huatuo:die": "疑患不除，汝无药可医。",
+
+  "#sxrmqingjun1": "小阿瞒，叔父今天定要好好招待你。",
+  "#sxrmqingjun2": "厨刀利、镬釜沸，烹猪宰羊，待老夫打酒而归！嘿嘿嘿！",
+  "#sxrm_lvboshe:die": "我未尽地主之谊，小阿瞒何故急行？啊！",
 
   "#jiehuo1": "红莲业火，焚汝残躯！",
   "#jiehuo2": "神火天降，樯橹灰飞烟灭！",

@@ -4,7 +4,7 @@ import { _status, game, get, lib } from "wtk"
 const skills = {
   // 族吴苋
   // 移荣
-  yirong: {
+  clanyirong: {
     audio: 2,
     enable: "phaseUse",
     usable: 2,
@@ -30,13 +30,16 @@ const skills = {
     check(card) {
       var player = _status.event.player
       if (
-        player.countCards("h", (card) => lib.skill.yirong.checkx(card) > 0) +
+        player.countCards(
+          "h",
+          (card) => lib.skill.clanyirong.checkx(card) > 0,
+        ) +
           1 <
         player.countCards("h") - player.getHandcardLimit()
       ) {
         return 0
       }
-      return lib.skill.yirong.checkx(card)
+      return lib.skill.clanyirong.checkx(card)
     },
     checkx(card) {
       var num = 1
@@ -51,9 +54,9 @@ const skills = {
         num2 = player.getHandcardLimit()
       var str = '<span class="text center">'
       if (num1 > num2) {
-        str += `弃置${get.cnNumber(num1 - num2)}张牌并令你手牌上限+1。`
+        str += `弃置${get.cnNumber(num1 - num2)}张牌，然后手牌上限+1。`
       } else {
-        str += `摸${get.cnNumber(num2 - num1)}张牌并令你手牌上限-1。`
+        str += `摸${get.cnNumber(num2 - num1)}张牌，然后手牌上限-1。`
       }
       str += `<br>※当前手牌上限：${num2}`
       var num3 = (_status.event.getParent().phaseIndex || 0) + 1
@@ -80,7 +83,7 @@ const skills = {
       order(item, player) {
         var num = player.getHandcardLimit(),
           numx = (_status.event.getParent().phaseIndex || 0) + 1
-        if (num === 5 && numx === 4 && player.getStat("skill").yirong) {
+        if (num === 5 && numx === 4 && player.getStat("skill").clanyirong) {
           return 0
         }
         if (
@@ -97,7 +100,7 @@ const skills = {
     },
   },
   // 贵相
-  guixiang: {
+  clanguixiang: {
     audio: 2,
     trigger: { player: "phaseChange" },
     forced: true,
@@ -115,9 +118,10 @@ const skills = {
     },
   },
   // 穆荫
-  muyin: {
+  clanmuyin: {
     audio: 2,
     clanSkill: true,
+    audioname: ["clan_wuxian"],
     trigger: { player: "phaseBegin" },
     isMax(player) {
       var num = player.getHandcardLimit()
@@ -129,19 +133,19 @@ const skills = {
       return game.hasPlayer(
         (current) =>
           (current === player || current.hasClan("陈留吴氏")) &&
-          !lib.skill.muyin.isMax(current),
+          !lib.skill.clanmuyin.isMax(current),
       )
     },
     direct: true,
     async content(event, trigger, player) {
       const result = await player
         .chooseTarget(
-          get.prompt("muyin"),
-          "令一名手牌上限不为全场最大的同族角色手牌上限+1",
+          get.prompt("clanmuyin"),
+          "令一名陈留吴氏角色的手牌上限+1",
           (card, player, current) => {
             return (
               (current === player || current.hasClan("陈留吴氏")) &&
-              !lib.skill.muyin.isMax(current)
+              !lib.skill.clanmuyin.isMax(current)
             )
           },
         )
@@ -152,7 +156,7 @@ const skills = {
 
       if (result.bool) {
         const target = result.targets[0]
-        player.logSkill("muyin", target)
+        player.logSkill("clanmuyin", target)
         lib.skill.chenliuwushi.change(target, 1)
         await game.delayx()
       }
