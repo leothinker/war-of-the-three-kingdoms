@@ -28,7 +28,7 @@ const cards = {
     },
   },
   // 蓄谋
-  xumou: {
+  xumou_jsrg: {
     type: "special_delay",
     allowDuplicate: true,
     blankCard: true,
@@ -36,26 +36,26 @@ const cards = {
     wuxieable: false,
     async effect(event, trigger, player) {
       const card = get.autoViewAs(event.cards[0])
-      card.storage.xumou = true
+      card.storage.xumou_jsrg = true
       const result = await player
         .chooseUseTarget(
           card,
           event.cards,
           `蓄谋:是否使用${get.translation(card)}？`,
-          `依次处理蓄谋牌：1.使用这张蓄谋牌；2.将你判定区内所有蓄谋牌置入弃牌堆。`,
+          `请选择要使用的目标。若不使用此牌，则判定区内的所有"蓄谋"牌都将被置入弃牌堆。`,
         )
         .forResult()
       if (!result.bool) {
         const cards = player.getCards(
           "j",
-          (card) => (card.viewAs || card.name) === "xumou",
+          (card) => (card.viewAs || card.name) === "xumou_jsrg",
         )
         if (cards.length > 0) {
           await player.loseToDiscardpile(cards)
         }
       } else {
-        player.addTempSkill("xumou_temp", "phaseChange")
-        player.markAuto("xumou_temp", [event.cards[0].name])
+        player.addTempSkill("xumou_jsrg_temp", "phaseChange")
+        player.markAuto("xumou_jsrg_temp", [event.cards[0].name])
       }
     },
   },

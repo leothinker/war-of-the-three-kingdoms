@@ -25,7 +25,7 @@ window.wtk_package = {
     // mouding: "谋定天下",
     clan: "门阀士族",
 
-    // bingshi: "兵势篇",
+    bingshi: "兵势篇",
 
     sxrm: "蚀心入魔",
 

@@ -1,19 +1,17 @@
 const characters = {
   // 起
-  jsrg_kongrong: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["jsrglirang", "zhengyi"],
-    dieAudios: ["kongrong"],
-  },
   jsrg_caocao: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["jsrgzhenglve", "jsrghuilie"],
   },
-
+  jsrg_sunjian: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["jsrgpingtao", "jsrgjuelie"],
+  },
   jsrg_liuhong: {
     sex: "male",
     group: "qun",
@@ -21,31 +19,24 @@ const characters = {
     skills: ["jsrgchaozheng", "jsrgshenchong", "jsrgjulian"],
     isZhugong: true,
   },
-  jsrg_wangyun: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["jsrgshelun", "jsrgfayi"],
-    clans: ["太原王氏"],
-  },
   jsrg_huangfusong: {
     sex: "male",
     group: "qun",
     hp: 4,
     names: "皇甫|嵩",
-    skills: ["jsrgguanhuo", "jsrg_new_juxia"],
+    skills: ["jsrgguanhuo", "jsrgjuxia"],
   },
   jsrg_qiaoxuan: {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["jsrg_new_juezhi", "jsrgjizhao"],
+    skills: ["jsrgjuezhi", "jsrgjizhao"],
   },
   jsrg_xushao: {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["sbyingmen", "sbpingjian"],
+    skills: ["jsrgyingmen", "jsrgpingjian"],
   },
   jsrg_hejin: {
     sex: "male",
@@ -57,8 +48,7 @@ const characters = {
     sex: "female",
     group: "qun",
     hp: 3,
-    skills: ["jsrgshichong", "jsrg_new_lianzhu"],
-    img: "image/character/dongbai.jpg",
+    skills: ["jsrgshichong", "jsrglianzhu"],
   },
   jsrg_nanhualaoxian: {
     sex: "male",
@@ -66,7 +56,6 @@ const characters = {
     hp: 3,
     names: "庄|周",
     skills: ["jsrgshoushu", "jsrgxundao", "jsrglinghua"],
-    img: "image/character/nanhualaoxian.jpg",
   },
   jsrg_yangbiao: {
     sex: "male",
@@ -74,9 +63,15 @@ const characters = {
     hp: 3,
     maxHp: 4,
     skills: ["jsrgzhaohan", "jsrgrangjie", "jsrgyizheng"],
-    img: "image/character/yangbiao.jpg",
     dieAudios: ["yangbiao"],
     clans: ["弘农杨氏"],
+  },
+  jsrg_kongrong: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["jsrglirang", "jsrgzhengyi"],
+    dieAudios: ["kongrong"],
   },
   ol_wangrong: {
     sex: "female",
@@ -88,7 +83,7 @@ const characters = {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["junklangmie"],
+    skills: ["langmie"],
   },
   jsrg_zhujun: {
     sex: "male",
@@ -100,9 +95,8 @@ const characters = {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["xinfu_limu", "jsrgtushe", "jsrgtongjue"],
+    skills: ["jsrglimu", "jsrgtushe", "jsrgtongjue"],
     isZhugong: true,
-    img: "image/character/liuyan.jpg",
     dieAudios: ["liuyan"],
   },
   jsrg_liubei: {
@@ -111,12 +105,14 @@ const characters = {
     hp: 4,
     skills: ["jsrgjishan", "jsrgzhenqiao"],
   },
-  jsrg_sunjian: {
+  jsrg_wangyun: {
     sex: "male",
     group: "qun",
-    hp: 4,
-    skills: ["jsrgpingtao", "jsrgjuelie"],
+    hp: 3,
+    skills: ["jsrgshelun", "jsrgfayi"],
+    clans: ["太原王氏"],
   },
+
   // 承
   jsrg_chendeng: {
     sex: "male",

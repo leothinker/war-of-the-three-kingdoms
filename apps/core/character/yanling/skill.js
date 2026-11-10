@@ -221,7 +221,7 @@ const skills = {
   // 蛊惑
   ylygguhuo: {
     audio: "reguhuo",
-    derivation: ["huinu"],
+    derivation: ["ylyghuinu"],
     getList(event, player) {
       return get.inpileVCardList((info) => {
         if (
@@ -295,7 +295,7 @@ const skills = {
             const enemyNum = game.countPlayer(
               (current) =>
                 current !== player &&
-                !current.hasSkill("huinu") &&
+                !current.hasSkill("ylyghuinu") &&
                 (get.realAttitude || get.attitude)(current, player) < 0,
             )
             const cardx = lib.skill.ylygguhuo_backup.viewAs
@@ -324,7 +324,7 @@ const skills = {
         }
       },
       prompt(links, player) {
-        return `扣置一张手牌，将此牌当${get.translation(links[0][3]) || ""}【${get.translation(links[0][2])}】使用`
+        return `扣置一张手牌当作${get.translation(links[0][3]) || ""}【${get.translation(links[0][2])}】使用`
       },
     },
     ai: {
@@ -390,7 +390,9 @@ const skills = {
           const targets = game.filterPlayer(
             (target) => target.countCards("h") > player.countCards("h"),
           )
-          const doubter = targets.filter((target) => target.hasSkill("huinu"))
+          const doubter = targets.filter((target) =>
+            target.hasSkill("ylyghuinu"),
+          )
           const acceptor = []
           game.broadcastAll(
             (card, player) => {
@@ -448,8 +450,8 @@ const skills = {
               )
               .set("ai", (button) => {
                 const player = _status.event.player
-                const evt = _status.event.getParent("ylygguhuo_guess"),
-                  evtx = evt.getTrigger()
+                const evt = _status.event.getParent("ylygguhuo_guess")
+                const evtx = evt.getTrigger()
                 if (!evt) {
                   return Math.random()
                 }
@@ -514,13 +516,17 @@ const skills = {
           }, event.onEnd01)
           await game.delay(2)
           if (isFake) {
-            if (targets.length) {
+            if (doubter.length) {
               doubter.forEach((target) => target.popup("质疑正确", "wood"))
               game.log(player, "声明的", trigger.card, "作废了")
               trigger.cancel()
               trigger.getParent().goto(0)
               trigger.line = false
-              const giver = acceptor
+              const giver = acceptor.concat(
+                game.filterPlayer(
+                  (target) => target !== player && !targets.includes(target),
+                ),
+              )
               if (giver.length) {
                 player.line(giver, "yellow")
                 await game.doAsyncInOrder(giver, async (target) =>
@@ -533,7 +539,7 @@ const skills = {
             player.line(doubter, "fire")
             await game.doAsyncInOrder(doubter, async (target) => {
               await target.loseHp()
-              await target.addSkills("huinu")
+              await target.addSkills("ylyghuinu")
             })
           }
           await game.delay(2)
@@ -552,8 +558,7 @@ const skills = {
     },
   },
   // 恚怒
-  huinu: {
-    audio: "chanyuan",
+  ylyghuinu: {
     locked: true,
     mark: true,
     intro: {

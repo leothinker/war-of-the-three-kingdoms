@@ -5432,7 +5432,7 @@ const skills = {
           const result = await target
             .chooseControl({
               prompt: "挟众：请选择一项",
-              choiceList: ["摸两张牌，失去1点体力", "将两张牌当【杀】使用"],
+              choiceList: ["摸两张牌并失去1点体力", "将两张牌当【杀】使用"],
               ai() {
                 const player = get.player()
                 if (player.hp <= 2) {
@@ -5475,7 +5475,7 @@ const skills = {
           }
           const next = target.chooseToUse()
           next.set("_backupevent", "sxrmxiezhong_backup")
-          next.set("openskilldialog", `###挟众###请将两张牌当【杀】使用`)
+          next.set("openskilldialog", `###挟众###请将两张牌当作【杀】使用`)
           next.backup("sxrmxiezhong_backup")
           next.set("norestore", true)
           next.set("custom", {
@@ -5496,12 +5496,11 @@ const skills = {
       const num = count1 > count2 ? 0 : 1
       const result = await player
         .chooseTarget({
-          prompt: `挟众：请选择另一名角色，令其执行两次“${num === 0 ? "摸两张牌，失去1点体力" : "将两张牌当【杀】使用"}”`,
+          prompt: `挟众：请选择一名角色，令其执行两次“${num === 0 ? "摸两张牌并失去1点体力" : "将两张牌当【杀】使用"}”`,
           filterTarget(card, player, target) {
             const { targets } = get.event()
             return !targets?.includes(target)
           },
-          forced: true,
           ai(target) {
             const player = get.player()
             const att = get.attitude(player, target)
@@ -5551,7 +5550,7 @@ const skills = {
           }
           const next = target.chooseToUse()
           next.set("_backupevent", "sxrmxiezhong_backup")
-          next.set("openskilldialog", `###挟众###请将两张牌当【杀】使用`)
+          next.set("openskilldialog", `###挟众###请将两张牌当作【杀】使用`)
           next.backup("sxrmxiezhong_backup")
           next.set("norestore", true)
           next.set("custom", {
@@ -5639,7 +5638,7 @@ const skills = {
       const result = await player
         .chooseButton({
           createDialog: [
-            `${!forced ? get.prompt2(event.skill) : "###乞施###<div class='text center'>获得本回合弃牌堆中其他角色置入的至多五张牌，然后你跳过下个摸牌阶段</div>"}`,
+            `${!forced ? get.prompt2(event.skill) : "###乞施###<div class='text center'>获得本回合其他角色进入弃牌堆的至多五张牌，然后你跳过下个摸牌阶段</div>"}`,
             cards,
           ],
           selectButton: [1, 5],

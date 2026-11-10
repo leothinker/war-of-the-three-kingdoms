@@ -20322,25 +20322,27 @@ export default {
           return num - 3
         }
         return num + 3
-      }
-      const player = _status.event.player
-      const zhu = get.zhu(player, "jiahe")
-      if (
-        player.hasCards("h", (card) => {
-          return (
-            get.type(card) === "equip" &&
-            get.subtype(card) === "sub" &&
-            player.hasValueTarget(card)
-          )
-        })
-      ) {
-        return num + 4
-      }
-      if (
-        zhu.getExpansions("yuanjiangfenghuotu").length >= 5 &&
-        !player.hasSkillTag("noe")
-      ) {
-        return num - 5
+        // biome-ignore lint/style/noUselessElse: <explanation>
+      } else {
+        const player = _status.event.player
+        const zhu = get.zhu(player, "jiahe")
+        if (
+          player.hasCards("h", (card) => {
+            return (
+              get.type(card) === "equip" &&
+              get.subtype(card) === "sub" &&
+              player.hasValueTarget(card)
+            )
+          })
+        ) {
+          return num + 4
+        }
+        if (
+          zhu.getExpansions("yuanjiangfenghuotu").length >= 5 &&
+          !player.hasSkillTag("noe")
+        ) {
+          return num - 5
+        }
       }
       return num
     },

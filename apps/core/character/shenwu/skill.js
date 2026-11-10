@@ -1181,16 +1181,24 @@ const skills = {
           let result
           while (targets.length) {
             const target = targets.shift()
+            if (!target.isIn()) {
+              continue
+            }
             event.target = target
 
             // step 0 -> await the choice
             result = await target
-              .chooseToDiscard("弃置一张牌或失去1点体力")
-              .set("ai", (card) => 9 - get.value(card))
+              .chooseToDiscard({
+                prompt: "弃置一张牌或失去1点体力",
+                ai: (card) => 9 - get.value(card),
+              })
               .forResult()
+            if (!target.isIn()) {
+              continue
+            }
 
             // step 1
-            if (!result.bool) {
+            if (!result?.bool) {
               await target.loseHp()
             }
 
@@ -1225,7 +1233,7 @@ const skills = {
     intro: {
       content(storage, player, skill) {
         var str =
-          "<li>锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。"
+          "<li>锁定技，你不能于〖蛊惑〗的结算流程中进行质疑。当你的体力值不大于1时，你的其他技能失效。"
         var list = player
           .getSkills(null, false, false)
           .filter((i) => lib.skill.rechanyuan.skillBlocker(i, player))

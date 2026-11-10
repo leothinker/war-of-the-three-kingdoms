@@ -945,7 +945,11 @@ const skills = {
     firstDo: true,
     charlotte: true,
     filter(event, player) {
-      return event.skill && event.skill.indexOf("reguhuo_") === 0
+      return (
+        event.skill &&
+        (event.skill.indexOf("guhuo_") === 0 ||
+          event.skill.indexOf("reguhuo_") === 0)
+      )
     },
     async content(event, trigger, player) {
       player.addTempSkill("reguhuo_phase")
@@ -1137,7 +1141,7 @@ const skills = {
     intro: {
       content(storage, player, skill) {
         let str =
-          "<li>锁定技，你不能质疑〖蛊惑〗；若你的体力值为1，你的其他技能失效。"
+          "<li>锁定技。你不能于〖蛊惑〗的结算流程中进行质疑。当你的体力值为1时，你的其他技能失效。"
         const list = player
           .getSkills(null, false, false)
           .filter((i) => lib.skill.chanyuan.skillBlocker(i, player))

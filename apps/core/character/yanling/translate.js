@@ -13,9 +13,9 @@ const translates = {
   ylyg_yuji: "界于吉",
   ylyg_yuji_prefix: "界",
   ylygguhuo: "蛊惑",
-  ylygguhuo_info: `每回合每种类别限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用，手牌数大于你的角色依次选择是否质疑，然后翻开此牌，若为：假，此牌作废且选择不质疑的角色各交给你一张手牌；真，选择质疑的角色各失去1点体力并获得${get.poptip("huinu")}。`,
-  huinu: "恚怒",
-  huinu_info: `锁定技，你必须质疑${get.poptip("ylygguhuo")}。`,
+  ylygguhuo_info: `每回合每种类别限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用，手牌数大于你的角色依次选择是否质疑，然后翻开此牌，若为：假，此牌作废且选择不质疑的角色各交给你一张手牌；真，选择质疑的角色各失去1点体力并获得${get.poptip("ylyghuinu")}。`,
+  ylyghuinu: "恚怒",
+  ylyghuinu_info: `锁定技，你必须质疑${get.poptip("ylygguhuo")}。`,
 
   ylyg_dianwei: "界典韦",
   ylyg_dianwei_prefix: "界",
